@@ -41,7 +41,7 @@ class Alloy_Kernel extends AppKernel_Main
 	 *
 	 * @param $className string Name of the class
 	 * @return object
-	 * @throws Cx_Exception_FileNotFound
+	 * @throws Alloy_Exception_FileNotFound
 	 */
 	public function module($module)
 	{
@@ -55,7 +55,7 @@ class Alloy_Kernel extends AppKernel_Main
 		// Load module file, call function on it
 		$loaded = $this->load($sModuleClass);
 		if(!$loaded) {
-			throw new Cx_Exception_FileNotFound("Module '" . $sModule . "' not found (class " . $sModuleClass . ")");
+			throw new Alloy_Exception_FileNotFound("Module '" . $sModule . "' not found (class " . $sModuleClass . ")");
 		}
 		
 		// Instantiate class and call method
@@ -65,10 +65,6 @@ class Alloy_Kernel extends AppKernel_Main
 		if(is_callable(array($sModuleObject, 'init'))) {
 			$sModuleObject->init();
 		}
-		
-		// @event
-		$this->trigger('cx_module', array($sModuleObject));
-		$this->trigger('cx_module_' . strtolower($module), array($sModuleObject));
 		
 		return $sModuleObject;
 	}
@@ -115,7 +111,7 @@ class Alloy_Kernel extends AppKernel_Main
 		
 		// Run module action
 		if(!is_callable(array($sModuleObject, $action))) {
-			throw new Cx_Exception_FileNotFound("Module '" . $module ."' does not have a callable method '" . $action . "'");
+			throw new Alloy_Exception_FileNotFound("Module '" . $module ."' does not have a callable method '" . $action . "'");
 		}
 		
 		// Handle result
@@ -127,10 +123,6 @@ class Alloy_Kernel extends AppKernel_Main
 		} else {
 			$result = call_user_func_array(array($sModuleObject, $action), $params);
 		}
-		
-		// @event
-		$this->trigger('cx_dispatch', array($sModuleObject, $action, $params, $result));
-		$this->trigger('cx_dispatch_' . strtolower($module), array($sModuleObject, $action, $params, $result));
 		
 		return $result;
 	}
@@ -172,7 +164,7 @@ class Alloy_Kernel extends AppKernel_Main
 	 */
 	public function resource($data)
 	{
-		return new Cx_Resource($data);
+		return new Alloy_Resource($data);
 	}
 	
 	
@@ -182,7 +174,7 @@ class Alloy_Kernel extends AppKernel_Main
 	public function session()
 	{
 		if(null === $this->session) {
-			$this->session = new Cx_Session();
+			$this->session = new Alloy_Session();
 		}
 		return $this->session;
 	}
@@ -194,7 +186,7 @@ class Alloy_Kernel extends AppKernel_Main
 	public function database($name = 'master')
 	{
 		if(!isset($this->database[$name])) {
-			$cfg = $this->config('cx.database.' . $name);
+			$cfg = $this->config('alloy.database.' . $name);
 			if($cfg) {
 				if($this->load('phpDataMapper_Adapter_Mysql')) {
 					$this->database[$name] = new phpDataMapper_Adapter_Mysql($cfg['host'], $cfg['dbname'], $cfg['username'], $cfg['password']);
@@ -260,9 +252,9 @@ class Alloy_Kernel extends AppKernel_Main
 	 * @return string
 	 */
 	public function url($routeName, array $params = array()) {
-		$urlBase = $this->config('cx.url');
+		$urlBase = $this->config('alloy.url');
 		// Use query string if URL rewriting is not enabled
-		if(!$this->config('cx.url_rewrite')) {
+		if(!$this->config('alloy.url_rewrite')) {
 			$urlBase .= "?r=";
 		}
 		$fullUrl = $urlBase . ltrim($this->router()->url($routeName, $params), '/');
