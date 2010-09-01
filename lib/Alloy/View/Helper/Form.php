@@ -28,7 +28,7 @@ class Alloy_View_Helper_Form extends Alloy_View_Helper
 		$type = (isset($inputTypeMap[$type]) ? $inputTypeMap[$type] : $type);
 		$extra['id'] = isset($extra['id']) ? $extra['id'] : trim($name);
 		$tag = '<input type="' . $type . '" name="' . $name . '" value="' . $value . '"' . $this->listExtra($extra) . ' />';
-		echo $tag;
+		return $tag;
 	}
 	
 	/**
@@ -36,7 +36,7 @@ class Alloy_View_Helper_Form extends Alloy_View_Helper
 	 */
 	public function text($name, $value='', $extra='')
 	{
-		$this->input('text', $name, $value, $extra);
+		return $this->input('text', $name, $value, $extra);
 	}
 	
 	
@@ -45,7 +45,7 @@ class Alloy_View_Helper_Form extends Alloy_View_Helper
 	 */
 	public function password($name, $value='', $extra='')
 	{
-		$this->input('password', $name, '', $extra);
+		return $this->input('password', $name, '', $extra);
 	}
 	
 	
@@ -55,7 +55,7 @@ class Alloy_View_Helper_Form extends Alloy_View_Helper
 	public function textarea($name, $value='', $extra='')
 	{
 		$tag = '<textarea name="' . $name . '"' . $this->listExtra($extra) . '>' . $value . '</textarea>';
-		echo $tag;
+		return $tag;
 	}
 	
 	
@@ -106,7 +106,7 @@ class Alloy_View_Helper_Form extends Alloy_View_Helper
 			$tag .= '<option value="' . $key . '"' . $selected . '>' . $val . '</option>' . "\n";
 		}
 		$tag .= '</select>';
-		echo $tag;
+		return $tag;
 	}
 	
 	
@@ -146,7 +146,7 @@ class Alloy_View_Helper_Form extends Alloy_View_Helper
 			// Print radio input
 			$tag .= '<input type="radio" name="' . $name . '" value="' . $key . '"' . $this->listExtra($extra) . '' . $selected . ' /><br />';
 		}
-		echo $tag;
+		return $tag;
 	}
 	*/
 	
@@ -160,7 +160,7 @@ class Alloy_View_Helper_Form extends Alloy_View_Helper
 			$extra['checked'] = "checked";
 		}
 		$value = isset($extra['value']) ? $extra['value'] : 1;
-		echo $this->input('checkbox', $name, $value, $extra);
+		return $this->input('checkbox', $name, $value, $extra);
 	}
 	
 	

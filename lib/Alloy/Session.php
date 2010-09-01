@@ -1,9 +1,15 @@
 <?php
+namespace Alloy;
+
 /**
  * Session Class
  * Handles and stores user session data
+ * 
+ * @package Alloy
+ * @link http://alloyframework.com/
+ * @license http://www.opensource.org/licenses/bsd-license.php
  */
-class Alloy_Session
+class Session
 {
 	/**
 	 * Constructor Fuction

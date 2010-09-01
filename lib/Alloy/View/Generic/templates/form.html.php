@@ -4,16 +4,6 @@ $formMethod = strtoupper(($this->method == 'GET' || $this->method == 'POST') ? $
 $formMethodRest = ($formMethod == 'POST' && $this->method != 'POST') ? $this->method : false;
 ?>
 
-<?php if($this->errors()): ?>
-<ul class="app_form_errors">
-<?php foreach($this->errors() as $field => $errors): ?>
-	<?php foreach($errors as $error): ?>
-		<li><?php echo $field; ?>: <?php echo $error; ?></li>
-	<?php endforeach; ?>
-<?php endforeach; ?>
-</ul>
-<?php endif; ?>
-
 <form action="<?php echo $this->action; ?>" method="post">
   <ol class="app_form">
   <?php if($this->fields && count($this->fields) >0): ?>
@@ -53,8 +43,12 @@ $formMethodRest = ($formMethod == 'POST' && $this->method != 'POST') ? $this->me
 		  echo $form->select($fieldName, $options, $this->data($fieldName));
 		break;
 		
+		case 'password':
+		  echo $form->input('password', $fieldName, $this->data($fieldName), array('size' => 25));
+		break;
+		
 		default:
-		  echo $form->input($fieldOpts['type'], $fieldName, $this->data($fieldName));
+		  echo $form->input($fieldType, $fieldName, $this->data($fieldName));
 	  }
 	  ?>
 	  </span>

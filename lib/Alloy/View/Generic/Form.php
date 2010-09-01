@@ -2,10 +2,10 @@
 /**
  * Generic Form View
  * 
- * @package Cont-xt
- * @link http://cont-xt.com/
+ * @package Alloy Framework
+ * @link http://alloyframework.com
  */
-class Cx_View_Generic_Form extends Cx_View
+class Alloy_View_Generic_Form extends Alloy_View
 {
 	protected $_fields = array();
 	protected $_fieldValues = array();

@@ -1,8 +1,14 @@
 <?php
+namespace Alloy;
+
 /**
- * View template class that will display and handle module views
+ * View template class that will display and handle view templates
+ *
+ * @package Alloy
+ * @link http://alloyframework.com/
+ * @license http://www.opensource.org/licenses/bsd-license.php
  */
-class Alloy_View
+class View
 {
 	// Template specific stuff
 	protected $_template;
@@ -40,6 +46,15 @@ class Alloy_View
 	 * Setup for view, used for extensibility without overriding constructor
 	 */
 	public function init() {}
+	
+	
+	/**
+	 * HTML Head helper object
+	 */
+	public function head()
+	{
+		return $this->helper('Head');
+	}
 	
 	
 	/**
@@ -124,7 +139,7 @@ class Alloy_View
 	 */
 	public function helper($name)
 	{
-		$helperClass = 'Cx_View_Helper_' . $name;
+		$helperClass = 'Alloy_View_Helper_' . $name;
 		
 		if(!isset(self::$_helpers[$helperClass])) {
 			self::$_helpers[$helperClass] = new $helperClass($this);

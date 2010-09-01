@@ -1,12 +1,15 @@
 <?php
+namespace Alloy\Module;
+
 /**
  * Base application module controller
  * Used as a base module class other modules must extend from
  *
- * @package Alloy Framework
- * @link http://alloyframework.com
+ * @package Alloy
+ * @link http://alloyframework.com/
+ * @license http://www.opensource.org/licenses/bsd-license.php
  */
-abstract class Alloy_Module_Controller
+abstract class Controller
 {
 	protected $kernel;
 	protected $_file = __FILE__;
@@ -15,7 +18,7 @@ abstract class Alloy_Module_Controller
 	/**
 	 * Kernel to handle dependenies
 	 */
-	public function __construct(Cx_Kernel $kernel)
+	public function __construct(\Alloy\Kernel $kernel)
 	{
 		$this->kernel = $kernel;
 	}
@@ -55,25 +58,9 @@ abstract class Alloy_Module_Controller
 	 */
 	public function view($template, $format = "html")
 	{
-		$view = new Cx_View($template, $format, $this->path() . "/views/");
+		$view = new Alloy_View($template, $format, $this->path() . "/views/");
 		$view->format($this->kernel->request()->format);
 		$view->set('kernel', $this->kernel);
 		return $view;
-	}
-	
-	
-	/**
-	 * Get mapper object to work with
-	 * 
-	 * @param string $mapperName Name of the mapper object to load (by convention)
-	 */
-	public function mapper($mapperName = null)
-	{
-		// Append given name, if any
-		if(null === $mapperName) {
-			$mapperName = 'Module_' . $this->name();
-		}
-		
-		return $this->kernel->mapper($mapperName);
 	}
 }

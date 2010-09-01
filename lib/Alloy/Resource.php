@@ -49,10 +49,48 @@ class Alloy_Resource
 	
 	
 	/**
+	 * Convert resource to native array type so we can have our way with it
+	 *
+	 * @return array
+	 * @throws Alloy_Exception
+	 */
+	public function toArray()
+	{
+		if(is_array($this->_resource)) {
+			return $this->_resource;
+
+		// String
+		} elseif(is_string($this->_resource)) {
+			// JSON decode
+			if($json = json_decode($this->_resource)) {
+				return $json;
+			// Unserialize
+			} elseif($data = unserialize($this->_resource)) {
+				return $data;
+			}
+		
+		// Object
+		} elseif(is_object($this->_resource)) {
+			// Call 'toArray' on object
+			if(method_exists($this->_resource, 'toArray')) {
+				return $this->_resource->toArray();
+			}
+		}
+		throw new Alloy_Exception("Resource (" . gettype($this->_resource) . ") could not be converted to array");
+	}
+	
+	/**
 	 * Return string content of resource
+	 *
+	 * @return string
 	 */
 	public function __toString()
 	{
-		return json_encode($this->_resource);
+		// Return unchanged if string
+		if(is_string($this->_resource)) {
+			return $this->_resource;
+		}
+		// Else return JSON encoded data
+		return json_encode($this->toArray());
 	}
 }
