@@ -1,17 +1,17 @@
 <?php
+namespace Alloy\Shipping;
+
 /**
  * UPS Rate Quote
- * $Id$
  * 
  * UPS Developer Documentation
  * @link http://inchoo.net/wp-content/uploads/2008/10/ratesandservicehtml.pdf
  * 
- * @package Alloy Framework
- * @link http://alloyframework.com
+ * @package Alloy
+ * @link http://alloyframework.com/
+ * @license http://www.opensource.org/licenses/bsd-license.php
  */
-require_once('Interface.php');
-require_once(dirname(__FILE__) . '/../Package.php');
-class Alloy_Shipping_Quote_UPS implements Alloy_Shipping_Quote_Interface
+class Quote_UPS implements Quote_AdapterInterface
 {
 	protected $fields = array();
 	protected $responseCode;

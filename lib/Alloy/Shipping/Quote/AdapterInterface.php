@@ -1,11 +1,14 @@
 <?php
+namespace Alloy\Shipping;
+
 /**
  * Shipping Rate Quote Interface
  * 
- * @package Alloy Framework
- * @link http://alloyframework.com
+ * @package Alloy
+ * @link http://alloyframework.com/
+ * @license http://www.opensource.org/licenses/bsd-license.php
  */
-interface Alloy_Shipping_Quote_Interface
+interface Quote_AdapterInterface
 {
 	// Add package to current calculation total
 	public function addPackage(Back40_Shipping_Package $package);

@@ -1,11 +1,14 @@
 <?php
+namespace Alloy\Payment;
+
 /**
  * Interface for processing payments online
  *
- * @package Alloy Framework
- * @link http://alloyframework.com
+ * @package Alloy
+ * @link http://alloyframework.com/
+ * @license http://www.opensource.org/licenses/bsd-license.php
  */
-interface Alloy_Payment_Interface
+interface AdapterInterface
 {
 	/**
 	 *	Set merchant account information

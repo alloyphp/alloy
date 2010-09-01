@@ -1,13 +1,16 @@
 <?php
+namespace Alloy\Shipping;
+
 /**
  * Shipping Package
  *
  * Holds package details for more presice calculations when adapters can support it
  * 
- * @package Alloy Framework
- * @link http://alloyframework.com
+ * @package Alloy
+ * @link http://alloyframework.com/
+ * @license http://www.opensource.org/licenses/bsd-license.php
  */
-class Alloy_Shipping_Package
+class Package
 {
 	// Weight
 	protected $weight;

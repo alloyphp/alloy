@@ -1,11 +1,14 @@
 <?php
+namespace Alloy\Payment;
+
 /**
  * PayPal Pro Payment Processing Class
  *
- * @package Alloy Framework
- * @link http://alloyframework.com
+ * @package Alloy
+ * @link http://alloyframework.com/
+ * @license http://www.opensource.org/licenses/bsd-license.php
  */
-class Alloy_Payment_PayPalPro implements Alloy_Payment_Interface
+class PayPalPro implements AdapterInterface
 {
 	protected $fields = array();
 	protected $responseString;
