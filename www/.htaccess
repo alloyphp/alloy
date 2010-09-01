@@ -5,8 +5,8 @@
 	RewriteCond %{REQUEST_FILENAME} !-f
 	# Prevent common static files from being loaded as pages
 	RewriteCond %{REQUEST_URI} !.*\.(ico|txt|css|jpg|jpeg|png|gif|bmp|zip|js|pdf)$
-	RewriteRule ^(.*)$ index.php?r=$1 [L,QSA]
+	RewriteRule ^(.*)$ index.php?u=$1 [L,QSA]
 </IfModule>
 
-ErrorDocument 404 /index.php?r=error/404
-ErrorDocument 500 /index.php?r=error/500
+ErrorDocument 404 /index.php?u=error/404
+ErrorDocument 500 /index.php?u=error/500

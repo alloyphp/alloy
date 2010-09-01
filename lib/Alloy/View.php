@@ -254,12 +254,12 @@ class View
 		
 		// Empty template name
 		if(empty($vpath)) {
-			throw new RuntimeException("Base template path is not set!  Use '\$view->path('/path/to/template')' to set root path to template files!");
+			throw new \RuntimeException("Base template path is not set!  Use '\$view->path('/path/to/template')' to set root path to template files!");
 		}
 		
 		// Ensure template file exists
 		if(!file_exists($vfile)) {
-			throw new RuntimeException("The template file '" . $template . "' does not exist.<br />Path: " . $vpath);
+			throw new \RuntimeException("The template file '" . $template . "' does not exist.<br />Path: " . $vpath);
 		}
 		
 		// Include() and parse PHP code
@@ -288,9 +288,9 @@ class View
 		// We have to catch any that may be thrown and return a string
 		try {
 			$content = $this->content();
-		} catch(Cx_Exception_View $e) {
+		} catch(Alloy\Exception_View $e) {
 			$content = $e->getError();
-		} catch(Exception $e) {
+		} catch(\Exception $e) {
 			$content = "<strong>TEMPLATE RENDERING ERROR:</strong><br />" . $e->getMessage();
 		}
 		return $content;

@@ -10,6 +10,7 @@ namespace Alloy;
  * 	- Extendable to create new functionality at runtime
  *
  * @package Alloy
+ * @link http://alloyframework.com/
  * @license http://www.opensource.org/licenses/bsd-license.php
  */
 class Kernel
@@ -58,16 +59,13 @@ class Kernel
 	
 	
 	/**
-	 * Constructor
+	 * Protected constructor to enforce singleton pattern
 	 *
 	 * @param array $config Array of configuration settings to store. Passed array will be stored as a static variable and automatically merged with previous stored settings
 	 */
-	public function __construct(array $config = array())
+	protected function __construct(array $config = array())
 	{
 		$this->config($config);
-		
-		// Add path to find own files in
-		$this->addLoadPath(dirname(dirname(__FILE__)) . '/', 'AppKernel_');
 		
 		// Save memory starting point
 		self::$traceMemoryStart = memory_get_usage();
@@ -138,11 +136,6 @@ class Kernel
 			return $this->instances[$className];
 		}
 		
-		// Ensure it was loaded
-		if(!$this->load($className)) {
-			throw new InvalidArgumentException("Unable to load requested class '" . $className . "'");
-		}
-		
 		// Return new class instance
 		if(count($args) == 0) {
 			$instance = new $className();
@@ -204,6 +197,9 @@ class Kernel
 	 */
 	public function load($className, $paths = array())
 	{
+	    var_dump($className);
+	    exit(__FILE__);
+	    
 		// Ensure class is not already loaded
 		if(class_exists($className, false)) {
 			return true;
@@ -304,7 +300,7 @@ class Kernel
 	 */
 	public function router()
 	{
-		return $this->factory('Router');
+		return $this->factory(__NAMESPACE__ . '\Router');
 	}
 	
 	
@@ -313,7 +309,7 @@ class Kernel
 	 */
 	public function request()
 	{
-		return $this->factory('Request');
+		return $this->factory(__NAMESPACE__ . '\Request');
 	}
 	
 	
@@ -322,7 +318,7 @@ class Kernel
 	 */
 	public function client()
 	{
-		return $this->factory('Client');
+		return $this->factory(__NAMESPACE__ . '\Client');
 	}
 	
 	
@@ -333,11 +329,29 @@ class Kernel
 	 */
 	public function response($statusCode = null)
 	{
-		$response = $this->factory('Response');
+		$response = $this->factory(__NAMESPACE__ . '\Response');
 		if(is_numeric($statusCode)) {
 			$response->status($statusCode);
 		}
 		return $response;
+	}
+	
+	
+	/**
+	 * Return a resource object to work with
+	 */
+	public function resource($data)
+	{
+		return new Resource($data);
+	}
+	
+	
+	/**
+	 * Return a session object to work with
+	 */
+	public function session()
+	{
+		return $this->factory(__NAMESPACE__ . '\Session');
 	}
 	
 	
@@ -446,16 +460,7 @@ class Kernel
 		
 		// Upper-case beginning of each word
 		$sModule = str_replace(' ', '_', ucwords(str_replace('_', ' ', $sModule)));
-		$sModuleClass = 'Module_' . $sModule . '_Controller';
-		
-		// Replace underscores with folder slashes
-		$sModule = str_replace('_', '/', $sModule);
-		
-		// Load module file
-		$loaded = $this->load($sModuleClass);
-		if(!$loaded) {
-			throw new Alloy_Exception_FileNotFound("Module '" . $sModule . "' not found (class " . $sModuleClass . ")");
-		}
+		$sModuleClass = 'Module\\' . $sModule . '\Controller';
 		
 		// Instantiate module class
 		$sModuleObject = new $sModuleClass($this);
@@ -520,7 +525,7 @@ class Kernel
 	public function dispatch($module, $action = 'index', array $params = array())
 	{
 		try {
-			if($module instanceof Alloy_Module_Controller) {
+			if($module instanceof \Alloy\Module\ControllerAbstract) {
 				// Use current module instance
 				$sModuleObject = $module;
 			} else {
@@ -586,24 +591,6 @@ class Kernel
 		
 		
 		return $this->dispatch($module, $action, $params);
-	}
-	
-	
-	/**
-	 * Return a resource object to work with
-	 */
-	public function resource($data)
-	{
-		return new Resource($data);
-	}
-	
-	
-	/**
-	 * Return a session object to work with
-	 */
-	public function session()
-	{
-		return $this->factory('Session');
 	}
 	
 	

@@ -9,7 +9,7 @@ namespace Alloy\Module;
  * @link http://alloyframework.com/
  * @license http://www.opensource.org/licenses/bsd-license.php
  */
-abstract class Controller
+abstract class ControllerAbstract
 {
 	protected $kernel;
 	protected $_file = __FILE__;
@@ -31,11 +31,13 @@ abstract class Controller
 	
 	
 	/**
-	 * Return current class path, based on given '$file' class var
+	 * Return current class path
 	 */
 	public function path()
 	{
-		return dirname($this->_file);
+	    $class = get_called_class();
+	    $path = str_replace('\\', '/', str_replace('\\Controller', '', $class));
+		return $this->kernel->config('path.app') . '/' . $path;
 	}
 	
 	
@@ -45,8 +47,8 @@ abstract class Controller
 	 */
 	public function name()
 	{
-		$name = str_replace("_Controller", "", get_class($this));
-		return str_replace("Module_", "", $name);
+		$name = str_replace("\\Controller", "", get_class($this));
+		return str_replace("Module\\", "", $name);
 	}
 	
 	
@@ -58,7 +60,7 @@ abstract class Controller
 	 */
 	public function view($template, $format = "html")
 	{
-		$view = new Alloy_View($template, $format, $this->path() . "/views/");
+		$view = new \Alloy\View($template, $format, $this->path() . "/views/");
 		$view->format($this->kernel->request()->format);
 		$view->set('kernel', $this->kernel);
 		return $view;
