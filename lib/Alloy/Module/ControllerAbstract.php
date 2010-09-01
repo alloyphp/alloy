@@ -55,12 +55,13 @@ abstract class ControllerAbstract
 	/**
 	 * New module view template
 	 *
-	 * @param string $template Template name/path
+	 * @param string $file Template filename
 	 * @param string $format Template output format
 	 */
-	public function view($template, $format = "html")
+	public function view($file, $format = null)
 	{
-		$view = new \Alloy\View($template, $format, $this->path() . "/views/");
+	    $format = ($format) ?: $this->kernel->request()->format;
+		$view = new \Alloy\View\Template($file, $format, $this->path() . "/views/");
 		$view->format($this->kernel->request()->format);
 		$view->set('kernel', $this->kernel);
 		return $view;

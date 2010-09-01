@@ -1,5 +1,5 @@
 <?php
-namespace Alloy;
+namespace Alloy\View;
 
 /**
  * View template class that will display and handle view templates
@@ -8,11 +8,11 @@ namespace Alloy;
  * @link http://alloyframework.com/
  * @license http://www.opensource.org/licenses/bsd-license.php
  */
-class View
+class Template
 {
 	// Template specific stuff
-	protected $_template;
-	protected $_templateFormat;
+	protected $_file;
+	protected $_fileFormat;
 	protected $_vars;
 	protected $_path;
 	
@@ -30,12 +30,12 @@ class View
 	/**
 	 *	Constructor function
 	 *
-	 * @param $template string	Template file name to use
+	 * @param $file string	Template filename to use
 	 * @param $module string	Module template file resides in
 	 */
-	public function __construct($template, $format = 'html', $path = null)
+	public function __construct($file, $format = 'html', $path = null)
 	{
-		$this->template($template, $format);
+		$this->file($file, $format);
 		$this->path($path);
 		
 		$this->init();
@@ -139,7 +139,7 @@ class View
 	 */
 	public function helper($name)
 	{
-		$helperClass = 'Alloy_View_Helper_' . $name;
+		$helperClass = 'Alloy\View\Helper_' . $name;
 		
 		if(!isset(self::$_helpers[$helperClass])) {
 			self::$_helpers[$helperClass] = new $helperClass($this);
@@ -167,13 +167,13 @@ class View
 	 *
 	 * @return string
 	 */
-	public function template($view = null, $format = null)
+	public function file($view = null, $format = null)
 	{
 		if(null === $view) {
-			return $this->_template;
+			return $this->_file;
 		} else {
-			$this->_template = $view;
-			$this->_templateFormat = ($format) ? $format : $this->_default_extenstion;
+			$this->_file = $view;
+			$this->_fileFormat = ($format) ? $format : $this->_default_extenstion;
 			return $this; // Fluent interface
 		}
 	}
@@ -185,10 +185,10 @@ class View
 	 * @param OPTIONAL $template string (Name of the template to return full file format)
 	 * @return string
 	 */
-	public function templateFilename($template = null)
+	public function filePath($template = null)
 	{
 		if(null === $template) {
-			$template = $this->template();
+			$template = $this->file();
 		}
 		return $template . '.' . $this->format() . '.' . $this->_default_extenstion;
 	}
@@ -204,9 +204,9 @@ class View
 	public function format($format = null)
 	{
 		if(null === $format) {
-			return $this->_templateFormat;
+			return $this->_fileFormat;
 		} else {
-			$this->_templateFormat = $format;
+			$this->_fileFormat = $format;
 			return $this; // Fluent interface
 		}
 	}
@@ -249,7 +249,7 @@ class View
 	public function content($parsePHP = true)
 	{
 		$vpath = $this->path();
-		$template = $this->templateFilename();
+		$template = $this->filePath();
 		$vfile = $vpath . $template;
 		
 		// Empty template name

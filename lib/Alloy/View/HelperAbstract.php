@@ -1,15 +1,18 @@
 <?php
+namespace Alloy\View;
+
 /**
  * Base View Helper
  * 
- * @package Alloy Framework
- * @link http://alloyframework.com
+ * @package Alloy
+ * @license http://www.opensource.org/licenses/bsd-license.php
+ * @link http://alloyframework.com/
  */
-abstract class Alloy_View_Helper
+abstract class HelperAbstract
 {
 	protected $_view;
 	
-	public function __construct(Alloy_View $view)
+	public function __construct(\Alloy\View\Template $view)
 	{
 		$this->_view = $view;
 		$this->init();

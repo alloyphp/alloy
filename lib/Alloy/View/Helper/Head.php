@@ -1,13 +1,16 @@
 <?php
+namespace Alloy\View;
+
 /**
  * HTML Head Helper
  * Collects HTML elements that need to be added within the <head></head> tags of an HTML document
  * Used so any view can add items to the final HTML layout that gets produced
  * 
- * @package Alloy Framework
- * @link http://alloyframework.com
+ * @package Alloy
+ * @license http://www.opensource.org/licenses/bsd-license.php
+ * @link http://alloyframework.com/
  */
-class Alloy_View_Helper_Head extends Alloy_View_Helper
+class Helper_Head extends HelperAbstract
 {
 	protected $_assetHelper;
 	protected $_styles = array();
@@ -30,8 +33,7 @@ class Alloy_View_Helper_Head extends Alloy_View_Helper
 	 */
 	public function stylesheet()
 	{
-		$args = func_get_args();
-		$this->_styles[] = call_user_func_array(array($this->_assetHelper, __FUNCTION__), $args);
+		$this->_styles[] = call_user_func_array(array($this->_assetHelper, __FUNCTION__), func_get_args());
 	}
 	
 	
@@ -40,8 +42,7 @@ class Alloy_View_Helper_Head extends Alloy_View_Helper
 	 */
 	public function script()
 	{
-		$args = func_get_args();
-		$this->_scripts[] = call_user_func_array(array($this->_assetHelper, __FUNCTION__), $args);
+		$this->_scripts[] = call_user_func_array(array($this->_assetHelper, __FUNCTION__), func_get_args());
 	}
 	
 	

@@ -1,11 +1,14 @@
 <?php
+namespace Alloy\View\Generic;
+
 /**
  * Generic Form View
  * 
- * @package Alloy Framework
- * @link http://alloyframework.com
+ * @package Alloy
+ * @license http://www.opensource.org/licenses/bsd-license.php
+ * @link http://alloyframework.com/
  */
-class Alloy_View_Generic_Form extends Alloy_View
+class Form extends \Alloy\View\Template
 {
 	protected $_fields = array();
 	protected $_fieldValues = array();
@@ -18,7 +21,7 @@ class Alloy_View_Generic_Form extends Alloy_View
 	public function init()
 	{
 		// Use local path by default
-		$this->path(dirname(__FILE__) . '/templates/');
+		$this->path(__DIR__ . '/templates/');
 	}
 	
 	

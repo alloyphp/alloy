@@ -1,12 +1,15 @@
 <?php
+namespace Alloy\View;
+
 /**
  * Form Helper
  * Functions useful for building HTML forms with less code
  * 
- * @package Alloy Framework
- * @link http://alloyframework.com
+ * @package Alloy
+ * @license http://www.opensource.org/licenses/bsd-license.php
+ * @link http://alloyframework.com/
  */
-class Alloy_View_Helper_Form extends Alloy_View_Helper
+class Helper_Form extends HelperAbstract
 {
 	/**
 	 *	Form input element
