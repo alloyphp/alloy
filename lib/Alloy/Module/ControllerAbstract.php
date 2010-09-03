@@ -58,7 +58,7 @@ abstract class ControllerAbstract
 	 * @param string $file Template filename
 	 * @param string $format Template output format
 	 */
-	public function view($file, $format = null)
+	public function template($file, $format = null)
 	{
 	    $format = ($format) ?: $this->kernel->request()->format;
 		$view = new \Alloy\View\Template($file, $format, $this->path() . "/views/");
