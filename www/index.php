@@ -4,15 +4,15 @@ error_reporting(-1);
 ini_set('display_errors', 'On');
 
 // PHP version must be 5.3 or greater
-if(version_compare(phpversion(), "5.3.0", "<")) {
-	throw new \RuntimeException("PHP version must be 5.3.0 or greater to run Alloy Framework.<br />\nCurrent PHP version: " . phpversion());
+if(version_compare(phpversion(), "5.3.2", "<")) {
+	throw new \RuntimeException("PHP version must be 5.3.2 or greater to run Alloy Framework.<br />\nCurrent PHP version: " . phpversion());
 }
 
 
 /**
  * Configuration settings
  */
-$cfg = require(dirname(dirname(__FILE__)) . '/app/config/app.php');
+$cfg = require(dirname(__DIR__) . '/app/config/app.php');
 
 // Host-based config file for overriding default settings in different environments
 $cfgHost = array();

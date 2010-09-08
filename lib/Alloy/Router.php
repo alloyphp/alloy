@@ -52,7 +52,7 @@ class Router
 	public function match($method, $url)
 	{
 		if(count($this->routes()) == 0) {
-			throw new OutOfBoundsException("There must be at least one route defined to match for.");
+			throw new \OutOfBoundsException("There must be at least one route defined to match for.");
 		}
 		
 		// Clean up URL for matching
@@ -121,7 +121,7 @@ class Router
 				// Combine params
 				if(count($namedParamsMatched) != count($matches)) {
 					// Route has inequal matches to named params
-					throw new Exception("Error matching URL to route params: matched(" . count($matches) . ") != named(" . count($namedParamsMatched) . ")");
+					throw new \Exception("Error matching URL to route params: matched(" . count($matches) . ") != named(" . count($namedParamsMatched) . ")");
 				}
 				$params = array_combine(array_keys($namedParamsMatched), $matches);
 				
@@ -146,7 +146,7 @@ class Router
 		if($this->_matchedRouteName) {
 			return $this->_routes[$this->_matchedRouteName];
 		} else {
-			throw new Exception("Unable to return last route matched - No route has been matched yet.");
+			throw new \Exception("Unable to return last route matched - No route has been matched yet.");
 		}
 	}
 	
@@ -162,7 +162,7 @@ class Router
 	public function url($routeName, array $params = array())
 	{
 		if(!isset($this->_routes[$routeName])) {
-			throw new UnexpectedValueException("Error creating URL: Route name '" . $routeName . "' not found in defined routes.");
+			throw new \UnexpectedValueException("Error creating URL: Route name '" . $routeName . "' not found in defined routes.");
 		}
 		
 		$routeUrl = "";
@@ -193,7 +193,7 @@ class Router
 				$routeParams[$key] = $optionalParams[$key]['routeSegment'];
 			// Required/standard param
 			} elseif(isset($routeParams[$key])) {
-				$matchedParams[$key] = $value;
+				$matchedParams[$key] = \urlencode($value);
 			}
 		}
 		
@@ -201,13 +201,13 @@ class Router
 		
 		// Ensure all params have been matched, exception if not
 		if(count(array_diff_key($matchedParams, $routeParams)) > 0) {
-			throw new UnexpectedValueException("Error creating URL: Route '" . $routeName . "' has parameters that have not been matched.");
+			throw new \UnexpectedValueException("Error creating URL: Route '" . $routeName . "' has parameters that have not been matched.");
 		}
 		
 		// Fill in values and put URL together
 		foreach($routeParams as $paramName => $paramPlaceholder) {
 			if(!isset($matchedParams[$paramName])) {
-				throw new UnexpectedValueException("Error creating URL for route '" . $routeName . "': Required route parameter '" . $paramName . "' has not been supplied.");
+				throw new \UnexpectedValueException("Error creating URL for route '" . $routeName . "': Required route parameter '" . $paramName . "' has not been supplied.");
 			}
 			$routeUrl = str_replace($paramPlaceholder, $matchedParams[$paramName], $routeUrl);
 		}

@@ -23,7 +23,7 @@ $cfg['path']['themes'] = $cfg['path']['root'] . $cfg['dir']['themes'];
 
 // URLs
 $cfg['url']['request'] = (isset($_GET['url']) ? urldecode($_GET['url']) : '' );
-$cfg['url']['root'] = 'http' . (($cfg['env']['https']) ? 's' : '' ) . '://' . $_SERVER['HTTP_HOST'] . '/' . str_replace('\\', '/', substr($cfg['path']['root'] . $cfg['dir']['www'], strlen($_SERVER['DOCUMENT_ROOT'])+1));
+$cfg['url']['root'] = 'http' . (($cfg['env']['https']) ? 's' : '' ) . '://' . (isset($_SERVER['HTTP_HOST']) ? $_SERVER['HTTP_HOST'] : 'localhost') . '/' . str_replace('\\', '/', substr($cfg['path']['root'] . $cfg['dir']['www'], strlen($_SERVER['DOCUMENT_ROOT'])+1));
 $cfg['url']['themes'] = $cfg['url']['root'] . str_replace($cfg['dir']['www'], '', $cfg['dir']['themes']);
 $cfg['url']['assets'] = $cfg['url']['root'] . str_replace($cfg['dir']['www'], '', $cfg['dir']['assets']);
 $cfg['url']['assets_admin'] = $cfg['url']['root'] . str_replace($cfg['dir']['www'], '', $cfg['dir']['assets_admin']);
