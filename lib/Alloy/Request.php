@@ -20,11 +20,7 @@ class Request
 	/**
 	 * Constructor Function
 	 */
-	public function __construct($url = null)
-	{
-		// Clean up magic quotes mess
-		$this->fixMagicQuotes();
-	}
+	public function __construct($url = null) {}
 	
 	
 	/**
@@ -465,9 +461,9 @@ class Request
 	
 	
 	/**
-	 *	Apply a user-defined function to all request parameters
+	 * Apply a user-defined function to all request parameters
 	 *
-	 *	@string $function user-defined function
+	 * @string $function user-defined function
 	 */
 	public function map($function)
 	{
@@ -488,13 +484,21 @@ class Request
 	
 	
 	/**
-	 * Cleans arrays ruined by MagicQuotes=On.
-	 */
-	protected function fixMagicQuotes()
+	* Parse query string into key/value associative array
+	*   Input: ?foo=bar&bar=baz
+	*   Output: array('foo' => 'bar', 'bar' => 'baz')
+	*/
+	public function queryStringToArray($qs)
 	{
-		if (get_magic_quotes_gpc()) {
-			$this->map('stripslashes');
+		$qs = html_entity_decode($qs);
+		$qs = explode('&', $qs);
+		$arr = array();
+		
+		foreach($qs as $val) {
+			$x = explode('=', $val);
+			$arr[$x[0]] = isset($x[1]) ? $x[1] : null;
 		}
-		return true;
+		unset($val, $x, $qs);
+		return $arr;
 	}
 }

@@ -24,15 +24,37 @@ try {
 	$router = $kernel->router();
 	require $kernel->config('path.config') . '/routes.php';
 	
-	// Router - Match HTTP request and return named params
+	// Handle both HTTP and CLI requests
 	$request = $kernel->request();
-	$requestUrl = isset($_GET['u']) ? $_GET['u'] : '/';
+	if($request->isCli()) {
+		// CLI request
+		$cliArgs = getopt("u:");
+		
+		$requestUrl = isset($cliArgs['u']) ? $cliArgs['u'] : '/';
+		$qs = parse_url($requestUrl, PHP_URL_QUERY);
+		$cliRequestParams = $request->queryStringToArray($qs);
+		
+		// Set parsed query params back on request object
+		$request->setParams($cliRequestParams);
+		
+		// Set requestUrl and remove query string if present so router can parse it as expected
+		if($qsPos = strpos($requestUrl, '?')) {
+			$requestUrl = substr($requestUrl, 0, $qsPos);
+		}
+		
+	} else {
+		// HTTP request
+		$requestUrl = isset($_GET['u']) ? $_GET['u'] : '/';
+	}
+	
+	// Router - Match HTTP request and return named params
 	$requestMethod = $request->method();
 	// Emulate REST for browsers
 	if($request->isPost() && $request->post('_method')) {
 		$requestMethod = $request->post('_method');
 	}
 	$params = $router->match($requestMethod, $requestUrl);
+	
 	// Set matched params back on request object
 	$request->setParams($params);
 	$request->route = $router->matchedRoute()->name();
