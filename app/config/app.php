@@ -12,19 +12,18 @@ $cfg['dir']['assets'] = $cfg['dir']['www'] . 'assets/';
 $cfg['dir']['assets_admin'] = $cfg['dir']['assets'] . 'admin/';
 $cfg['dir']['lib'] = '/lib/';
 $cfg['dir']['modules'] = $cfg['dir']['app'];
-$cfg['dir']['themes'] = $cfg['dir']['www'] . 'themes/';
+$cfg['dir']['layouts'] = $cfg['dir']['app'] . 'layouts/';
 
 $cfg['path']['app'] = dirname(__DIR__);
 $cfg['path']['config'] = __DIR__;
 $cfg['path']['lib'] = $cfg['path']['root'] . $cfg['dir']['lib'];
 $cfg['path']['modules'] = $cfg['path']['root'] . $cfg['dir']['modules'];
 $cfg['path']['public'] = $cfg['path']['root'] . $cfg['dir']['www'];
-$cfg['path']['themes'] = $cfg['path']['root'] . $cfg['dir']['themes'];
+$cfg['path']['layouts'] = $cfg['path']['root'] . $cfg['dir']['layouts'];
 
 // URLs
 $cfg['url']['request'] = (isset($_GET['url']) ? urldecode($_GET['url']) : '' );
 $cfg['url']['root'] = 'http' . (($cfg['env']['https']) ? 's' : '' ) . '://' . (isset($_SERVER['HTTP_HOST']) ? $_SERVER['HTTP_HOST'] : 'localhost') . '/' . str_replace('\\', '/', substr($cfg['path']['root'] . $cfg['dir']['www'], strlen($_SERVER['DOCUMENT_ROOT'])+1));
-$cfg['url']['themes'] = $cfg['url']['root'] . str_replace($cfg['dir']['www'], '', $cfg['dir']['themes']);
 $cfg['url']['assets'] = $cfg['url']['root'] . str_replace($cfg['dir']['www'], '', $cfg['dir']['assets']);
 $cfg['url']['assets_admin'] = $cfg['url']['root'] . str_replace($cfg['dir']['www'], '', $cfg['dir']['assets_admin']);
 

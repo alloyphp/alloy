@@ -16,8 +16,8 @@ class Helper_Asset extends HelperAbstract
 	 */
 	public function stylesheet($file, $media = 'screen', $extra = '')
 	{
-		if(strpos($file, '://') === false) {
-			$file = Alloy()->config('url.assets') . 'styles/' . $file;
+		if(false === strpos($file, '://')) {
+			$file = \Alloy()->config('url.assets') . 'styles/' . $file;
 		}
 		$tag = '<link type="text/css" href="' . $file . '" media="' . $media . '" rel="stylesheet"' . $this->listExtra($extra) . ' />';
 		return $tag;
@@ -29,8 +29,8 @@ class Helper_Asset extends HelperAbstract
 	 */
 	public function script($file, $extra = '')
 	{
-		if(strpos($file, '://') === false) {
-			$file = Alloy()->config('url.assets') . 'scripts/' . $file;
+		if(false === strpos($file, '://')) {
+			$file = \Alloy()->config('url.assets') . 'scripts/' . $file;
 		}
 		$tag = '<script type="text/javascript" src="' . $file . '"' . $this->listExtra($extra) . '></script>';
 		return $tag;
@@ -42,8 +42,8 @@ class Helper_Asset extends HelperAbstract
 	 */
 	public function image($file, $alt = '', $extra = '')
 	{
-		if(strpos($file, '://') === false) {
-			$file = Alloy()->config('url.assets') . 'images/' . $file;
+		if(false === strpos($file, '://')) {
+			$file = \Alloy()->config('url.assets') . 'images/' . $file;
 		}
 		$tag = '<img src="' . $file . '" alt="' . $alt . '"' . $this->listExtra($extra) . ' />';
 		return $tag;
