@@ -36,8 +36,7 @@ $cfg['debug'] = false;
 // In Development Mode?
 $cfg['mode']['development'] = true;
 
-
-// Database - Param names to match Zend_Config
+// Database (Optional - only used if module loads a mapper)
 $cfg['database']['master']['adapter'] = 'mysql';
 $cfg['database']['master']['host'] = 'localhost';
 $cfg['database']['master']['username'] = 'root';
