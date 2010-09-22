@@ -36,14 +36,6 @@ $cfg['debug'] = false;
 // In Development Mode?
 $cfg['mode']['development'] = true;
 
-// Error Reporting
-$cfg['errors']['display'] = true;
-
-// Defaults
-$cfg['default']['module'] = 'page';
-$cfg['default']['action'] = 'index';
-$cfg['default']['theme'] = 'default';
-$cfg['default']['theme_template'] = 'index';
 
 // Database - Param names to match Zend_Config
 $cfg['database']['master']['adapter'] = 'mysql';
