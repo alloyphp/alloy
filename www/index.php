@@ -69,7 +69,7 @@ try {
 		$action = $params['action'];
 		
 		// Run/execute
-		$content = $kernel->dispatchRequest($request, $module, $action, array($request));
+		$content = $kernel->dispatchRequest($module, $action);
 	} else {
 		$content = false;
 	}

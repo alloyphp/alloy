@@ -1,106 +1,114 @@
 <?php
 namespace Alloy;
 
+/*
+ * This file was taken from the Symfony2 package (awesome code FTW).
+ *
+ * (c) Fabien Potencier <fabien.potencier@symfony-project.com>
+ *
+ * For the full copyright and license information, please view the LICENSE
+ * file that was distributed with this source code.
+ */
+
 /**
- * SplClassLoader implementation that implements the technical interoperability
- * standards for PHP 5.3 namespaces and class names.
+ * UniversalClassLoader implements a "universal" autoloader for PHP 5.3.
  *
- * http://groups.google.com/group/php-standards/web/final-proposal
+ * It is able to load classes that use either:
  *
- *     // Example which loads classes for the Doctrine Common package in the
- *     // Doctrine\Common namespace.
- *     $classLoader = new SplClassLoader('Doctrine\Common', '/path/to/doctrine');
- *     $classLoader->register();
+ *  * The technical interoperability standards for PHP 5.3 namespaces and
+ *    class names (http://groups.google.com/group/php-standards/web/psr-0-final-proposal);
  *
- * @author Jonathan H. Wage <jonwage@gmail.com>
- * @author Roman S. Borschel <roman@code-factory.org>
- * @author Matthew Weier O'Phinney <matthew@zend.com>
- * @author Kris Wallsmith <kris.wallsmith@gmail.com>
- * @author Fabien Potencier <fabien.potencier@symfony-project.org>
- * 
- * @link http://gist.github.com/221634
+ *  * The PEAR naming convention for classes (http://pear.php.net/).
+ *
+ * Classes from a sub-namespace or a sub-hierarchy of PEAR classes can be
+ * looked for in a list of locations to ease the vendoring of a sub-set of
+ * classes for large projects.
+ *
+ * Example usage:
+ *
+ *     $loader = new UniversalClassLoader();
+ *
+ *     // register classes with namespaces
+ *     $loader->registerNamespaces(array(
+ *       'Symfony\Component' => __DIR__.'/component',
+ *       'Symfony' => __DIR__.'/framework',
+ *     ));
+ *
+ *     // register a library using the PEAR naming convention
+ *     $loader->registerPrefixes(array(
+ *       'Swift_' => __DIR__.'/Swift',
+ *     ));
+ *
+ *     // activate the autoloader
+ *     $loader->register();
+ *
+ * In this example, if you try to use a class in the Symfony\Component
+ * namespace or one of its children (Symfony\Component\Console for instance),
+ * the autoloader will first look for the class under the component/
+ * directory, and it will then fallback to the framework/ directory if not
+ * found before giving up.
+ *
+ * @author     Fabien Potencier <fabien.potencier@symfony-project.org>
  */
 class ClassLoader
 {
-    private $_fileExtension = '.php';
-    private $_namespace;
-    private $_includePath;
-    private $_namespaceSeparator = '\\';
+    protected $namespaces = array();
+    protected $prefixes = array();
 
-    /**
-     * Creates a new <tt>SplClassLoader</tt> that loads classes of the
-     * specified namespace.
-     * 
-     * @param string $ns The namespace to use.
-     */
-    public function __construct($ns = null, $includePath = null)
+    public function getNamespaces()
     {
-        $this->_namespace = $ns;
-        $this->_includePath = $includePath;
+        return $this->namespaces;
+    }
+
+    public function getPrefixes()
+    {
+        return $this->prefixes;
     }
 
     /**
-     * Sets the namespace separator used by classes in the namespace of this class loader.
-     * 
-     * @param string $sep The separator to use.
-     */
-    public function setNamespaceSeparator($sep)
-    {
-        $this->_namespaceSeparator = $sep;
-    }
-
-    /**
-     * Gets the namespace seperator used by classes in the namespace of this class loader.
+     * Registers an array of namespaces
      *
-     * @return void
+     * @param array $namespaces An array of namespaces (namespaces as keys and locations as values)
      */
-    public function getNamespaceSeparator()
+    public function registerNamespaces(array $namespaces)
     {
-        return $this->_namespaceSeparator;
+        $this->namespaces = array_merge($this->namespaces, $namespaces);
     }
 
     /**
-     * Sets the base include path for all class files in the namespace of this class loader.
-     * 
-     * @param string $includePath
-     */
-    public function setIncludePath($includePath)
-    {
-        $this->_includePath = $includePath;
-    }
-
-    /**
-     * Gets the base include path for all class files in the namespace of this class loader.
+     * Registers a namespace.
      *
-     * @return string $includePath
+     * @param string $namespace The namespace
+     * @param string $path      The location of the namespace
      */
-    public function getIncludePath()
+    public function registerNamespace($namespace, $path)
     {
-        return $this->_includePath;
+        $this->namespaces[$namespace] = $path;
     }
 
     /**
-     * Sets the file extension of class files in the namespace of this class loader.
-     * 
-     * @param string $fileExtension
-     */
-    public function setFileExtension($fileExtension)
-    {
-        $this->_fileExtension = $fileExtension;
-    }
-
-    /**
-     * Gets the file extension of class files in the namespace of this class loader.
+     * Registers an array of classes using the PEAR naming convention.
      *
-     * @return string $fileExtension
+     * @param array $classes An array of classes (prefixes as keys and locations as values)
      */
-    public function getFileExtension()
+    public function registerPrefixes(array $classes)
     {
-        return $this->_fileExtension;
+        $this->prefixes = array_merge($this->prefixes, $classes);
     }
 
     /**
-     * Installs this class loader on the SPL autoload stack.
+     * Registers a set of classes using the PEAR naming convention.
+     *
+     * @param string $prefix The classes prefix
+     * @param string $path   The location of the classes
+     */
+    public function registerPrefix($prefix, $path)
+    {
+        $this->prefixes[$prefix] = $path;
+    }
+
+    /**
+     * Registers this instance as an autoloader.
      */
     public function register()
     {
@@ -108,32 +116,38 @@ class ClassLoader
     }
 
     /**
-     * Uninstalls this class loader from the SPL autoloader stack.
-     */
-    public function unregister()
-    {
-        spl_autoload_unregister(array($this, 'loadClass'));
-    }
-
-    /**
      * Loads the given class or interface.
      *
-     * @param string $className The name of the class to load.
-     * @return void
+     * @param string $class The name of the class
      */
-    public function loadClass($className)
+    public function loadClass($class)
     {
-        if (null === $this->_namespace || $this->_namespace.$this->_namespaceSeparator === substr($className, 0, strlen($this->_namespace.$this->_namespaceSeparator))) {
-            $fileName = '';
-            $namespace = '';
-            if (false !== ($lastNsPos = strripos($className, $this->_namespaceSeparator))) {
-                $namespace = substr($className, 0, $lastNsPos);
-                $className = substr($className, $lastNsPos + 1);
-                $fileName = str_replace($this->_namespaceSeparator, DIRECTORY_SEPARATOR, $namespace) . DIRECTORY_SEPARATOR;
-            }
-            $fileName .= str_replace('_', DIRECTORY_SEPARATOR, $className) . $this->_fileExtension;
+        if (false !== ($pos = strripos($class, '\\'))) {
+            // namespaced class name
+            $namespace = substr($class, 0, $pos);
+            foreach ($this->namespaces as $ns => $dir) {
+                if (0 === strpos($namespace, $ns)) {
+                    $class = substr($class, $pos + 1);
+                    $file = $dir.DIRECTORY_SEPARATOR.str_replace('\\', DIRECTORY_SEPARATOR, $namespace).DIRECTORY_SEPARATOR.str_replace('_', DIRECTORY_SEPARATOR, $class).'.php';
+                    if (file_exists($file)) {
+                        require $file;
+                    }
 
-            require ($this->_includePath !== null ? $this->_includePath . DIRECTORY_SEPARATOR : '') . $fileName;
+                    return;
+                }
+            }
+        } else {
+            // PEAR-like class name
+            foreach ($this->prefixes as $prefix => $dir) {
+                if (0 === strpos($class, $prefix)) {
+                    $file = $dir.DIRECTORY_SEPARATOR.str_replace('_', DIRECTORY_SEPARATOR, $class).'.php';
+                    if (file_exists($file)) {
+                        require $file;
+                    }
+
+                    return;
+                }
+            }
         }
     }
 }

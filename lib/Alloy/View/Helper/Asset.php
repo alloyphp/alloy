@@ -19,7 +19,7 @@ class Helper_Asset extends HelperAbstract
 		if(false === strpos($file, '://')) {
 			$file = \Alloy()->config('url.assets') . 'styles/' . $file;
 		}
-		$tag = '<link type="text/css" href="' . $file . '" media="' . $media . '" rel="stylesheet"' . $this->listExtra($extra) . ' />';
+		$tag = '<link type="text/css" href="' . $file . '" media="' . $media . '" rel="stylesheet"' . $this->listExtra($extra) . ' />' . PHP_EOL;
 		return $tag;
 	}
 	
@@ -32,7 +32,7 @@ class Helper_Asset extends HelperAbstract
 		if(false === strpos($file, '://')) {
 			$file = \Alloy()->config('url.assets') . 'scripts/' . $file;
 		}
-		$tag = '<script type="text/javascript" src="' . $file . '"' . $this->listExtra($extra) . '></script>';
+		$tag = '<script type="text/javascript" src="' . $file . '"' . $this->listExtra($extra) . '></script>' . PHP_EOL;
 		return $tag;
 	}
 	
@@ -45,7 +45,7 @@ class Helper_Asset extends HelperAbstract
 		if(false === strpos($file, '://')) {
 			$file = \Alloy()->config('url.assets') . 'images/' . $file;
 		}
-		$tag = '<img src="' . $file . '" alt="' . $alt . '"' . $this->listExtra($extra) . ' />';
+		$tag = '<img src="' . $file . '" alt="' . $alt . '"' . $this->listExtra($extra) . ' />' . PHP_EOL;
 		return $tag;
 	}
 	

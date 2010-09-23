@@ -451,7 +451,7 @@ class Kernel
 	 *
 	 * @param string $className Name of the class
 	 * @return object
-	 * @throws Alloy_Exception_FileNotFound
+	 * @throws \Alloy\Exception_FileNotFound
 	 */
 	public function module($module, $init = true)
 	{
@@ -524,39 +524,31 @@ class Kernel
 	 */
 	public function dispatch($module, $action = 'index', array $params = array())
 	{
-		try {
-			if($module instanceof \Alloy\Module\ControllerAbstract) {
-				// Use current module instance
-				$sModuleObject = $module;
-			} else {
-				// Get module instance
-				$sModuleObject = $this->module($module);
-			}
-			
-			// Module action callable (includes __call magic function if method missing)?
-			if(!is_callable(array($sModuleObject, $action))) {
-				throw new Alloy_Exception_FileNotFound("Module '" . $module ."' does not have a callable method '" . $action . "'");
-			}
+		if($module instanceof \Alloy\Module\ControllerAbstract) {
+			// Use current module instance
+			$sModuleObject = $module;
+		} else {
+			// Get module instance
+			$sModuleObject = $this->module($module);
+		}
 		
-			// Handle result
-			$paramCount = count($params);
-			if($paramCount == 0) {
-				$result = $sModuleObject->$action();
-			} elseif($paramCount == 1) {
-				$result = $sModuleObject->$action(current($params));
-			} elseif($paramCount == 2) {
-				$result = $sModuleObject->$action($params[0], $params[1]);
-			} elseif($paramCount == 3) {
-				$result = $sModuleObject->$action($params[0], $params[1], $params[2]);
-			} else {
-				$result = call_user_func_array(array($sModuleObject, $action), $params);
-			}
-		
-		// Database table/datasource missing - attempt to autoinstall
-		// @todo Move this elsewhere - it probably does not belong here 
-		} catch(Spot_Exception_Datasource_Missing $e) {
-			$module = $this->module($module, false); // Don't run init function for install
-			$result = $this->dispatch($module, 'install', array($action, $params));
+		// Module action callable (includes __call magic function if method missing)?
+		if(!is_callable(array($sModuleObject, $action))) {
+			throw new \Alloy\Exception_FileNotFound("Module '" . $module ."' does not have a callable method '" . $action . "'");
+		}
+	
+		// Handle result
+		$paramCount = count($params);
+		if($paramCount == 0) {
+			$result = $sModuleObject->$action();
+		} elseif($paramCount == 1) {
+			$result = $sModuleObject->$action(current($params));
+		} elseif($paramCount == 2) {
+			$result = $sModuleObject->$action($params[0], $params[1]);
+		} elseif($paramCount == 3) {
+			$result = $sModuleObject->$action($params[0], $params[1], $params[2]);
+		} else {
+			$result = call_user_func_array(array($sModuleObject, $action), $params);
 		}
 		
 		return $result;
@@ -567,15 +559,15 @@ class Kernel
 	 * Dispatch module action from HTTP request
 	 * Automatically limits call scope by appending 'Action' or 'Method' to module actions
 	 *
-	 * @param AppKernel_Request $request
 	 * @param string $moduleName Name of module to be called
 	 * @param optional string $action function name to call on module
 	 * @param optional array $params parameters to pass to module function
 	 *
 	 * @return mixed String or object that has __toString method
 	 */
-	public function dispatchRequest($request, $module, $action = 'indexAction', array $params = array())
+	public function dispatchRequest($module, $action = 'indexAction', array $params = array())
 	{
+	    $request = $this->request();
 		$requestMethod = $request->method();
 		// Emulate REST for browsers
 		if($request->isPost() && $request->post('_method')) {
@@ -589,7 +581,10 @@ class Kernel
 			$action = $action . (false === strpos($action, 'Action') ? 'Action' : ''); // Append with 'Action' to limit scope of available functions from HTTP request
 		}
 		
+		// Prepend request object as first parameter
+		array_unshift($params, $request);
 		
+		// Run normal dispatch
 		return $this->dispatch($module, $action, $params);
 	}
 	

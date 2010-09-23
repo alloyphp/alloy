@@ -50,14 +50,22 @@ try {
      * Class autoloaders - uses PHP 5.3 SplClassLoader
      */
     require $kernel->config('path.lib') . '/Alloy/ClassLoader.php';
+    $loader = new \Alloy\ClassLoader();
 
-    // Autoload: Alloy lib
-    $alloyLoader = new \Alloy\ClassLoader('Alloy', $kernel->config('path.lib'));
-    $alloyLoader->register();
+    // Register classes with namespaces
+    $loader->registerNamespaces(array(
+        'Alloy' => $kernel->config('path.lib'),
+        'Module' => $kernel->config('path.app'),
+    ));
 
-    // Autoload: Modules in app
-    $moduleLoader = new \Alloy\ClassLoader('Module', $kernel->config('path.app'));
-    $moduleLoader->register();
+    // Register a library using the PEAR naming convention
+    $loader->registerPrefixes(array(
+        'Spot_' => $kernel->config('path.lib'),
+    ));
+
+    // Activate the autoloader
+    $loader->register();
+    
     
     // Debug?
 	if($kernel->config('debug')) {
@@ -79,8 +87,8 @@ try {
 
 
 /**
- * Get and return instance of Alloy Kernel
- * Checks if 'Alloy' function already exists (so it can be overridden/customized if needed)
+ * Get and return instance of AppKernel
+ * Checks if 'Alloy' function already exists so it can be overridden/customized
  */
 if(!function_exists('Alloy')) {
 	function Alloy(array $config = array()) {
