@@ -10,11 +10,13 @@ namespace Alloy\View;
  */
 abstract class HelperAbstract
 {
+    protected $kernel;
 	protected $_view;
 	
-	public function __construct(\Alloy\View\Template $view)
+	public function __construct(\Alloy\Kernel $kernel, \Alloy\View\Template $view)
 	{
-		$this->_view = $view;
+		$this->kernel = $kernel;
+        $this->_view = $view;
 		$this->init();
 	}
 	

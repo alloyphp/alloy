@@ -60,10 +60,6 @@ try {
 	$request->route = $router->matchedRoute()->name();
 	
 	// Required params
-	$module = $params['module'];
-	$action = $params['action'];
-	
-	// Required params
 	if(isset($params['module']) && isset($params['action'])) {
 		$module = $params['module'];
 		$action = $params['action'];
@@ -186,9 +182,9 @@ if($kernel) {
 		
 		// Executed queries
 		echo "<hr />";
-		echo "<h1>Executed Queries (" . Spot_Log::queryCount() . ")</h1>";
+		echo "<h1>Executed Queries (" . \Spot\Log::queryCount() . ")</h1>";
 		echo "<pre>";
-		print_r(Spot_Log::queries());
+		print_r(\Spot\Log::queries());
 		echo "</pre>";
 	}
 	

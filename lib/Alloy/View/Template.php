@@ -142,7 +142,7 @@ class Template
 		$helperClass = 'Alloy\View\Helper_' . $name;
 		
 		if(!isset(self::$_helpers[$helperClass])) {
-			self::$_helpers[$helperClass] = new $helperClass($this);
+			self::$_helpers[$helperClass] = new $helperClass(Alloy(), $this);
 		}
 		return self::$_helpers[$helperClass];
 	}

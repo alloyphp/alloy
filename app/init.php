@@ -4,13 +4,13 @@
  * @link http://alloyframework.org
  */
 
-// Show all errors by default
+// Show all errors by default - they can be turned off later if needed
 error_reporting(-1);
 ini_set('display_errors', 'On');
 
-// PHP version must be 5.3 or greater
-if(version_compare(phpversion(), "5.3.2", "<")) {
-	throw new \RuntimeException("PHP version must be 5.3.2 or greater to run Alloy Framework.<br />\nCurrent PHP version: " . phpversion());
+// PHP version must be 5.3.1 or greater
+if(version_compare(phpversion(), "5.3.1", "<")) {
+    throw new \RuntimeException("PHP version must be 5.3.1 or greater to run Alloy Framework.<br />\nCurrent PHP version: " . phpversion());
 }
 
 
@@ -23,11 +23,11 @@ $cfg = require(dirname(__DIR__) . '/app/config/app.php');
 $cfgHost = array();
 $cfgHostFile = $cfg['path']['config'] . '/' . strtolower(php_uname('n')) . '/app.php';
 if(file_exists($cfgHostFile)) {
-	$cfgHost = require($cfgHostFile);
-	// Override lib path if provided before manually requiring in base classes
-	if(isset($cfgHost['path']['lib'])) {
+    $cfgHost = require($cfgHostFile);
+    // Override lib path if provided before manually requiring in base classes
+    if(isset($cfgHost['path']['lib'])) {
         $cfg['path']['lib'] = $cfgHost['path']['lib'];
-	}
+    }
 }
 
 // Ensure at least a lib path is set
@@ -55,31 +55,30 @@ try {
     // Register classes with namespaces
     $loader->registerNamespaces(array(
         'Alloy' => $kernel->config('path.lib'),
-        'Module' => $kernel->config('path.app'),
+        'App' => $kernel->config('path.lib'),
+        'Module' => $kernel->config('path.app')
     ));
 
     // Register a library using the PEAR naming convention
+    /*
     $loader->registerPrefixes(array(
-        'Spot_' => $kernel->config('path.lib'),
+        'Zend_' => $kernel->config('path.lib'),
     ));
-
+    */
+    
     // Activate the autoloader
     $loader->register();
     
     
     // Debug?
-	if($kernel->config('debug')) {
-		// Enable debug mode
-		$kernel->debug(true);
-		
-		// Show all errors
-		error_reporting(-1);
-		ini_set('display_errors', 'On');
-	} else {
-		// Show NO errors
-		//error_reporting(0);
-		//ini_set('display_errors', 'Off');
-	}
+    if($kernel->config('debug')) {
+        // Enable debug mode
+        $kernel->debug(true);
+    } else {
+        // Show NO errors
+        error_reporting(0);
+        ini_set('display_errors', 'Off');
+    }
 } catch(Exception $e) {
     echo $e->getTraceAsString();
     exit();
@@ -91,7 +90,7 @@ try {
  * Checks if 'Alloy' function already exists so it can be overridden/customized
  */
 if(!function_exists('Alloy')) {
-	function Alloy(array $config = array()) {
-		return \Alloy\Kernel::getInstance($config);
-	}
+    function Alloy(array $config = array()) {
+        return \Alloy\Kernel::getInstance($config);
+    }
 }
