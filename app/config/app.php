@@ -43,10 +43,10 @@ $cfg['database']['master']['username'] = 'root';
 $cfg['database']['master']['password'] = '';
 $cfg['database']['master']['database'] = 'alloy';
 $cfg['database']['master']['options'] = array(
-	PDO::ERRMODE_EXCEPTION => true,
-	PDO::ATTR_PERSISTENT => false,
-	PDO::ATTR_EMULATE_PREPARES => true
-	);
+    PDO::ERRMODE_EXCEPTION => true,
+    PDO::ATTR_PERSISTENT => false,
+    PDO::ATTR_EMULATE_PREPARES => true
+    );
 
 // Session Settings
 $cfg['session']['lifetime'] = 28000;
