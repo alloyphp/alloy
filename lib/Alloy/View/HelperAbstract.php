@@ -11,19 +11,20 @@ namespace Alloy\View;
 abstract class HelperAbstract
 {
     protected $kernel;
-	protected $_view;
-	
-	public function __construct(\Alloy\Kernel $kernel, \Alloy\View\Template $view)
-	{
-		$this->kernel = $kernel;
+    protected $_view;
+    
+    public function __construct(\Alloy\Kernel $kernel, \Alloy\View\Template $view)
+    {
+        $this->kernel = $kernel;
         $this->_view = $view;
-		$this->init();
-	}
-	
-	
-	/**
-	 * Initialization called upon instantiation
-	 * Used so extending classes don't have to override constructor
-	 */
-	public function init() {}
+        
+        $this->init();
+    }
+    
+    
+    /**
+     * Initialization called upon instantiation
+     * Used so extending classes don't have to override constructor
+     */
+    public function init() {}
 }

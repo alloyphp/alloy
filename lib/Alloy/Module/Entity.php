@@ -13,5 +13,5 @@ namespace Alloy\Module;
  */
 class Entity extends \Spot_Entity
 {
-	
+    
 }

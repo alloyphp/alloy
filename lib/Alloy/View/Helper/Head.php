@@ -12,91 +12,91 @@ namespace Alloy\View;
  */
 class Helper_Head extends HelperAbstract
 {
-	protected $_assetHelper;
-	protected $_styles = array();
-	protected $_scripts = array();
-	protected $_contentPrepend = array();
-	protected $_contentAppend = array();
-	
-	
-	/**
-	 * Load required Asset helper
-	 */
-	public function init()
-	{
-		$this->_assetHelper = $this->_view->helper('Asset');
-	}
-	
-	
-	/**
-	 *	Stylesheet <link> tag input
-	 */
-	public function stylesheet()
-	{
-		$this->_styles[] = call_user_func_array(array($this->_assetHelper, __FUNCTION__), func_get_args());
-	}
-	
-	
-	/**
-	 *	Javascript <script> tag input
-	 */
-	public function script()
-	{
-		$this->_scripts[] = call_user_func_array(array($this->_assetHelper, __FUNCTION__), func_get_args());
-	}
-	
-	
-	/**
-	 * Prepend content
-	 */
-	public function prepend($content)
-	{
-		$this->_contentPrepend[] = $content;
-	}
-	
-	
-	/**
-	 * Append content
-	 */
-	public function append($content)
-	{
-		$this->_contentAppend[] = $content;
-	}
-	
-	
-	/**
-	 * Return HTML content string
-	 *
-	 * @return string
-	 */
-	public function content()
-	{
-		$content = "";
-		
-		// Numeric keys with array_merge just appends items in order
-		$contentItems = array_merge(
-			$this->_contentPrepend,
-			$this->_styles,
-			$this->_scripts,
-			$this->_contentAppend
-			);
-		
-		// Format content items
-		foreach($contentItems as $item) {
-			$content .= "\t" . (string) $item . "\n";
-		}
-		
-		return $content;
-	}
-	
-	
-	/**
-	 * Return HTML content string
-	 *
-	 * @return string
-	 */
-	public function __toString()
-	{
-		return $this->content();
-	}
+    protected $_assetHelper;
+    protected $_styles = array();
+    protected $_scripts = array();
+    protected $_contentPrepend = array();
+    protected $_contentAppend = array();
+    
+    
+    /**
+     * Load required Asset helper
+     */
+    public function init()
+    {
+        $this->_assetHelper = $this->_view->helper('Asset');
+    }
+    
+    
+    /**
+     *	Stylesheet <link> tag input
+     */
+    public function stylesheet()
+    {
+        $this->_styles[] = call_user_func_array(array($this->_assetHelper, __FUNCTION__), func_get_args());
+    }
+    
+    
+    /**
+     *	Javascript <script> tag input
+     */
+    public function script()
+    {
+        $this->_scripts[] = call_user_func_array(array($this->_assetHelper, __FUNCTION__), func_get_args());
+    }
+    
+    
+    /**
+     * Prepend content
+     */
+    public function prepend($content)
+    {
+        $this->_contentPrepend[] = $content;
+    }
+    
+    
+    /**
+     * Append content
+     */
+    public function append($content)
+    {
+        $this->_contentAppend[] = $content;
+    }
+    
+    
+    /**
+     * Return HTML content string
+     *
+     * @return string
+     */
+    public function content()
+    {
+        $content = "";
+        
+        // Numeric keys with array_merge just appends items in order
+        $contentItems = array_merge(
+            $this->_contentPrepend,
+            $this->_styles,
+            $this->_scripts,
+            $this->_contentAppend
+            );
+        
+        // Format content items
+        foreach($contentItems as $item) {
+            $content .= "\t" . (string) $item . "\n";
+        }
+        
+        return $content;
+    }
+    
+    
+    /**
+     * Return HTML content string
+     *
+     * @return string
+     */
+    public function __toString()
+    {
+        return $this->content();
+    }
 }

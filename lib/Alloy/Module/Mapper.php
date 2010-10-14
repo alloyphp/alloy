@@ -13,5 +13,5 @@ namespace Alloy\Module;
  */
 abstract class Mapper extends \Spot_Mapper
 {
-	// Used for future extensibility for global module changes
+    // Used for future extensibility for global module changes
 }

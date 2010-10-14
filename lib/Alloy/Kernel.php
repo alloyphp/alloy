@@ -353,7 +353,7 @@ class Kernel
         $sModule = preg_replace('/[^a-zA-Z0-9_]/', '', $module);
         
         // Upper-case beginning of each word
-        $sModule = str_replace(' ', '_', ucwords(str_replace('_', ' ', $sModule)));
+        $sModule = str_replace(' ', '\\', ucwords(str_replace('_', ' ', $sModule)));
         $sModuleClass = 'Module\\' . $sModule . '\Controller';
         
         // Instantiate module class
@@ -539,7 +539,7 @@ class Kernel
  * @param array $queryParams Named querystring URL parts (optional)
      * @return string
      */
-    public function url(array $params = array(), $queryParams = array())
+    public function url($params = array(), $queryParams = array())
     {
         $urlBase = $this->config('url.root', '');
         
@@ -548,15 +548,23 @@ class Kernel
             $urlBase .= "?u=";
         }
         
+        // Detemine what URL is from param types
+        if(is_string($params)) {
+            $routeName = $params;
+            $params = array();
+        } elseif(is_array($params)) {
+            // Route name
+            $routeName = isset($params['_route']) ? $params['_route'] : null;
+        } else {
+            throw new Exception("First parameter of URL must be array or string route name");
+        }
+        
         // Query params
         $queryString = "";
         if(count($queryParams) > 0) {
             $queryString = "?" . http_build_query($queryParams);
         }
-    
-        // Route name
-        $routeName = isset($params['_route']) ? $params['_route'] : null;
-    
+        
         // Get URL from router object by reverse match
         $fullUrl = $urlBase . strtolower(ltrim($this->router()->url($routeName, $params), '/')) . $queryString;
         return $fullUrl;
