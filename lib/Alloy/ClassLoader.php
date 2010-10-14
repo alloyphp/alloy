@@ -72,18 +72,24 @@ class ClassLoader
      */
     public function registerNamespaces(array $namespaces)
     {
-        $this->namespaces = array_merge($this->namespaces, $namespaces);
+        foreach($namespaces as $ns => $path) {
+            $this->registerNamespace($ns, $path);
+        }
     }
 
     /**
      * Registers a namespace.
      *
      * @param string $namespace The namespace
-     * @param string $path      The location of the namespace
+     * @param mixed $path      The location of the namespace (string or array of possible paths)
      */
     public function registerNamespace($namespace, $path)
     {
-        $this->namespaces[$namespace] = $path;
+        // If namespace has already been specified, add path to array of possible paths -- don't overwrite
+        if(isset($this->namespaces[$namespace])) {
+            $path = array_merge($this->namespaces[$namespace], $path);
+        }
+        $this->namespaces[$namespace] = (array) $path;
     }
 
     /**
@@ -93,18 +99,24 @@ class ClassLoader
      */
     public function registerPrefixes(array $classes)
     {
-        $this->prefixes = array_merge($this->prefixes, $classes);
+        foreach($classes as $prefix => $path) {
+            $this->registerPrefix($prefix, $path);
+        }
     }
 
     /**
      * Registers a set of classes using the PEAR naming convention.
      *
      * @param string $prefix The classes prefix
-     * @param string $path   The location of the classes
+     * @param mixed $path   The location of the classes (string or array or possible paths)
      */
     public function registerPrefix($prefix, $path)
     {
-        $this->prefixes[$prefix] = $path;
+        // If prefix has already been specified, add path to array of possible paths -- don't overwrite
+        if(isset($this->prefixes[$prefix])) {
+            $path = array_merge($this->prefixes[$prefix], $path);
+        }
+        $this->prefixes[$prefix] = (array) $path;
     }
 
     /**
@@ -125,27 +137,29 @@ class ClassLoader
         if (false !== ($pos = strripos($class, '\\'))) {
             // namespaced class name
             $namespace = substr($class, 0, $pos);
-            foreach ($this->namespaces as $ns => $dir) {
-                if (0 === strpos($namespace, $ns)) {
-                    $class = substr($class, $pos + 1);
-                    $file = $dir.DIRECTORY_SEPARATOR.str_replace('\\', DIRECTORY_SEPARATOR, $namespace).DIRECTORY_SEPARATOR.str_replace('_', DIRECTORY_SEPARATOR, $class).'.php';
-                    if (file_exists($file)) {
-                        require $file;
+            $class = substr($class, $pos + 1);
+            foreach ($this->namespaces as $ns => $dirs) {
+                $dirs = array_reverse($dirs);
+                foreach($dirs as $dir) {
+                    if (0 === strpos($namespace, $ns)) {
+                        $file = $dir.DIRECTORY_SEPARATOR.str_replace('\\', DIRECTORY_SEPARATOR, $namespace).DIRECTORY_SEPARATOR.str_replace('_', DIRECTORY_SEPARATOR, $class).'.php';
+                        if (file_exists($file)) {
+                            return require $file;
+                        }
                     }
-
-                    return;
                 }
             }
         } else {
             // PEAR-like class name
-            foreach ($this->prefixes as $prefix => $dir) {
-                if (0 === strpos($class, $prefix)) {
-                    $file = $dir.DIRECTORY_SEPARATOR.str_replace('_', DIRECTORY_SEPARATOR, $class).'.php';
-                    if (file_exists($file)) {
-                        require $file;
+            foreach ($this->prefixes as $prefix => $dirs) {
+                $dirs = array_reverse($dirs);
+                foreach($dirs as $dir) {
+                    if (0 === strpos($class, $prefix)) {
+                        $file = $dir.DIRECTORY_SEPARATOR.str_replace('_', DIRECTORY_SEPARATOR, $class).'.php';
+                        if (file_exists($file)) {
+                            return require $file;
+                        }
                     }
-
-                    return;
                 }
             }
         }
