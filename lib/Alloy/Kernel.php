@@ -42,17 +42,17 @@ class Kernel
      */
     public static function getInstance(array $config = array())
     {
-            if(!is_object(self::$self)) {
-                    $className = __CLASS__;
-                    self::$self = new $className($config);
+            if(!is_object(static::$self)) {
+                    $className = get_called_class();
+                    static::$self = new $className($config);
             } else {
                     // Add new config settings if given
                     if(is_array($config) && count($config) > 0) {
-                            self::$self->config($config);
+                            static::$self->config($config);
                     }
             }
             
-            return self::$self;
+            return static::$self;
     }
     
     
@@ -66,11 +66,11 @@ class Kernel
         $this->config($config);
         
         // Save memory starting point
-        self::$traceMemoryStart = memory_get_usage();
-        self::$traceTimeStart = microtime(true);
+        static::$traceMemoryStart = memory_get_usage();
+        static::$traceTimeStart = microtime(true);
         // Set last as current starting for good zero-base
-        self::$traceMemoryLast = self::$traceMemoryStart;
-        self::$traceTimeLast = self::$traceTimeStart;
+        static::$traceMemoryLast = static::$traceMemoryStart;
+        static::$traceTimeLast = static::$traceTimeStart;
     }
     
     
@@ -87,12 +87,12 @@ class Kernel
         if(is_array($value)) {
             if(count($value) > 0) {
                 // Merge given config settings over any previous ones (if $value is array)
-                self::$cfg = $this->array_merge_recursive_replace(self::$cfg, $value);
+                static::$cfg = $this->array_merge_recursive_replace(static::$cfg, $value);
             }
         // Getter
         } else {
             // Config array is static to persist across multiple instances
-            $cfg = self::$cfg;
+            $cfg = static::$cfg;
             
             // No value passed - return entire config array
             if($value === null) { return $cfg; }
@@ -275,7 +275,7 @@ class Kernel
     public function trace($msg = null, $data = array(), $function = null, $file = null, $line = null, $internal = false)
     {
         // Don't incur the overhead if not in debug mode
-        if(!self::$debug) {
+        if(!static::$debug) {
             return false;
         }
         
@@ -294,19 +294,19 @@ class Kernel
                 $currentTime = microtime(true);
                 $currentMemory = memory_get_usage();
                 $entry += array(
-                    'time' => ($currentTime - self::$traceTimeLast),
-                    'time_total' => $currentTime - self::$traceTimeStart,
-                    'memory' => $currentMemory - self::$traceMemoryLast,
-                    'memory_total' => $currentMemory - self::$traceMemoryStart
+                    'time' => ($currentTime - static::$traceTimeLast),
+                    'time_total' => $currentTime - static::$traceTimeStart,
+                    'memory' => $currentMemory - static::$traceMemoryLast,
+                    'memory_total' => $currentMemory - static::$traceMemoryStart
                     );
                 // Store as last run
-                self::$traceTimeLast = $currentTime;
-                self::$traceMemoryLast = $currentMemory;
+                static::$traceTimeLast = $currentTime;
+                static::$traceMemoryLast = $currentMemory;
             }
-            self::$trace[] = $entry;
+            static::$trace[] = $entry;
         }
         
-        return self::$trace;
+        return static::$trace;
     }
     
     
@@ -316,7 +316,7 @@ class Kernel
     protected function traceInternal($msg = null, $data = array(), $function = null, $file = null, $line = null)
     {
         // Don't incur the overhead if not in debug mode
-        if(!self::$debug) {
+        if(!static::$debug) {
                 return false;
         }
         
@@ -437,6 +437,7 @@ class Kernel
         }
 
         // Handle result
+        $params = array_values($params); // Ensure params are numerically indexed
         $paramCount = count($params);
         if($paramCount == 0) {
             $result = $sModuleObject->$action();
@@ -539,7 +540,7 @@ class Kernel
  * @param array $queryParams Named querystring URL parts (optional)
      * @return string
      */
-    public function url($params = array(), $queryParams = array())
+    public function url($params = array(), $routeName = null, $queryParams = array())
     {
         $urlBase = $this->config('url.root', '');
         
@@ -552,10 +553,7 @@ class Kernel
         if(is_string($params)) {
             $routeName = $params;
             $params = array();
-        } elseif(is_array($params)) {
-            // Route name
-            $routeName = isset($params['_route']) ? $params['_route'] : null;
-        } else {
+        } elseif(!is_array($params)) {
             throw new Exception("First parameter of URL must be array or string route name");
         }
         
@@ -566,7 +564,7 @@ class Kernel
         }
         
         // Get URL from router object by reverse match
-        $fullUrl = $urlBase . strtolower(ltrim($this->router()->url($routeName, $params), '/')) . $queryString;
+        $fullUrl = $urlBase . str_replace('%2f', '/', strtolower($this->router()->url($params, $routeName))) . $queryString;
         return $fullUrl;
     }
     
@@ -699,7 +697,7 @@ class Kernel
      */
     public function debug($switch = true)
     {
-        self::$debug = (boolean) $switch;
+        static::$debug = (boolean) $switch;
         return $this->trace();
     }
     

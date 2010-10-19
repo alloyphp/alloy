@@ -154,12 +154,13 @@ class Router
     /**
      * Put a URL together by matching route name and params
      *
-     * @param string $routeName Name of the route previously defined
      * @param array $params Array of key => value params to fill in for given route
+     * @param string $routeName Name of the route previously defined
+     * 
      * @return string Full matched URL as string with given values put in place of named parameters
      * @throws UnexpectedValueException For non-existent route name or params that don't match given route name (Unable to create URL string)
      */
-    public function url($routeName, array $params = array())
+    public function url(array $params = array(), $routeName)
     {
         if(!isset($this->_routes[$routeName])) {
             throw new \UnexpectedValueException("Error creating URL: Route name '" . $routeName . "' not found in defined routes.");
@@ -171,7 +172,7 @@ class Router
         
         // Static routes - let's save some time here
         if($route->isStatic()) {
-                return $routeUrl;
+            return $routeUrl;
         }
         
         

@@ -1,5 +1,5 @@
 <?php
-namespace Alloy\View;
+namespace Alloy\View\Helper;
 
 /**
  * Asset Helper
@@ -9,7 +9,7 @@ namespace Alloy\View;
  * @license http://www.opensource.org/licenses/bsd-license.php
  * @link http://alloyframework.com/
  */
-class Helper_Asset extends HelperAbstract
+class Asset extends HelperAbstract
 {
     /**
      *	Stylesheet <link> tag input

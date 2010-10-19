@@ -1,5 +1,5 @@
 <?php
-namespace Alloy\View;
+namespace Alloy\View\Helper;
 
 /**
  * Base View Helper

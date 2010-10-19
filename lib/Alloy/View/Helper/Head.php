@@ -1,5 +1,5 @@
 <?php
-namespace Alloy\View;
+namespace Alloy\View\Helper;
 
 /**
  * HTML Head Helper
@@ -10,7 +10,7 @@ namespace Alloy\View;
  * @license http://www.opensource.org/licenses/bsd-license.php
  * @link http://alloyframework.com/
  */
-class Helper_Head extends HelperAbstract
+class Head extends HelperAbstract
 {
     protected $_assetHelper;
     protected $_styles = array();
