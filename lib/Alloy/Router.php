@@ -160,8 +160,18 @@ class Router
      * @return string Full matched URL as string with given values put in place of named parameters
      * @throws UnexpectedValueException For non-existent route name or params that don't match given route name (Unable to create URL string)
      */
-    public function url(array $params = array(), $routeName)
+    public function url($params = array(), $routeName)
     {
+        // If params is string, assume route name for static route
+        if(is_string($params)) {
+            $routeName = $params;
+            $params = array();
+        }
+        
+        if(!$routeName) {
+            throw new \UnexpectedValueException("Error creating URL: Route name must be specified.");
+        }
+        
         if(!isset($this->_routes[$routeName])) {
             throw new \UnexpectedValueException("Error creating URL: Route name '" . $routeName . "' not found in defined routes.");
         }
