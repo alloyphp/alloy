@@ -26,15 +26,20 @@ class Template
     // Errors
     protected $_errors = array();
     
+    // Kernel instance
+    protected $kernel;
+    
     
     /**
-     *	Constructor function
+     * Constructor function
      *
      * @param $file string	Template filename to use
      * @param $module string	Module template file resides in
      */
     public function __construct($file, $format = 'html', $path = null)
     {
+        $this->kernel = \Kernel();
+        
         $this->file($file, $format);
         $this->path($path);
         
@@ -152,9 +157,21 @@ class Template
     
     
     /**
+     * Load and return generic view template
+     * 
+     * @return Alloy\View\Template
+     */
+    public function generic($name)
+    {
+        $helperClass = 'Alloy\View\Generic\\' . $name;
+        return new $helperClass(strtolower($name));
+    }
+    
+    
+    /**
      * Load and return view helper
      * 
-     * @return Cx_View_Helper
+     * @return Alloy\View\Helper\HelperAbstract
      */
     public function helper($name)
     {
@@ -248,6 +265,46 @@ class Template
             return $this; // Fluent interface
         }
         return $this; // Fluent interface
+    }
+    
+    
+    /**
+     * Escapes HTML entities
+     * Use to prevent XSS attacks
+     *
+     * @link http://ha.ckers.org/xss.html
+     */
+    public function h($str)
+    {
+        return htmlentities($str, ENT_NOQUOTES, "UTF-8");
+    }
+    
+    
+    /**
+     * Date/time string to date format
+     *
+     * @param mixed $input Date string or timestamp
+     * @param string $format Optional string format
+     * @return string
+     */
+    public function toDate($input = null, $format = 'M d, Y')
+    {
+        $format = $this->kernel->config('i18n.date_format', $format);
+        return $input ? date($format, (is_int($input) ? $input : strtotime($input))) : date($format);
+    }
+    
+    
+    /**
+     * Date/time string to date format
+     *
+     * @param mixed $input Date string or timestamp
+     * @param string $format Optional string format
+     * @return string
+     */
+    public function toDateTime($input = null, $format = null)
+    {
+        $format = ($format) ? $format : ($this->kernel->config('i18n.date_format') . ' ' . $this->kernel->config('i18n.time_format'));
+        return $input ? date($format, (is_int($input) ? $input : strtotime($input))) : date($format);
     }
     
     

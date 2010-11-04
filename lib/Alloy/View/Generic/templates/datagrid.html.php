@@ -3,6 +3,14 @@ $i = 0;
 ?>
 
 <table cellpadding=="0" cellspacing="0" border="0" class="app_datagrid">
+  <thead>
+    <tr>
+      <?php foreach($this->columns as $colName => $colOpts): ?>
+      <th><?php echo $colName; ?></th>
+      <?php endforeach; ?>
+    </tr>
+  </thead>
+  <tbody>
   <?php foreach($this->data as $data => $item): $i++; ?>
     <tr class="app_datagrid_row <?php echo ($i % 2) ? 'even' : 'odd'; ?>">
     <?php foreach($this->columns as $colName => $colOpts):
@@ -12,4 +20,5 @@ $i = 0;
     <?php endforeach; ?>
     </tr>
   <?php endforeach; ?>
-</form>
+  </tbody>
+</table>
