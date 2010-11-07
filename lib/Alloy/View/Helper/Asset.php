@@ -12,9 +12,9 @@ namespace Alloy\View\Helper;
 class Asset extends HelperAbstract
 {
     /**
-     *	Stylesheet <link> tag input
+     * Stylesheet <link> tag input
      */
-    public function stylesheet($file, $media = 'screen', $extra = '')
+    public function stylesheet($file, array $options = array())
     {
         if(false === strpos($file, '://')) {
             $file = $this->kernel->config('url.assets') . 'styles/' . $file;
@@ -25,9 +25,9 @@ class Asset extends HelperAbstract
     
     
     /**
-     *	Javascript <script> tag input
+     * Javascript <script> tag input
      */
-    public function script($file, $extra = '')
+    public function script($file, array $options = array())
     {
         if(false === strpos($file, '://')) {
             $file = $this->kernel->config('url.assets') . 'scripts/' . $file;
@@ -38,14 +38,17 @@ class Asset extends HelperAbstract
     
     
     /**
-     *	image <img> tag input
+     * Image <img> tag input
+     *
+     * @param string $file
+     * @param array $options Array of Key => Value attributes for image tag
      */
-    public function image($file, $alt = '', $extra = '')
+    public function image($file, array $options = array())
     {
         if(false === strpos($file, '://')) {
             $file = $this->kernel->config('url.assets') . 'images/' . $file;
         }
-        $tag = '<img src="' . $file . '" alt="' . $alt . '"' . $this->listExtra($extra) . ' />';
+        $tag = '<img src="' . $file . '"' . $this->listExtra($options) . ' />';
         return $tag;
     }
     
@@ -53,14 +56,12 @@ class Asset extends HelperAbstract
     /**
      * List extra attributes passed in
      */
-    protected function listExtra($extra)
+    protected function listExtra(array $options)
     {
         $output = '';
-        if(is_array($extra) && count($extra) > 0) {
-            foreach($extra as $key => $val) {
-                if(!empty($val)) {
-                    $output .= ' ' . $key . '="' . $val . '"';
-                }
+        foreach($extra as $key => $val) {
+            if(!empty($val)) {
+                $output .= ' ' . $key . '="' . $val . '"';
             }
         }
         return $output;

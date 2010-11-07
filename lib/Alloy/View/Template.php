@@ -13,7 +13,7 @@ class Template
     // Template specific stuff
     protected $_file;
     protected $_fileFormat;
-    protected $_vars;
+    protected $_vars = array();
     protected $_path;
     
     // Extension type
@@ -161,10 +161,11 @@ class Template
      * 
      * @return Alloy\View\Template
      */
-    public function generic($name)
+    public function generic($name, $template = null)
     {
         $helperClass = 'Alloy\View\Generic\\' . $name;
-        return new $helperClass(strtolower($name));
+        $template = (null === $template) ? strtolower($name) : $template;
+        return new $helperClass($template);
     }
     
     
@@ -281,6 +282,46 @@ class Template
     
     
     /**
+     * Full URL to different component/action
+     */
+    public function url($params, $route = null, array $qsData = array(), $qsAppend = false)
+    {
+        return $this->kernel->url($params, $route, $qsData, $qsAppend);
+    }
+    
+    
+    /**
+     * HTML link tag to specified URL or route
+     */
+    public function link($title, $params, $route = null, array $extra = array(), $qsAppend = false)
+    {
+        $qsData = isset($params['?']) && is_array($params['?']) ? $params['?'] : array();
+        $extra['title'] = isset($extra['title']) ? $extra['title'] : trim(strip_tags($title));
+        $tag = '<a href="' . $this->url($params, $route, $qsData, $qsAppend) . '"' . $this->toTagAttributes($extra) . '>' . $title . '</a>';
+        return $tag;
+    }
+    
+    
+    /**
+     * List array values as HTML tag attributes
+     */
+    public function toTagAttributes(array $extra)
+    {
+        $str = '';
+        foreach($extra as $key => $value) {
+            // Javascript "confirm" box
+            if($key == "confirm") {
+                $msg = (empty($value) || $value == "true") ? "Are you sure?" : $value;
+                $str .= ' onClick="if(!confirm(\'' . $msg . '\')){ return false; }"';
+            } else {
+                $str .= ' ' . $key . '="' . $value . '"';
+            }
+        }
+        return $str;
+    }
+    
+    
+    /**
      * Date/time string to date format
      *
      * @param mixed $input Date string or timestamp
@@ -305,6 +346,20 @@ class Template
     {
         $format = ($format) ? $format : ($this->kernel->config('i18n.date_format') . ' ' . $this->kernel->config('i18n.time_format'));
         return $input ? date($format, (is_int($input) ? $input : strtotime($input))) : date($format);
+    }
+    
+    
+    /**
+     * Load and return new Alloy view for partial
+     *
+     * @param string $template Template file to use
+     * @param array $vars Variables to pass to partial
+     * @return Alloy\View\Template
+     */
+    public function partial($template, array $vars = array())
+    {
+        $partial = new static($template, $this->format(), $this->path());
+        return $partial->set($vars);
     }
     
     
@@ -341,6 +396,8 @@ class Template
         // Include() and parse PHP code
         if($parsePHP) {
             ob_start();
+            // Extract set variables into local template scope
+            extract($this->vars());
             include($vfile);
             $templateContent = ob_get_contents();
             ob_end_clean();
@@ -368,6 +425,9 @@ class Template
             $content = $e->getError();
         } catch(\Exception $e) {
             $content = "<strong>TEMPLATE RENDERING ERROR:</strong><br />" . $e->getMessage();
+            if($this->kernel->config('debug')) {
+                $this->kernel->dump($e->getTraceAsString());
+            }
         }
         return $content;
     }
