@@ -537,16 +537,19 @@ class Kernel
      * Generate URL from given params
      *
      * @param array $params Named URL parts
- * @param array $queryParams Named querystring URL parts (optional)
+     * @param array $queryParams Named querystring URL parts (optional)
      * @return string
      */
-    public function url($params = array(), $routeName = null, $queryParams = array())
+    public function url($params = array(), $routeName = null, $queryParams = array(), $qsAppend = false)
     {
         $urlBase = $this->config('url.root', '');
         
-        // Use query string if URL rewriting is not enabled
-        if(!$this->config('url.rewrite')) {
-            $urlBase .= "?u=";
+        // HTTPS Secure URL?
+        $isSecure = false;
+        if(isset($params['secure']) && true === $params['secure']) {
+            $isSecure = true;
+            $urlBase = str_replace('http:', 'https:', $urlBase);
+            unset($params['secure']);
         }
         
         // Detemine what URL is from param types
@@ -557,15 +560,32 @@ class Kernel
             throw new Exception("First parameter of URL must be array or string route name");
         }
         
-        // Query params
+        
+        // Is there query string data?
         $queryString = "";
+        $request = $this->request();
+        if(true === $qsAppend && $request->query()) {
+            $queryParams = array_merge($request->query(), $queryParams);
+        }
         if(count($queryParams) > 0) {
-            $queryString = "?" . http_build_query($queryParams);
+            // Build query string from array $qsData
+            $queryString = http_build_query($queryParams, '', '&amp;');
+        } else {
+            $queryString = false;
         }
         
         // Get URL from router object by reverse match
-        $fullUrl = $urlBase . str_replace('%2f', '/', strtolower($this->router()->url($params, $routeName))) . $queryString;
-        return $fullUrl;
+        $url = str_replace('%2f', '/', strtolower($this->router()->url($params, $routeName)));
+        
+        // Use query string if URL rewriting is not enabled
+        if($this->config('url.rewrite')) {
+            $url = $urlBase . $url . (($queryString !== false) ? '?' . $queryString : '');
+        } else {
+            $url = $urlBase . '?u=' . $url . (($queryString !== false) ? '&amp;' . $queryString : '');
+        }
+        
+        // Return fully assembled URL
+        return $url;
     }
     
     
