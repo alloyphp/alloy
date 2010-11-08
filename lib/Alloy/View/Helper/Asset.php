@@ -19,7 +19,7 @@ class Asset extends HelperAbstract
         if(false === strpos($file, '://')) {
             $file = $this->kernel->config('url.assets') . 'styles/' . $file;
         }
-        $tag = '<link type="text/css" href="' . $file . '" media="' . $media . '" rel="stylesheet"' . $this->listExtra($extra) . ' />';
+        $tag = '<link type="text/css" href="' . $file . '" rel="stylesheet"' . $this->listExtra($options) . ' />';
         return $tag;
     }
     
@@ -32,7 +32,7 @@ class Asset extends HelperAbstract
         if(false === strpos($file, '://')) {
             $file = $this->kernel->config('url.assets') . 'scripts/' . $file;
         }
-        $tag = '<script type="text/javascript" src="' . $file . '"' . $this->listExtra($extra) . '></script>';
+        $tag = '<script type="text/javascript" src="' . $file . '"' . $this->listExtra($options) . '></script>';
         return $tag;
     }
     
@@ -59,7 +59,7 @@ class Asset extends HelperAbstract
     protected function listExtra(array $options)
     {
         $output = '';
-        foreach($extra as $key => $val) {
+        foreach($options as $key => $val) {
             if(!empty($val)) {
                 $output .= ' ' . $key . '="' . $val . '"';
             }
