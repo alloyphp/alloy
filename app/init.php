@@ -58,8 +58,7 @@ try {
     /**
      * Class autoloaders - uses PHP 5.3 SplClassLoader
      */
-    require $kernel->config('path.lib') . '/Alloy/ClassLoader.php';
-    $loader = new \Alloy\ClassLoader();
+    $loader = $kernel->loader();
 
     // Register classes with namespaces
     $loader->registerNamespaces(array(

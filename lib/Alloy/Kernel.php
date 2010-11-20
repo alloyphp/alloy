@@ -232,6 +232,19 @@ class Kernel
     
     
     /**
+     * Get class loader object
+     */
+    public function loader()
+    {
+        $class = __NAMESPACE__ . '\ClassLoader';
+        if(!class_exists($class, false)) {
+            require(__DIR__ . '/ClassLoader.php');
+        }
+        return $this->factory($class);
+    }
+    
+    
+    /**
      * Return a resource object to work with
      */
     public function resource($data)
@@ -355,6 +368,11 @@ class Kernel
         // Upper-case beginning of each word
         $sModule = str_replace(' ', '\\', ucwords(str_replace('_', ' ', $sModule)));
         $sModuleClass = 'Module\\' . $sModule . '\Controller';
+        
+        // Ensure class exists / can be loaded
+        if(!$this->loader()->loadClass($sModuleClass)) {
+            return false;
+        }
         
         // Instantiate module class
         $sModuleObject = new $sModuleClass($this);
