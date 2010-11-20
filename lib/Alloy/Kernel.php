@@ -447,11 +447,16 @@ class Kernel
         } else {
             // Get module instance
             $sModuleObject = $this->module($module);
+            
+            // Does module exist?
+            if(false === $sModuleObject) {
+                throw new Exception_FileNotFound("Module '" . $module ."' not found");
+            }
         }
         
         // Module action callable (includes __call magic function if method missing)?
         if(!is_callable(array($sModuleObject, $action))) {
-            throw new \Alloy\Exception_FileNotFound("Module '" . $module ."' does not have a callable method '" . $action . "'");
+            throw new Exception_FileNotFound("Module '" . $module ."' does not have a callable method '" . $action . "'");
         }
 
         // Handle result
