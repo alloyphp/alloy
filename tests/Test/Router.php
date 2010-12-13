@@ -137,4 +137,20 @@ class Test_Router extends \PHPUnit_Framework_TestCase
         $params = $this->router->match("GET", "test%20ing");
         $this->assertEquals('test ing', $params['module']);
     }
+    
+    public function testUrlEncodedSymbols()
+    {
+        // Model
+        $this->router->route('vehicle_view', '/<#year>/<:make>/<:model>.<:format>')
+                ->defaults(array('module' => 'vehicle', 'action' => 'view'));
+        
+        $params = $this->router->match("GET", "/2007/chrysler/town+%26+country.json");
+        
+        $this->assertEquals("vehicle", $params['module']);
+        $this->assertEquals("view", $params['action']);
+        $this->assertEquals("2007", $params['year']);
+        $this->assertEquals("chrysler", $params['make']);
+        $this->assertEquals("town & country", $params['model']);
+        $this->assertEquals("json", $params['format']);
+    }
 }

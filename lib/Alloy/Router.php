@@ -56,7 +56,7 @@ class Router
         }
         
         // Clean up URL for matching
-        $url = trim(urldecode($url), '/');
+        $url = trim($url, '/');
         $params = array();
         
         // Loop over set routes to find a match
@@ -134,7 +134,7 @@ class Router
                 }
             }
         }
-        return $params;
+        return array_map('urldecode', $params);
     }
     
     
@@ -204,7 +204,7 @@ class Router
                 $routeParams[$key] = $optionalParams[$key]['routeSegment'];
             // Required/standard param
             } elseif(isset($routeParams[$key])) {
-                $matchedParams[$key] = \urlencode($value);
+                $matchedParams[$key] = $value;
             }
         }
         
@@ -220,7 +220,7 @@ class Router
             if(!isset($matchedParams[$paramName])) {
                 throw new \UnexpectedValueException("Error creating URL for route '" . $routeName . "': Required route parameter '" . $paramName . "' has not been supplied.");
             }
-            $routeUrl = str_replace($paramPlaceholder, $matchedParams[$paramName], $routeUrl);
+            $routeUrl = str_replace($paramPlaceholder, urlencode($matchedParams[$paramName]), $routeUrl);
         }
         
         // Remove all optional parameters with no supplied match or default value
