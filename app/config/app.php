@@ -31,7 +31,7 @@ $cfg['url']['assets_admin'] = $cfg['url']['root'] . str_replace($cfg['dir']['www
 $cfg['url']['rewrite'] = true;
 
 // Debug?
-$cfg['debug'] = false;
+$cfg['debug'] = true;
 
 // In Development Mode?
 $cfg['mode']['development'] = true;

@@ -28,7 +28,6 @@ class Kernel
     protected $instances = array();
     protected $callbacks = array();
     
-    protected $binds = array();
     protected $_user = false;
     
     protected $_spotConfig;
@@ -126,39 +125,50 @@ class Kernel
      * Factory method for loading and instantiating new objects
      *
      * @param string $className Name of the class to attempt to load
+     * @param array $params Array of parameters to pass to instantiate new object with
      * @return object Instance of the class requested
      * @throws InvalidArgumentException
      */
-    public function factory($className, array $args = array())
+    public function factory($className, array $params = array())
     {
-        if(isset($this->instances[$className])) {
-            return $this->instances[$className];
+        $instanceHash = md5($className . var_export($params, true));
+        
+        // Return already instantiated object instance if set
+        if(isset($this->instances[$instanceHash])) {
+            return $this->instances[$instanceHash];
         }
         
         // Return new class instance
-        if(count($args) == 0) {
+        $paramCount = count($params);
+        if(0 === $paramCount) {
             $instance = new $className();
+        } elseif(1 === $paramCount) {
+            $instance = new $className(current($params));
+        } elseif(2 === $paramCount) {
+            $instance = new $className($params[0], $params[1]);
+        } elseif(3 === $paramCount) {
+            $instance = new $className($params[0], $params[1], $params[2]);
         } else {
-            $class = new ReflectionClass($className);
+            $class = new \ReflectionClass($className);
             $instance = $class->newInstanceArgs($args);
         }
         
-        return $this->setInstance($className, $instance);
+        return $this->setInstance($instanceHash, $instance);
     }
     
     
     /**
-     * Sets instance of specified class
+     * Class-level object instance cache
      * Note: This function does not check if $class is currently in use or already instantiated.
      *  This will override any previous instances of $class within the $instances array.
      *
-     * @param $class string Name of the class you wish to locate
-     * @param $instance object Instance of class you wish to set in locator
+     * @param $hash string Hash or name of the object instance to cache
+     * @param $instance object Instance of object you wish to cache
      * @return object
      */
-    public function setInstance($class, $instance)
+    public function setInstance($hash, $instance)
     {
-        $this->instances[$class] = $instance;
+        $this->instances[$hash] = $instance;
         return $instance;
     }
     
@@ -259,6 +269,17 @@ class Kernel
     public function session()
     {
         return $this->factory(__NAMESPACE__ . '\Session');
+    }
+    
+    
+    /**
+     * Get events object with given namespace
+     *
+     * @param string Event namespace (default is 'alloy')
+     */
+    public function events($ns = 'alloy')
+    {
+        return $this->factory(__NAMESPACE__ . '\Events', array($ns));
     }
     
     
@@ -370,7 +391,7 @@ class Kernel
         $sModuleClass = 'Module\\' . $sModule . '\Controller';
         
         // Ensure class exists / can be loaded
-        if(!$this->loader()->loadClass($sModuleClass)) {
+        if(!class_exists($sModuleClass)) {
             return false;
         }
         
@@ -462,13 +483,13 @@ class Kernel
         // Handle result
         $params = array_values($params); // Ensure params are numerically indexed
         $paramCount = count($params);
-        if($paramCount == 0) {
+        if(0 === $paramCount) {
             $result = $sModuleObject->$action();
-        } elseif($paramCount == 1) {
+        } elseif(1 === $paramCount) {
             $result = $sModuleObject->$action(current($params));
-        } elseif($paramCount == 2) {
+        } elseif(2 === $paramCount) {
             $result = $sModuleObject->$action($params[0], $params[1]);
-        } elseif($paramCount == 3) {
+        } elseif(3 === $paramCount) {
             $result = $sModuleObject->$action($params[0], $params[1], $params[2]);
         } else {
             $result = call_user_func_array(array($sModuleObject, $action), $params);
@@ -512,50 +533,6 @@ class Kernel
     }
     
     
-    /**
-     * Event: Trigger a named event and execute callbacks that have been hooked onto it
-     * 
-     * @param string $name Name of the event
-     * @param array $params Parameters to pass to bound event callbacks
-     */
-    public function trigger($name, array $params = array())
-    {
-        if(isset($this->binds[$name])) {
-            foreach($this->binds[$name] as $hookName => $callback) {
-                call_user_func_array($callback, $params);
-            }
-        }
-        
-        $this->trace('[Event] Triggered: ' . $name);
-    }
-    
-    
-    /**
-     * Event: Add callback to be triggered on event name
-     * 
-     * @param string $name Name of the event
-     * @param string $hookName Name of the bound callback that is being added (custom for each callback)
-     * @param callback $callback Callback to execute when named event is triggered
-     */
-    public function bind($eventName, $hookName, $callback)
-    {
-        $this->binds[$eventName][$hookName] = $callback;
-        $this->trace('[Event] Hook callback added: ' . $hookName . ' on event ' . $eventName);
-    }
-
-
-    /**
-     * Event: Remove callback by name
-     */
-    public function unbind($eventName, $hookName)
-    {
-        if(isset($this->binds[$eventName][$hookName])) {
-            unset($this->binds[$eventName][$hookName]);
-        }
-        $this->trace('[Event] Hook callback removed: ' . $hookName);
-    }
-
-
     /**
      * Generate URL from given params
      *

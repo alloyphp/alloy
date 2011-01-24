@@ -6,12 +6,13 @@ namespace Module\Home;
  */
 class Controller extends \Alloy\Module\ControllerAbstract
 {
-	/**
-	 * Index
-	 * @method GET
-	 */
-	public function indexAction(\Alloy\Request $request)
-	{
-		return "Hello World!";
-	}
+    /**
+     * Index
+     * @method GET
+     */
+    public function indexAction(\Alloy\Request $request)
+    {
+        $this->kernel->events();
+        return "Hello World!";
+    }
 }
