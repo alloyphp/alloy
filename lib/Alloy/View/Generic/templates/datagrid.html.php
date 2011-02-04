@@ -28,19 +28,18 @@ $ci = 0;
     <?php foreach($this->columns as $colName => $colOpts):
         $colLabel = isset($fieldOpts['title']) ? $fieldOpts['title'] : ucwords(str_replace('_', ' ', $colName));
     ?>
-      <td class="app_datagrid_cell"><?php echo $colOpts['callback']($this, $item); ?></td>
+      <td class="app_datagrid_cell"><?php echo $colOpts['callback']($item); ?></td>
     <?php endforeach; ?>
     </tr>
   <?php endforeach; ?>
   <?php
   // No data was displayed, counter still at '0', and there is a 'noData' callback
-  if(0 === $i && $this->noDataCallback):
+  if(0 === $i && isset($noDataCallback)):
   ?>
     <tr>
       <td colspan="<?php echo $ci; ?>" class="app_datagrid_nodata">
         <?php
-          $cb = $this->noDataCallback;
-          echo $cb($this);
+          echo $noDataCallback();
         ?>
       </td>
     </tr>
