@@ -15,6 +15,7 @@ class Template
     protected $_fileFormat;
     protected $_vars = array();
     protected $_path;
+    protected $_title;
     
     // Extension type
     protected $_default_format = 'html';
@@ -267,6 +268,20 @@ class Template
         }
         return $this; // Fluent interface
     }
+
+
+    /**
+     * Get/Set title, usually to pass along to layout
+     */
+    public function title($title = null)
+    {
+        if(null === $title) {
+            return $this->_title;
+        } else {
+            $this->_title = $title;
+            return $this; // Fluent interface
+        }
+    }
     
     
     /**
@@ -331,7 +346,7 @@ class Template
     public function toDate($input = null, $format = 'M d, Y')
     {
         $format = $this->kernel->config('i18n.date_format', $format);
-        return $input ? date($format, (is_int($input) ? $input : strtotime($input))) : date($format);
+        return $input ? date($format, (is_numeric($input) ? $input : strtotime($input))) : date($format);
     }
     
     
@@ -344,8 +359,8 @@ class Template
      */
     public function toDateTime($input = null, $format = null)
     {
-        $format = ($format) ? $format : ($this->kernel->config('i18n.date_format') . ' ' . $this->kernel->config('i18n.time_format'));
-        return $input ? date($format, (is_int($input) ? $input : strtotime($input))) : date($format);
+        $format = (null !== $format) ? $format : ($this->kernel->config('i18n.date_format') . ' ' . $this->kernel->config('i18n.time_format'));
+        return $input ? date($format, (is_numeric($input) ? $input : strtotime($input))) : date($format);
     }
     
     
@@ -398,9 +413,13 @@ class Template
             ob_start();
             // Extract set variables into local template scope
             extract($this->vars());
+
+            // Localize object instance for easier use in closures 
+            $view = &$this;
+            $kernel = $this->kernel;
+
             include($vfile);
-            $templateContent = ob_get_contents();
-            ob_end_clean();
+            $templateContent = ob_get_clean();
         } else {
             // Just get raw file contents
             $templateContent = file_get_contents($vfile);
