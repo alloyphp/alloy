@@ -78,19 +78,23 @@ try {
     // Wrap returned content in a layout
     if($request->format == 'html' && !$request->isAjax() && !$request->isCli()) {
         
-        $pageTitle = '';
-        if($content instanceof \Alloy\View\Template) {
-            $pageTitle = ($content->title) ? $content->title : '';
-        }
-        
         $layout = new \Alloy\View\Template('app');
+
+        // Pass set title up to layout to override at template level
+        if($content instanceof \Alloy\View\Template) {
+            // Force render layout so we can pull out variables set in template
+            $contentRendered = $content->content();
+            $layout->title($content->title());
+            $content = $contentRendered;
+        }
+
         $layout->path($kernel->config('path.layouts'))
             ->format($request->format)
             ->set(array(
-                'title' => $pageTitle,
                 'kernel' => $kernel,
                 'content' => $content
                 ));
+
         $content = $layout;
         $response->contentType('text/html');
         

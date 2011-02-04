@@ -77,11 +77,13 @@ try {
     $loader->register();
     
     /**
-     * Debug?
+     * Development Mode & Debug Handling
      */
-    if($kernel->config('debug')) {
-        // Enable debug mode
-        $kernel->debug(true);
+    if($kernel->config('mode.development')) {
+        if($kernel->config('debug')) {
+            // Enable debug mode
+            $kernel->debug(true);
+        }
     } else {
         // Show NO errors
         error_reporting(0);
