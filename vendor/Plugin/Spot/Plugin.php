@@ -20,6 +20,9 @@ class Plugin
     {
         $this->kernel = $kernel;
 
+        // Let autoloader know where to find Spot library files
+        $kernel->loader()->registerNamespace('Spot', $kernel->config('path.vendor'));
+
         // Make methods globally avaialble with Kernel
         $kernel->addMethod('mapper', array($this, 'mapper'));
         $kernel->addMethod('spotConfig', array($this, 'spotConfig'));
@@ -56,16 +59,12 @@ class Plugin
             $dbCfg = $kernel->config('database');
             if($dbCfg) {
                 // New config
-                if(!class_exists('\Spot\Config')) {
-                    // Require Spot\Config, it will register its own autoloader
-                    require $kernel->config('path.lib') . 'Spot/Config.php';
-                }
                 $this->spotConfig = new \Spot\Config();
                 foreach($dbCfg as $name => $options) {
                         $this->spotConfig->addConnection($name, $options);
                 }
             } else {
-                throw new Exception("Unable to load configuration for Spot - Database configuration settings do not exist.");
+                throw new \Exception("Unable to load configuration for Spot - Database configuration settings do not exist.");
             }
         }
         return $this->spotConfig;
