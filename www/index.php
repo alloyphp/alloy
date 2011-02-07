@@ -132,7 +132,6 @@ try {
 } catch(\Alloy\Exception_Auth $e) {
     $responseStatus = 403;
     $content = $e;
-    $kernel->dispatch('user', 'loginAction', array($request));
  
 // 404 Errors
 } catch(\Alloy\Exception_FileNotFound $e) {
