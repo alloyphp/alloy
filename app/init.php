@@ -65,7 +65,7 @@ try {
         'Alloy' => $kernel->config('path.lib'),
         'App' => $kernel->config('path.lib'),
         'Module' => $kernel->config('path.app'),
-        'Spot' => $kernel->config('path.lib'),
+        'Plugin' => array($kernel->config('path.app'), $kernel->config('path.vendor')),
     ));
 
     // Register a library using the PEAR naming convention

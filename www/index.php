@@ -59,6 +59,20 @@ try {
     $request->setParams($params);
     $request->route = $router->matchedRoute()->name();
     
+    // Load plugins
+    if($plugins = $kernel->config('plugins', false)) {
+        if(!is_array($plugins)) {
+            throw new \InvalidArgumentException("Plugin configuration from app config must be an array. Given (" . gettype($plugins) . ").");
+        }
+
+        foreach($plugins as $pluginName) {
+            $plugin = $kernel->plugin($pluginName);
+            if(false === $plugin) {
+                throw new \Exception("Unable to load plugin '" . $pluginName . "'. Remove from app config or ensure plugin files exist in 'app' or 'lib' load paths.");
+            }
+        }
+    }
+
     // Required params
     if(isset($params['module']) && isset($params['action'])) {
         $module = $params['module'];

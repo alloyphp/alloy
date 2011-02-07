@@ -11,14 +11,14 @@ $cfg['dir']['www'] = '/www/';
 $cfg['dir']['assets'] = $cfg['dir']['www'] . 'assets/';
 $cfg['dir']['assets_admin'] = $cfg['dir']['assets'] . 'admin/';
 $cfg['dir']['lib'] = '/lib/';
-$cfg['dir']['modules'] = $cfg['dir']['app'];
+$cfg['dir']['vendor'] = '/vendor/';
 $cfg['dir']['layouts'] = $cfg['dir']['app'] . 'layouts/';
 
 $cfg['path']['app'] = dirname(__DIR__);
 $cfg['path']['config'] = __DIR__;
+$cfg['path']['www'] = $cfg['path']['root'] . $cfg['dir']['www'];
 $cfg['path']['lib'] = $cfg['path']['root'] . $cfg['dir']['lib'];
-$cfg['path']['modules'] = $cfg['path']['root'] . $cfg['dir']['modules'];
-$cfg['path']['public'] = $cfg['path']['root'] . $cfg['dir']['www'];
+$cfg['path']['vendor'] = $cfg['path']['root'] . $cfg['dir']['vendor'];
 $cfg['path']['layouts'] = $cfg['path']['root'] . $cfg['dir']['layouts'];
 
 // URLs
@@ -35,6 +35,9 @@ $cfg['debug'] = false;
 
 // In Development Mode?
 $cfg['mode']['development'] = true;
+
+// Plugins loaded
+$cfg['plugins'] = array('Spot');
 
 // Database (Optional - only used if module loads a mapper)
 $cfg['database']['master']['adapter'] = 'mysql';

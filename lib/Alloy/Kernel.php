@@ -30,9 +30,6 @@ class Kernel
     
     protected $_user = false;
     
-    protected $_spotConfig;
-    protected $_spotMapper = array();
-    
     
     /**
      * Returns an instance of class itself
@@ -377,9 +374,8 @@ class Kernel
     /**
      * Load and return instantiated module class
      *
-     * @param string $className Name of the class
+     * @param string $module Name of the module class
      * @return object
-     * @throws \Alloy\Exception_FileNotFound
      */
     public function module($module, $init = true)
     {
@@ -407,50 +403,34 @@ class Kernel
         
         return $sModuleObject;
     }
-    
-    
-    /**
-     * Get mapper object to work with
-     * Ensures only one instance of a mapper gets loaded
-     *
-     * @param string $mapperName (Optional) Custom mapper class to load in case of custom requirements or queries
-     */
-    public function mapper($mapperName = '\Spot\Mapper')
-    {
-        if(!isset($this->_spotMapper[$mapperName])) {
-            // Create new mapper, passing in config
-            $cfg = $this->spotConfig();
-            $this->_spotMapper[$mapperName] = new $mapperName($this->spotConfig());
-        }
-        return $this->_spotMapper[$mapperName];
-    }
-    
-    
-    /**
-     * Get instance of database connection
-     */
-    public function spotConfig()
-    {
-        if(!$this->_spotConfig) {
-            $dbCfg = $this->config('database');
-            if($dbCfg) {
-                // New config
-                if(!class_exists('\Spot\Config')) {
-                    // Require Spot\Config, it will register its own autoloader
-                    require $this->config('path.lib') . 'Spot/Config.php';
-                }
-                $this->_spotConfig = new \Spot\Config();
-                foreach($dbCfg as $name => $options) {
-                        $this->_spotConfig->addConnection($name, $options);
-                }
-            } else {
-                throw new Exception("Unable to load configuration for Spot - Database configuration settings do not exist.");
-            }
-        }
-        return $this->_spotConfig;
-    }
-    
 
+
+    /**
+     * Load and return instantiated plugin class
+     *
+     * @param string $plugin Name of the plugin to get the instance for
+     * @return object
+     */
+    public function plugin($plugin, $init = true)
+    {
+        // Clean module name to prevent possible security vulnerabilities
+        $sPlugin = preg_replace('/[^a-zA-Z0-9_]/', '', $plugin);
+        
+        // Upper-case beginning of each word
+        $sPlugin = str_replace(' ', '\\', ucwords(str_replace('_', ' ', $sPlugin)));
+        $sPluginClass = 'Plugin\\' . $sPlugin . '\Plugin';
+        
+        // Ensure class exists / can be loaded
+        if(!class_exists($sPluginClass)) {
+            return false;
+        }
+        
+        // Instantiate module class
+        $sPluginObject = new $sPluginClass($this);
+        return $sPluginObject;
+    }
+    
+    
     /**
      * Dispatch module action
      *
@@ -696,6 +676,48 @@ class Kernel
         }
         return $output;
     }
+
+
+    /**
+     * Merges any number of arrays of any dimensions, the later overwriting
+     * previous keys, unless the key is numeric, in whitch case, duplicated
+     * values will not be added.
+     *
+     * The arrays to be merged are passed as arguments to the function.
+     *
+     * @return array Resulting array, once all have been merged
+     */
+    public function array_merge_recursive_replace() {
+     // Holds all the arrays passed
+        $params =  func_get_args();
+   
+        // First array is used as the base, everything else overwrites on it
+        $return = array_shift($params);
+   
+        // Merge all arrays on the first array
+        foreach ($params as $array) {
+            foreach($array as $key => $value) {
+                // Numeric keyed values are added (unless already there)
+                if(is_numeric($key) && (!in_array($value, $return))) {
+                    if(is_array($value)) {
+                        $return[] = $this->array_merge_recursive_replace($return[$key], $value);
+                    } else {
+                        $return[] = $value;
+                    }
+                      
+                // String keyed values are replaced
+                } else {
+                    if (isset($return[$key]) && is_array($value) && is_array($return[$key])) {
+                        $return[$key] = $this->array_merge_recursive_replace($return[$key], $value);
+                    } else {
+                        $return[$key] = $value;
+                    }
+                }
+            }
+        }
+   
+        return $return;
+    }
     
     
     /**
@@ -759,50 +781,7 @@ class Kernel
             $callback = $this->callbacks[$method];
             return call_user_func_array($callback, $args);
         } else {
-            throw new BadMethodCallException("Method '" . __CLASS__ . "::" . $method . "' not found or the command is not a valid callback type.");	
+            throw new \BadMethodCallException("Method '" . __CLASS__ . "::" . $method . "' not found or the command is not a valid callback type.");	
         }
-    }
-    
-    
-    /**
-     * Merges any number of arrays of any dimensions, the later overwriting
-     * previous keys, unless the key is numeric, in whitch case, duplicated
-     * values will not be added.
-     *
-     * The arrays to be merged are passed as arguments to the function.
-     *
-     * @access public
-     * @return array Resulting array, once all have been merged
-     */
-    public function array_merge_recursive_replace() {
-     // Holds all the arrays passed
-        $params =  func_get_args();
-   
-        // First array is used as the base, everything else overwrites on it
-        $return = array_shift($params);
-   
-        // Merge all arrays on the first array
-        foreach ($params as $array) {
-            foreach($array as $key => $value) {
-                // Numeric keyed values are added (unless already there)
-                if(is_numeric($key) && (!in_array($value, $return))) {
-                    if(is_array($value)) {
-                        $return[] = $this->array_merge_recursive_replace($return[$key], $value);
-                    } else {
-                        $return[] = $value;
-                    }
-                      
-                // String keyed values are replaced
-                } else {
-                    if (isset($return[$key]) && is_array($value) && is_array($return[$key])) {
-                        $return[$key] = $this->array_merge_recursive_replace($return[$key], $value);
-                    } else {
-                        $return[$key] = $value;
-                    }
-                }
-            }
-        }
-   
-        return $return;
     }
 }

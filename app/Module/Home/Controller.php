@@ -14,6 +14,8 @@ class Controller extends Alloy\Module\ControllerAbstract
     public function indexAction(Alloy\Request $request)
     {
     	$greeting = "Hello World";
+        
+        $mapper = $this->kernel->mapper();
 
     	// Returns Alloy\View\Template object that renders template on __toString:
     	//   views/indexAction.html.php
