@@ -72,6 +72,7 @@ try {
             }
         }
     }
+    $kernel->events()->trigger('plugins_loaded');
 
     // Required params
     $content = false;
@@ -79,6 +80,7 @@ try {
         $request->module = $params['module'];
         $request->action = $params['action'];
         
+        // Matched route
         $kernel->events()->trigger('route_match');
     } else {
         $content = $kernel->events()->filter('route_not_found', $content);
