@@ -37,7 +37,10 @@ $cfg['debug'] = false;
 $cfg['mode']['development'] = true;
 
 // Plugins loaded
-$cfg['plugins'] = array('Spot');
+$cfg['plugins'] = array(
+	'Alloy_Layout', # app/Plugin/Alloy/Layout
+	'Spot' # vendor/Plugin/Spot
+);
 
 // Database (Optional - only used if module loads a mapper)
 $cfg['database']['master']['adapter'] = 'mysql';
