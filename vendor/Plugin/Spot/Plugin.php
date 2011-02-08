@@ -21,7 +21,7 @@ class Plugin
         $this->kernel = $kernel;
 
         // Let autoloader know where to find Spot library files
-        $kernel->loader()->registerNamespace('Spot', $kernel->config('path.vendor'));
+        $kernel->loader()->registerNamespace('Spot', __DIR__ . '/lib');
 
         // Make methods globally avaialble with Kernel
         $kernel->addMethod('mapper', array($this, 'mapper'));
