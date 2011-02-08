@@ -68,64 +68,28 @@ try {
         foreach($plugins as $pluginName) {
             $plugin = $kernel->plugin($pluginName);
             if(false === $plugin) {
-                throw new \Exception("Unable to load plugin '" . $pluginName . "'. Remove from app config or ensure plugin files exist in 'app' or 'lib' load paths.");
+                throw new \Exception("Unable to load plugin '" . $pluginName . "'. Remove from app config or ensure plugin files exist in 'app' or 'vendor' load paths.");
             }
         }
     }
 
     // Required params
+    $content = false;
     if(isset($params['module']) && isset($params['action'])) {
-        $module = $params['module'];
-        $action = $params['action'];
+        $request->module = $params['module'];
+        $request->action = $params['action'];
         
-        // Run/execute
-        $content = $kernel->dispatchRequest($module, $action);
+        $kernel->events()->trigger('route_match');
     } else {
-        $content = false;
+        $content = $kernel->events()->filter('route_not_found', $content);
     }
+
+    // Run/execute
+    $content = $kernel->dispatchRequest($request->module, $request->action);
     
     // Raise 404 error on boolean false result
     if(false === $content) {
         throw new \Alloy\Exception_FileNotFound("Requested file or page not found. Please check the URL and try again.");
-    }
-    
-    // Wrap returned content in a layout
-    if($request->format == 'html' && !$request->isAjax() && !$request->isCli()) {
-        
-        $layout = new \Alloy\View\Template('app');
-
-        // Pass set title up to layout to override at template level
-        if($content instanceof \Alloy\View\Template) {
-            // Force render layout so we can pull out variables set in template
-            $contentRendered = $content->content();
-            $layout->title($content->title());
-            $content = $contentRendered;
-        }
-
-        $layout->path($kernel->config('path.layouts'))
-            ->format($request->format)
-            ->set(array(
-                'kernel' => $kernel,
-                'content' => $content
-                ));
-
-        $content = $layout;
-        $response->contentType('text/html');
-        
-    } elseif(in_array($request->format, array('json', 'xml'))) {
-        // No cache and hide potential errors
-        ini_set('display_errors', 0);
-        $response->header("Expires", "Mon, 26 Jul 1997 05:00:00 GMT"); 
-        $response->header("Last-Modified", gmdate( "D, d M Y H:i:s" ) . "GMT"); 
-        $response->header("Cache-Control", "no-cache, must-revalidate"); 
-        $response->header("Pragma", "no-cache");
-        
-        // Correct content-type
-        if('json' == $request->format) {
-            $response->contentType('application/json');
-        } elseif('xml' == $request->format) {
-            $response->contentType('text/xml');
-        }
     }
 
 // Authentication Error
@@ -158,6 +122,9 @@ try {
     $responseStatus = 500;
     $content = $e;
 }
+
+// Run resulting content through filter
+$content = $kernel->events()->filter('dispatch_content', $content);
 
 // Exception detail depending on mode
 if($content instanceof Exception) {
