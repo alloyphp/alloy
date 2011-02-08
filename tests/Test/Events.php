@@ -111,16 +111,6 @@ class Test_Events extends \PHPUnit_Framework_TestCase
     /**
      * Filters
      */
-    public function testAddFilter()
-    {
-        $this->events->addFilter('test_filter', 'foobar', function($val) {
-            return $val . "bar";
-        });
-        
-        $test = $this->events->filter('test_filter', 'foo');
-
-        $this->assertEquals($test, 'foobar');
-    }
 
     /**
      * @expectedException \InvalidArgumentException
@@ -130,7 +120,7 @@ class Test_Events extends \PHPUnit_Framework_TestCase
         $val = $this->events->addFilter(__FUNCTION__, 'filter_invalid', '1234567890');
     }
 
-    public function testRunFilter()
+    public function testAddFilter()
     {
         $callback = function($val) {
             return $val . "bar";
@@ -143,5 +133,31 @@ class Test_Events extends \PHPUnit_Framework_TestCase
         $test = $this->events->filters('test_filter');
 
         $this->assertEquals($test, array('foo' => $callback));
+    }
+
+    public function testRunFilter()
+    {
+        $this->events->addFilter('test_filter', 'foobar', function($val) {
+            return $val . "bar";
+        });
+        
+        $test = $this->events->filter('test_filter', 'foo');
+
+        $this->assertEquals($test, 'foobar');
+    }
+
+
+    public function testRunFilterMultiple()
+    {
+        $this->events->addFilter('test_filter_multi', 'addbar', function($val) {
+            return $val . "bar";
+        });
+        $this->events->addFilter('test_filter_multi', 'addbazaround', function($val) {
+            return "baz" . $val . "baz";
+        });
+        
+        $test = $this->events->filter('test_filter_multi', 'foo');
+
+        $this->assertEquals($test, 'bazfoobarbaz');
     }
 }
