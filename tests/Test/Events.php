@@ -106,4 +106,42 @@ class Test_Events extends \PHPUnit_Framework_TestCase
         $ev = $this->kernel->events('custom');
         $this->assertEquals($ev->ns(), 'custom');
     }
+
+
+    /**
+     * Filters
+     */
+    public function testAddFilter()
+    {
+        $this->events->addFilter('test_filter', 'foobar', function($val) {
+            return $val . "bar";
+        });
+        
+        $test = $this->events->filter('test_filter', 'foo');
+
+        $this->assertEquals($test, 'foobar');
+    }
+
+    /**
+     * @expectedException \InvalidArgumentException
+     */
+    public function testAddFilterInvalidCallback()
+    {
+        $val = $this->events->addFilter(__FUNCTION__, 'filter_invalid', '1234567890');
+    }
+
+    public function testRunFilter()
+    {
+        $callback = function($val) {
+            return $val . "bar";
+        };
+
+        // Add it
+        $this->events->addFilter('test_filter', 'foo', $callback);
+        
+        // Inspect it
+        $test = $this->events->filters('test_filter');
+
+        $this->assertEquals($test, array('foo' => $callback));
+    }
 }
