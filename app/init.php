@@ -50,7 +50,7 @@ if(!isset($cfgAlloy['path']['lib'])) {
  */
 try {
     // Get Kernel with config and host config
-    require $cfgAlloy['path']['lib'] . '/Alloy/Kernel.php';
+    require_once $cfgAlloy['path']['lib'] . '/Alloy/Kernel.php';
     $kernel = \Kernel($cfgAlloy);
     $kernel->config($cfgHost);
     unset($cfgAlloy, $cfgHost);
