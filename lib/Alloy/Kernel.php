@@ -28,8 +28,6 @@ class Kernel
     protected $instances = array();
     protected $callbacks = array();
     
-    protected $_user = false;
-    
     
     /**
      * Returns an instance of class itself
@@ -353,21 +351,6 @@ class Kernel
         
         // Log with last parameter as 'true' - last param will always be internal marker
         return $this->trace($msg, $data, $function, $file, $line, true);
-    }
-    
-    
-    /**
-     * Get/return user
-     *
-     * @param $className string Name of the class
-     * @return object
-     */
-    public function user($user = null)
-    {
-        if(null !== $user) {
-            $this->_user = $user;
-        }
-        return $this->_user;
     }
     
     
