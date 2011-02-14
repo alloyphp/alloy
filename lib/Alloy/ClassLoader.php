@@ -88,7 +88,7 @@ class ClassLoader
     {
         // If namespace has already been specified, add path to array of possible paths -- don't overwrite
         if(isset($this->namespaces[$namespace])) {
-            $path = array_merge($this->namespaces[$namespace], $path);
+            $path = array_merge($this->namespaces[$namespace], (array) $path);
         }
         $this->namespaces[$namespace] = (array) $path;
         return $this;
@@ -117,7 +117,7 @@ class ClassLoader
     {
         // If prefix has already been specified, add path to array of possible paths -- don't overwrite
         if(isset($this->prefixes[$prefix])) {
-            $path = array_merge($this->prefixes[$prefix], $path);
+            $path = array_merge($this->prefixes[$prefix], (array) $path);
         }
         $this->prefixes[$prefix] = (array) $path;
         return $this;
