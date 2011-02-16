@@ -34,25 +34,26 @@ class Plugin
 
         // Wrap returned content in a layout
         if($request->format == 'html' && !$request->isAjax() && !$request->isCli()) {
-            
-            $layout = new \Alloy\View\Template('app');
+            if(true === $kernel->config('layout.enabled', false)) {
+                $layout = new \Alloy\View\Template($kernel->config('layout.template', 'app'));
 
-            // Pass set title up to layout to override at template level
-            if($content instanceof \Alloy\View\Template) {
-                // Force render layout so we can pull out variables set in template
-                $contentRendered = $content->content();
-                $layout->title($content->title());
-                $content = $contentRendered;
+                // Pass set title up to layout to override at template level
+                if($content instanceof \Alloy\View\Template) {
+                    // Force render layout so we can pull out variables set in template
+                    $contentRendered = $content->content();
+                    $layout->title($content->title());
+                    $content = $contentRendered;
+                }
+
+                $layout->path($kernel->config('path.layouts'))
+                    ->format($request->format)
+                    ->set(array(
+                        'kernel' => $kernel,
+                        'content' => $content
+                        ));
+
+                $content = $layout;
             }
-
-            $layout->path($kernel->config('path.layouts'))
-                ->format($request->format)
-                ->set(array(
-                    'kernel' => $kernel,
-                    'content' => $content
-                    ));
-
-            $content = $layout;
             $response->contentType('text/html');
             
         } elseif(in_array($request->format, array('json', 'xml'))) {

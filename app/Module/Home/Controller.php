@@ -1,11 +1,14 @@
 <?php
 namespace Module\Home;
-use Alloy;
+use App, Alloy;
 
 /**
  * Home Module
+ * 
+ * Extends from base Application controller so custom functionality can be added easily
+ *   lib/App/Module/ControllerAbstract
  */
-class Controller extends Alloy\Module\ControllerAbstract
+class Controller extends App\Module\ControllerAbstract
 {
     /**
      * Index
