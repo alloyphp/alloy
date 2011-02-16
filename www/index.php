@@ -154,14 +154,10 @@ if($kernel) {
         echo "<pre>";
         print_r($kernel->trace());
         echo "</pre>";
-        
-        // Executed queries
-        echo "<hr />";
-        echo "<h1>Executed Queries (" . \Spot\Log::queryCount() . ")</h1>";
-        echo "<pre>";
-        print_r(\Spot\Log::queries());
-        echo "</pre>";
     }
+
+    // Notify that response has been sent
+    $kernel->events()->trigger('response_sent');
 
 } else {
     header("HTTP/1.0 500 Internal Server Error");

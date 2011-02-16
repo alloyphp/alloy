@@ -26,6 +26,9 @@ class Plugin
         // Make methods globally avaialble with Kernel
         $kernel->addMethod('mapper', array($this, 'mapper'));
         $kernel->addMethod('spotConfig', array($this, 'spotConfig'));
+
+        // Debug Spot queries
+        $kernel->events()->bind('response_sent', 'spot_query_log', array($this, 'debugQueryLog'));
     }
 
 
@@ -68,5 +71,20 @@ class Plugin
             }
         }
         return $this->spotConfig;
+    }
+
+    /**
+     * Debug Spot queries by dumping query log
+     */
+    public function debugQueryLog()
+    {
+        if($this->kernel->config('debug')) {
+            // Executed queries
+            echo "<hr />";
+            echo "<h1>Executed Queries (" . \Spot\Log::queryCount() . ")</h1>";
+            echo "<pre>";
+            print_r(\Spot\Log::queries());
+            echo "</pre>";
+        }
     }
 }
