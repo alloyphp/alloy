@@ -32,6 +32,9 @@ class Router_Route
     protected $_paramRegex = "([a-zA-Z0-9\_\-\+\%\s]+)";
     protected $_paramRegexNumeric = "([0-9]+)";
     protected $_paramRegexWildcard = "(.*)";
+
+    // Callbacks
+    protected $_condition;
     
     
     /**
@@ -47,6 +50,11 @@ class Router_Route
         $route = trim($route, '/');
         $routeRegex = $route;
         
+        // Detect static routes to skip regex overhead
+        if(false === strpos($route, '<')) {
+            $this->isStatic(true);
+        }
+
         // No regex compile for static routes if we know ahead of time
         if(!$this->isStatic()) {
             // Extract optional named parameters from route
@@ -265,5 +273,27 @@ class Router_Route
         }
         
         return $this;
+    }
+
+
+    /**
+     * Condition callback
+     *
+     * @param callback $callback Callback function to be used when providing custom route match conditions
+     * @throws \InvalidArgumentException When supplied argument is not a valid callback
+     * @return callback
+     */
+    public function condition($callback = null)
+    {
+        // Setter
+        if(null !== $callback) {
+            if(!is_callable($callback)) {
+                throw new \InvalidArgumentException("Condition provided is not a valid callback. Given (" . gettype($callback) . ")");
+            }
+            $this->_condition = $callback;
+            return $this;
+        }
+
+        return $this->_condition;
     }
 }

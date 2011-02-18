@@ -149,8 +149,31 @@ class Test_Router extends \PHPUnit_Framework_TestCase
         $this->assertEquals("vehicle", $params['module']);
         $this->assertEquals("view", $params['action']);
         $this->assertEquals("2007", $params['year']);
-        $this->assertEquals("chrysler", $params['make']);
+        $this->assertEquals("chrysler", $params['make'] );
         $this->assertEquals("town & country", $params['model']);
         $this->assertEquals("json", $params['format']);
+    }
+
+    public function testRouteConditionFalse()
+    {
+        $this->router->route('module', '/<:module>')
+            ->condition(function($params, $method, $url) {
+                return ($url != "test");
+            });
+        $this->router->route('module2', '/<:module2>');
+        
+        // Match SECOND route (first one should skip)
+        $params = $this->router->match("GET", "test");
+        $this->assertEquals(array('module2' => 'test'), $params);
+    }
+
+
+    /**
+     * @expectedException \InvalidArgumentException
+     */
+    public function testRouteConditionCallbackInvalidThrowsException()
+    {
+        $this->router->route('module', '/<:module>')
+            ->condition('funnystuff');
     }
 }

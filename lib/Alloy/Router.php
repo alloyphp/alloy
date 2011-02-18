@@ -26,8 +26,7 @@ class Router
      */
     public function route($name, $route, array $defaults = array())
     {
-        $routeClass = get_class($this) . '_Route';
-        $route = new $routeClass($route);
+        $route = new Router_Route($route);
         $this->_routes[$name] = $route->name($name);
         return $route;
     }
@@ -64,6 +63,18 @@ class Router
         $routes = $this->routes();
         foreach($routes as $routeName => $route) {
             if($params = $this->routeMatch($route, $method, $url)) {
+                // Check condition callback if set
+                $cb = $route->condition();
+                if(null !== $cb) {
+                    // Pass in method, url, and matched params
+                    $cbr = call_user_func($cb, $params, $method, $url);
+                    // Condition returned false - no match - skip route and clear matched data
+                    if(false === $cbr) {
+                        $params = array();
+                        $this->_matchedRouteName = null;
+                        continue;
+                    }
+                }
                 break;
             }
         }
@@ -75,7 +86,7 @@ class Router
     /**
      * Match URL against a specific given route
      */
-    protected function routeMatch(\Alloy\Router_Route $route, $method, $url)
+    protected function routeMatch(Router_Route $route, $method, $url)
     {
         $params = array();
         
@@ -121,7 +132,7 @@ class Router
                 // Combine params
                 if(count($namedParamsMatched) != count($matches)) {
                     // Route has inequal matches to named params
-                    throw new \Exception("Error matching URL to route params: matched(" . count($matches) . ") != named(" . count($namedParamsMatched) . ")");
+                    throw new \InvalidArgumentException("Error matching URL to route params: matched(" . count($matches) . ") != named(" . count($namedParamsMatched) . ")");
                 }
                 $params = array_combine(array_keys($namedParamsMatched), $matches);
                 
@@ -146,7 +157,7 @@ class Router
         if($this->_matchedRouteName) {
             return $this->_routes[$this->_matchedRouteName];
         } else {
-            throw new \Exception("Unable to return last route matched - No route has been matched yet.");
+            throw new \LogicException("Unable to return last route matched - No route has been matched yet.");
         }
     }
     
