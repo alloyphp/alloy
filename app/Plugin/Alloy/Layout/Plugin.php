@@ -70,6 +70,11 @@ class Plugin
             } elseif('xml' == $request->format) {
                 $response->contentType('text/xml');
             }
+
+            // Send the correct response status for Resources
+            if($content instanceof \Alloy\Resource) {
+                $response->status($content->status());
+            }
         }
 
         return $content;
