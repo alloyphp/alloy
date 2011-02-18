@@ -80,8 +80,8 @@ class Template
         }
         echo $cached($this);
     }
-    
-    
+
+
     /**
      * Gets a view variable
      *
@@ -92,34 +92,13 @@ class Template
      * @return mixed   value if the key is found
      * @return null    if key is not found
      */
-    public function __get($var)
+    public function get($var)
     {
         if(isset($this->_vars[$var])) {
             return $this->_vars[$var];
         } else {
             return null;
         }
-    }
-    
-    
-    /**
-     * Sets a view variable.
-     *
-     * @param   string   key
-     * @param   string   value
-     */
-    public function __set($key, $value)
-    {
-        $this->set($key, $value);
-    }
-    
-    
-    /**
-     * Gets a view variable
-     */
-    public function get($var)
-    {
-        return $this->__get($var);
     }
     
     
@@ -144,7 +123,25 @@ class Template
         }
         return $this; // Fluent interface
     }
+
+
+    /**
+     * Gets a view variable
+     */
+    public function __get($var)
+    {
+        $this->get($var);
+    }
     
+    
+    /**
+     * Sets a view variable.
+     */
+    public function __set($key, $value)
+    {
+        $this->set($key, $value);
+    }
+
     
     /**
      * Get template variables
