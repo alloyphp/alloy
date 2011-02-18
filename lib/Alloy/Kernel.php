@@ -404,7 +404,7 @@ class Kernel
         $sPluginClass = 'Plugin\\' . $sPlugin . '\Plugin';
         
         // Ensure class exists / can be loaded
-        if(!class_exists($sPluginClass)) {
+        if(!class_exists($sPluginClass, $init)) {
             return false;
         }
         
