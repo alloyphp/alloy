@@ -13,6 +13,7 @@ namespace Alloy\View\Helper;
 class Head extends HelperAbstract
 {
     protected $_assetHelper;
+    protected $_title;
     protected $_styles = array();
     protected $_scripts = array();
     protected $_contentPrepend = array();
@@ -43,6 +44,20 @@ class Head extends HelperAbstract
     public function script()
     {
         $this->_scripts[] = call_user_func_array(array($this->_assetHelper, __FUNCTION__), func_get_args());
+    }
+
+
+    /**
+     * Get/Set title, usually to pass along to layout
+     */
+    public function title($title = null)
+    {
+        if(null === $title) {
+            return $this->_title;
+        } else {
+            $this->_title = $title;
+            return $this; // Fluent interface
+        }
     }
     
     

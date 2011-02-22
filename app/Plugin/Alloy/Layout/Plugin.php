@@ -38,10 +38,10 @@ class Plugin
                 $layout = new \Alloy\View\Template($kernel->config('layout.template', 'app'));
 
                 // Pass set title up to layout to override at template level
-                if($content instanceof \Alloy\View\Template) {
+                if($content instanceof Alloy\View\Template) {
                     // Force render layout so we can pull out variables set in template
                     $contentRendered = $content->content();
-                    $layout->title($content->title());
+                    $layout->head()->title($content->head()->title());
                     $content = $contentRendered;
                 }
 
@@ -70,11 +70,11 @@ class Plugin
             } elseif('xml' == $request->format) {
                 $response->contentType('text/xml');
             }
+        }
 
-            // Send the correct response status for Resources
-            if($content instanceof \Alloy\Resource) {
-                $response->status($content->status());
-            }
+        // Pass along set response status and data if we can
+        if($content instanceof Alloy\Module\ResponseAbstract) {
+            $response->status($content->status());
         }
 
         return $content;

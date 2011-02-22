@@ -1,5 +1,6 @@
 <?php
 namespace Alloy;
+use Alloy\Module;
 
 /**
  * Resource wrapper object
@@ -7,7 +8,7 @@ namespace Alloy;
  * @package Alloy Framework
  * @link http://alloyframework.com/
  */
-class Resource
+class Resource extends Module\Response
 {
     protected $_resource;
     protected $_errors = array();
@@ -20,7 +21,7 @@ class Resource
      *
      * @param mixed $resource Array or Object that has a 'toArray' method
      */
-    public function __construct($resource)
+    public function __construct($resource = array())
     {
         $this->_resource = $resource;
     }
@@ -51,38 +52,6 @@ class Resource
         }
 
         $this->_location = $url;
-        return $this;
-    }
-    
-    
-    /**
-     * HTTP Status code
-     *
-     * @param int $statusCode HTTP status code to return
-     */
-    public function status($statusCode = null)
-    {
-        if(null === $statusCode) {
-            return $this->_status;
-        }
-
-        $this->_status = $statusCode;
-        return $this;
-    }
-
-
-    /**
-     * Errors
-     *
-     * @param mixed $errors Error array to return
-     */
-    public function errors($errors = null)
-    {
-        if(null === $errors) {
-            return $this->_errors;
-        }
-
-        $this->_errors += $errors;
         return $this;
     }
     
@@ -136,13 +105,14 @@ class Resource
 
         return $r;
     }
+
     
     /**
      * Return string content of resource
      *
      * @return string
      */
-    public function __toString()
+    public function content()
     {
         // Return unchanged if string
         if(is_string($this->_resource)) {
