@@ -57,6 +57,7 @@ abstract class ControllerAbstract
      *
      * @param string $file Template filename
      * @param string $format Template output format
+     * @return \Alloy\View\Template
      */
     public function template($file, $format = null)
     {
@@ -65,5 +66,20 @@ abstract class ControllerAbstract
         $view = new \Alloy\View\Template($file, $format, $this->path() . "/views/");
         $view->format($kernel->request()->format);
         return $view;
+    }
+
+
+    /**
+     * New generic module response
+     *
+     * @param string $file Template filename
+     * @return \Alloy\Module\Response
+     */
+    public function response($content, $status = 200)
+    {
+        $res = new \Alloy\Module\Response();
+        $res->content($content)
+            ->status($status);
+        return $res;
     }
 }

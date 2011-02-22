@@ -36,6 +36,11 @@ class Plugin
         if($request->format == 'html' && !$request->isAjax() && !$request->isCli()) {
             if(true === $kernel->config('layout.enabled', false)) {
                 $layout = new \Alloy\View\Template($kernel->config('layout.template', 'app'));
+                // Pass along set response status and data if we can
+                if($content instanceof Alloy\Module\Response) {
+                    $layout->status($content->status());
+                    $layout->errors($content->errors());
+                }
 
                 // Pass set title up to layout to override at template level
                 if($content instanceof Alloy\View\Template) {
@@ -70,11 +75,6 @@ class Plugin
             } elseif('xml' == $request->format) {
                 $response->contentType('text/xml');
             }
-        }
-
-        // Pass along set response status and data if we can
-        if($content instanceof Alloy\Module\Response) {
-            $response->status($content->status());
         }
 
         return $content;

@@ -33,4 +33,27 @@ class Controller extends App\Module\ControllerAbstract
     {
         return "Hello World!";
     }
+
+
+    /**
+     * Returns 400 "Bad Request" HTTP Status
+     * @method GET
+     */
+    public function helloBadAction(Alloy\Request $request)
+    {
+        // Set to any HTTP status code you want
+        return $this->response("Hello Bad Request!", 400);
+    }
+
+
+    /**
+     * Returns generic "404 File Not Found" error
+     *  Useful for silent failure conditions like trying to retrieve a DB record that does not exist
+     * 
+     * @method GET
+     */
+    public function hello404(Alloy\Request $request)
+    {
+        return false;
+    }
 }
