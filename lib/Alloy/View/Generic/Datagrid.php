@@ -36,7 +36,7 @@ class Datagrid extends \Alloy\View\Template
             throw new \Alloy\View\Exception("Data provided must be defined by using either an array or Traversable object - given (" . gettype($data) . ").");
         }
         
-        $this->_data = $data;
+        $this->set('columnData', $data);
         return $this;
     }
     
