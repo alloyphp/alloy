@@ -36,12 +36,17 @@ class Plugin
         if($request->format == 'html' && !$request->isAjax() && !$request->isCli()) {
             if(true === $kernel->config('layout.enabled', false)) {
                 $layout = new \Alloy\View\Template($kernel->config('layout.template', 'app'));
+                // Pass along set response status and data if we can
+                if($content instanceof Alloy\Module\Response) {
+                    $layout->status($content->status());
+                    $layout->errors($content->errors());
+                }
 
                 // Pass set title up to layout to override at template level
-                if($content instanceof \Alloy\View\Template) {
+                if($content instanceof Alloy\View\Template) {
                     // Force render layout so we can pull out variables set in template
                     $contentRendered = $content->content();
-                    $layout->title($content->title());
+                    $layout->head()->title($content->head()->title());
                     $content = $contentRendered;
                 }
 

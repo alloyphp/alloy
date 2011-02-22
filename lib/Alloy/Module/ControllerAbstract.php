@@ -37,7 +37,7 @@ abstract class ControllerAbstract
     {
         $class = get_called_class();
         $path = str_replace('\\', '/', str_replace('\\Controller', '', $class));
-        return $this->kernel->config('path.app') . '/' . $path;
+        return \Kernel()->config('path.app') . '/' . $path;
     }
     
     
@@ -57,13 +57,29 @@ abstract class ControllerAbstract
      *
      * @param string $file Template filename
      * @param string $format Template output format
+     * @return \Alloy\View\Template
      */
     public function template($file, $format = null)
     {
-        $format = ($format) ?: $this->kernel->request()->format;
+        $kernel = \Kernel();
+        $format = ($format) ?: $kernel->request()->format;
         $view = new \Alloy\View\Template($file, $format, $this->path() . "/views/");
-        $view->format($this->kernel->request()->format);
-        $view->set('kernel', $this->kernel);
+        $view->format($kernel->request()->format);
         return $view;
+    }
+
+
+    /**
+     * New generic module response
+     *
+     * @param string $file Template filename
+     * @return \Alloy\Module\Response
+     */
+    public function response($content, $status = 200)
+    {
+        $res = new \Alloy\Module\Response();
+        $res->content($content)
+            ->status($status);
+        return $res;
     }
 }

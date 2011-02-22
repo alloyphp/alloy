@@ -2,7 +2,7 @@
 $asset = $view->helper('Asset');
 
 // If page title has been set by sub-template
-if($title = $view->title()) {
+if($title = $view->head()->title()) {
 	$title .= " - Alloy Framework";
 } else {
 	$title = "Alloy Framework Application";

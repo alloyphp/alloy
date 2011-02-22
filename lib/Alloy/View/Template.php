@@ -1,5 +1,6 @@
 <?php
 namespace Alloy\View;
+use Alloy\Module;
 
 /**
  * View template class that will display and handle view templates
@@ -8,14 +9,13 @@ namespace Alloy\View;
  * @link http://alloyframework.com/
  * @license http://www.opensource.org/licenses/bsd-license.php
  */
-class Template
+class Template extends Module\Response
 {
     // Template specific stuff
     protected $_file;
     protected $_fileFormat;
     protected $_vars = array();
     protected $_path;
-    protected $_title;
     
     // Extension type
     protected $_default_format = 'html';
@@ -23,12 +23,6 @@ class Template
     
     // Helpers
     protected static $_helpers = array();
-    
-    // Errors
-    protected $_errors = array();
-    
-    // Kernel instance
-    protected $kernel;
     
     
     /**
@@ -39,8 +33,6 @@ class Template
      */
     public function __construct($file, $format = 'html', $path = null)
     {
-        $this->kernel = \Kernel();
-        
         $this->file($file, $format);
         $this->path($path);
         
@@ -248,40 +240,6 @@ class Template
     
     
     /**
-     * Set errors to template
-     *
-     * @param array $errors
-     */
-    public function errors($errors = null)
-    {
-        //$this->set('errors', $errors);
-        if(null === $errors) {
-            return $this->_errors;
-        } elseif(is_string($errors)) {
-            return isset($this->_errors[$errors]) ? $this->_errors[$errors] : array();
-        } else {
-            $this->_errors = $errors;
-            return $this; // Fluent interface
-        }
-        return $this; // Fluent interface
-    }
-
-
-    /**
-     * Get/Set title, usually to pass along to layout
-     */
-    public function title($title = null)
-    {
-        if(null === $title) {
-            return $this->_title;
-        } else {
-            $this->_title = $title;
-            return $this; // Fluent interface
-        }
-    }
-    
-    
-    /**
      * Escapes HTML entities
      * Use to prevent XSS attacks
      *
@@ -298,7 +256,7 @@ class Template
      */
     public function url($params, $route = null, array $qsData = array(), $qsAppend = false)
     {
-        return $this->kernel->url($params, $route, $qsData, $qsAppend);
+        return \Kernel()->url($params, $route, $qsData, $qsAppend);
     }
     
     
@@ -342,7 +300,7 @@ class Template
      */
     public function toDate($input = null, $format = 'M d, Y')
     {
-        $format = $this->kernel->config('i18n.date_format', $format);
+        $format = \Kernel()->config('i18n.date_format', $format);
         return $input ? date($format, (is_numeric($input) ? $input : strtotime($input))) : date($format);
     }
     
@@ -356,7 +314,7 @@ class Template
      */
     public function toDateTime($input = null, $format = null)
     {
-        $format = (null !== $format) ? $format : ($this->kernel->config('i18n.date_format') . ' ' . $this->kernel->config('i18n.time_format'));
+        $format = (null !== $format) ? $format : (\Kernel()->config('i18n.date_format') . ' ' . \Kernel()->config('i18n.time_format'));
         return $input ? date($format, (is_numeric($input) ? $input : strtotime($input))) : date($format);
     }
     
@@ -372,15 +330,6 @@ class Template
     {
         $partial = new static($template, $this->format(), $this->path());
         return $partial->set($vars);
-    }
-    
-    
-    /**
-     * Display template file (read and echo contents)
-     */
-    public function render()
-    {
-        echo $this->content();
     }
     
     
@@ -413,7 +362,7 @@ class Template
 
             // Localize object instance for easier use in closures 
             $view = &$this;
-            $kernel = $this->kernel;
+            $kernel = \Kernel();
 
             include($vfile);
             $templateContent = ob_get_clean();
@@ -423,28 +372,5 @@ class Template
         }
             
         return $templateContent;
-    }
-    
-    
-    /**
-     * Converts view object to string on the fly
-     *
-     * @return  string
-     */
-    public function __toString()
-    {
-        // Exceptions cannot be thrown in __toString method (results in fatal error)
-        // We have to catch any that may be thrown and return a string
-        try {
-            $content = $this->content();
-        } catch(Alloy\Exception_View $e) {
-            $content = $e->getError();
-        } catch(\Exception $e) {
-            $content = "<strong>TEMPLATE RENDERING ERROR:</strong><br />" . $e->getMessage();
-            if($this->kernel->config('debug')) {
-                $this->kernel->dump($e->getTraceAsString());
-            }
-        }
-        return $content;
     }
 }
