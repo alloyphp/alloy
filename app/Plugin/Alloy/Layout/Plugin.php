@@ -73,7 +73,7 @@ class Plugin
         }
 
         // Pass along set response status and data if we can
-        if($content instanceof Alloy\Module\ResponseAbstract) {
+        if($content instanceof Alloy\Module\Response) {
             $response->status($content->status());
         }
 
