@@ -1,6 +1,6 @@
 <?php
 namespace Plugin\Spot;
-use Alloy;
+use Spot, Alloy;
 
 /**
  * Spot ORM Plugin
@@ -26,9 +26,13 @@ class Plugin
         // Make methods globally avaialble with Kernel
         $kernel->addMethod('mapper', array($this, 'mapper'));
         $kernel->addMethod('spotConfig', array($this, 'spotConfig'));
+        $kernel->addMethod('spotForm', array($this, 'spotForm'));
 
         // Debug Spot queries
         $kernel->events()->bind('response_sent', 'spot_query_log', array($this, 'debugQueryLog'));
+
+        // Add 'autoinstall' method as callback for 'dispatch_content' filter when exceptions are encountered
+        $kernel->events()->addFilter('dispatch_content', 'autoinstallOnException', array($this, 'autoinstallOnException'));
     }
 
 
@@ -73,6 +77,25 @@ class Plugin
         return $this->spotConfig;
     }
 
+
+    /**
+     * Return view object for the add/edit form
+     *
+     * @param \Spot\Entity $entity Entity object to build form from and set data with
+     */
+    public function spotForm(Spot\Entity $entity)
+    {
+        $entityClass = get_class($entity);
+        $view = new \Alloy\View\Generic\Form('form');
+        $view->action('')
+            ->method('post')
+            ->fields($entityClass::fields()) // love me some late static binding
+            ->data($entity->data())
+            ->removeFields(array('id', 'date_created', 'date_modified'));
+        return $view;
+    }
+
+
     /**
      * Debug Spot queries by dumping query log
      */
@@ -86,5 +109,27 @@ class Plugin
             print_r(\Spot\Log::queries());
             echo "</pre>";
         }
+    }
+
+
+    /**
+     * Autoinstall missing tables on exception
+     */
+    public function autoinstallOnException($content)
+    {
+        $kernel = \Kernel();
+
+        // Database error
+        if($content instanceof \PDOException
+          || $content instanceof \Spot\Exception_Datasource_Missing) {
+            if($content instanceof \Spot\Exception_Datasource_Missing
+              ||'42S02' == $content->getCode()
+              || false !== stripos($content->getMessage(), 'Base table or view not found')) {
+                // Table not found - auto-install module to cause Entity migrations
+                $content = $kernel->dispatch($kernel->request()->module, 'install');
+            }
+        }
+
+        return $content;
     }
 }

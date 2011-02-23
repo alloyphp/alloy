@@ -139,7 +139,10 @@ class Mysql extends PDO_Abstract implements AdapterInterface
 			if ( is_bool($default) && $fieldInfo['type'] == "boolean" ) {
 				$default = $default ? 1 : 0;
 			}
-			$syntax .= " DEFAULT '" . $default . "'";
+
+			if(is_scalar($default)) {
+				$syntax .= " DEFAULT '" . $default . "'";
+			}
 		}
 		// Extra
 		$syntax .= ($fieldInfo['primary'] && $fieldInfo['serial']) ? ' AUTO_INCREMENT' : '';
