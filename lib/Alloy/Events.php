@@ -175,7 +175,11 @@ class Events
     {
         if(isset($this->_filters[$name])) {
             foreach($this->_filters[$name] as $hookName => $callback) {
-                $value = call_user_func($callback, $value);
+                try {
+                    $value = call_user_func($callback, $value);
+                } catch(\Exception $e) {
+                    $value = $e;
+                }
             }
         }
         return $value;

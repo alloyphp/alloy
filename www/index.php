@@ -129,7 +129,7 @@ try {
 $content = $kernel->events()->filter('dispatch_content', $content);
 
 // Exception detail depending on mode
-if($content instanceof Exception) {
+if($content instanceof \Exception) {
     $e = $content;
     $content = "<h1>ERROR</h1><p>" . get_class($e) . " (Code: " . $e->getCode() . ")<br />" . $e->getMessage() . "</p>";
     // Show debugging info?

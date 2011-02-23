@@ -115,7 +115,15 @@ abstract class Entity
             throw new \InvalidArgumentException(__METHOD__ . " Expected array or object input - " . gettype($data) . " given");
         }
     }
-    
+
+    /**
+     * Alias of self::data()
+     */
+    public function toArray()
+    {
+        return $this->data();
+    }
+
     
     /**
      * Gets data that has been modified since object construct

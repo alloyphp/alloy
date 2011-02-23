@@ -28,7 +28,12 @@ class Plugin
      */
     public function wrapLayout($content)
     {
-        $kernel = $this->kernel;
+        // Don't do anything with exceptions
+        if($content instanceof \Exception) {
+            return $content;
+        }
+
+        $kernel = \Kernel();
         $request = $kernel->request();
         $response = $kernel->response();
 

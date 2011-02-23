@@ -113,9 +113,18 @@ class Form extends \Alloy\View\Template
     public function removeFields($fieldName)
     {
         $fields = (array) $fieldName;
+
+        // Fields
         foreach($fields as $field) {
             if(isset($this->_fields[$field])) {
                 unset($this->_fields[$field]);
+            }
+        }
+
+        // Data
+        foreach($fields as $field) {
+            if(isset($this->_fieldValues[$field])) {
+                unset($this->_fieldValues[$field]);
             }
         }
         return $this;
@@ -127,7 +136,7 @@ class Form extends \Alloy\View\Template
      *
      * @param string $text Text to display on the button
      */
-    public function submitButtonText($text = null)
+    public function submit($text = null)
     {
         if(null === $text) {
             return $this->_submitButtonText;

@@ -112,8 +112,13 @@ class Resource extends Module\Response
      *
      * @return string
      */
-    public function content()
+    public function content($content = null)
     {
+        if(null !== $content) {
+            $this->_resource = $content;
+            return $this;
+        }
+
         // Return unchanged if string
         if(is_string($this->_resource)) {
             return $this->_resource;

@@ -280,6 +280,7 @@ abstract class PDO_Abstract extends AdapterAbstract implements AdapterInterface
 		// Add query to log
 		\Spot\Log::addQuery($this, $sql, $binds);
 		
+		$result = false;
 		try {
 			// Prepare update query
 			$stmt = $this->connection()->prepare($sql);

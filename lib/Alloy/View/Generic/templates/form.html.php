@@ -62,9 +62,11 @@ $formMethodRest = ($formMethod == 'POST' && $method != 'POST') ? $method : false
       $setFields = $view->fields();
       $dataWithoutFields = array_diff_key($setData, $setFields);
       foreach($dataWithoutFields as $unsetField => $unsetValue):
+        if(is_scalar($unsetValue)):
       ?>
         <input type="hidden" name="<?php echo $unsetField; ?>" value="<?php echo $unsetValue; ?>" />  
       <?php
+        endif;
       endforeach;
       ?>
       <?php if($formMethodRest): ?>
@@ -72,7 +74,7 @@ $formMethodRest = ($formMethod == 'POST' && $method != 'POST') ? $method : false
       <?php endif; ?>
     </li>
     <li class="app_form_actions">
-      <button type="submit" class="app_action_primary"><?php echo $view->submitButtonText(); ?></button>
+      <button type="submit" class="app_action_primary"><?php echo $view->submit(); ?></button>
       <!--<a href="#" class="app_action_cancel">Cancel</a>-->
     </li>
   </ol>
