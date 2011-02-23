@@ -17,6 +17,20 @@ if($title = $view->head()->title()) {
 </head>
 <body>
     
+    <?php
+    // Display errors
+    if($errors = $view->errors()):
+    ?>
+      <p><b>ERRORS:</b></p>
+      <ul>
+      <?php foreach($errors as $field => $fieldErrors): ?>
+      	<?php foreach($fieldErrors as $error): ?>
+      		<li><?php echo $error; ?></li>
+      	<?php endforeach; ?>
+      <?php endforeach; ?>
+      </ul>
+    <?php endif; ?>
+
     <?php echo $content; ?>
     
 </body>
