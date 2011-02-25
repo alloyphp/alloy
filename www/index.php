@@ -94,6 +94,9 @@ try {
         throw new \Alloy\Exception_FileNotFound("Requested file or page not found. Please check the URL and try again.");
     }
 
+    // Run resulting content through filter
+    $content = $kernel->events()->filter('dispatch_content', $content);
+
 // Authentication Error
 } catch(\Alloy\Exception_Auth $e) {
     $responseStatus = 403;
@@ -125,17 +128,22 @@ try {
     $content = $e;
 }
 
-// Run resulting content through filter
-$content = $kernel->events()->filter('dispatch_content', $content);
 
 // Exception detail depending on mode
 if($content instanceof \Exception) {
-    $e = $content;
-    $content = "<h1>ERROR</h1><p>" . get_class($e) . " (Code: " . $e->getCode() . ")<br />" . $e->getMessage() . "</p>";
-    // Show debugging info?
-    if($kernel && $kernel->config('debug')) {
-        $content .= "<p>File: " . $e->getFile() . " (" . $e->getLine() . ")</p>";
-        $content .= "<pre>" . $e->getTraceAsString() . "</pre>";
+
+    // Filter to give a chance for Plugins to handle error
+    $content = $kernel->events()->filter('dispatch_exception', $content);
+
+    // Content still an exception, default display
+    if($content instanceof \Exception) {
+        $e = $content;
+        $content = "<h1>ERROR</h1><p>" . get_class($e) . " (Code: " . $e->getCode() . ")<br />" . $e->getMessage() . "</p>";
+        // Show debugging info?
+        if($kernel && ($kernel->config('debug') || $kernel->config('mode.development'))) {
+            $content .= "<p>File: " . $e->getFile() . " (" . $e->getLine() . ")</p>";
+            $content .= "<pre>" . $e->getTraceAsString() . "</pre>";
+        }
     }
 }
 

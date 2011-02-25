@@ -31,8 +31,8 @@ class Plugin
         // Debug Spot queries
         $kernel->events()->bind('response_sent', 'spot_query_log', array($this, 'debugQueryLog'));
 
-        // Add 'autoinstall' method as callback for 'dispatch_content' filter when exceptions are encountered
-        $kernel->events()->addFilter('dispatch_content', 'autoinstallOnException', array($this, 'autoinstallOnException'));
+        // Add 'autoinstall' method as callback for 'dispatch_exception' filter when exceptions are encountered
+        $kernel->events()->addFilter('dispatch_exception', 'spot_autoinstall_on_exception', array($this, 'autoinstallOnException'));
     }
 
 
