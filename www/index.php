@@ -6,6 +6,18 @@ require dirname(__DIR__) . '/app/init.php';
  * Run
  */
 try {
+    // Load plugins
+    if($plugins = $kernel->config('plugins', false)) {
+        if(!is_array($plugins)) {
+            throw new \InvalidArgumentException("Plugin configuration from app config must be an array. Given (" . gettype($plugins) . ").");
+        }
+
+        foreach($plugins as $pluginName) {
+            $plugin = $kernel->plugin($pluginName);
+        }
+    }
+    $kernel->events()->trigger('boot_start');
+
     // Error and session setup
     set_error_handler(array($kernel, 'errorHandler'));
     ini_set("session.cookie_httponly", true); // Mitigate XSS javascript cookie attacks for browers that support it
@@ -58,21 +70,6 @@ try {
     // Set matched params back on request object
     $request->setParams($params);
     $request->route = $router->matchedRoute()->name();
-    
-    // Load plugins
-    if($plugins = $kernel->config('plugins', false)) {
-        if(!is_array($plugins)) {
-            throw new \InvalidArgumentException("Plugin configuration from app config must be an array. Given (" . gettype($plugins) . ").");
-        }
-
-        foreach($plugins as $pluginName) {
-            $plugin = $kernel->plugin($pluginName);
-            if(false === $plugin) {
-                throw new \Exception("Unable to load plugin '" . $pluginName . "'. Remove from app config or ensure plugin files exist in 'app' or 'vendor' load paths.");
-            }
-        }
-    }
-    $kernel->events()->trigger('plugins_loaded');
 
     // Required params
     $content = false;
@@ -82,12 +79,12 @@ try {
         
         // Matched route
         $kernel->events()->trigger('route_match');
+
+        // Run/execute
+        $content = $kernel->dispatchRequest($request->module, $request->action);
     } else {
         $content = $kernel->events()->filter('route_not_found', $content);
     }
-
-    // Run/execute
-    $content = $kernel->dispatchRequest($request->module, $request->action);
     
     // Raise 404 error on boolean false result
     if(false === $content) {
@@ -149,6 +146,8 @@ if($content instanceof \Exception) {
 
 // Send proper response
 if($kernel) {
+    $response = $kernel->response();
+    
     // Set content and send response
     if($responseStatus != 200) {
         $response->status($responseStatus);
@@ -172,6 +171,9 @@ if($kernel) {
 
     // Notify that response has been sent
     $kernel->events()->trigger('response_sent');
+
+    // Notify events of shutdown
+    $kernel->events()->trigger('boot_stop');
 
 } else {
     header("HTTP/1.0 500 Internal Server Error");
