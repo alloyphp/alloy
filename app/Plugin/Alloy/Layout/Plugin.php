@@ -16,10 +16,8 @@ class Plugin
      */
     public function __construct(Alloy\Kernel $kernel)
     {
-        $this->kernel = $kernel;
-
         // Add 'wrapLayout' method as callback for 'dispatch_content' filter
-        $kernel->events()->addFilter('dispatch_content', 'layout_wrap', array($this, 'wrapLayout'));
+        $kernel->events()->addFilter('dispatch_content', 'alloy_layout_wrap', array($this, 'wrapLayout'));
     }
 
 
@@ -28,19 +26,24 @@ class Plugin
      */
     public function wrapLayout($content)
     {
-        // Don't do anything with exceptions
-        if($content instanceof \Exception) {
-            return $content;
-        }
-
         $kernel = \Kernel();
         $request = $kernel->request();
         $response = $kernel->response();
 
         // Wrap returned content in a layout
         if($request->format == 'html' && !$request->isAjax() && !$request->isCli()) {
-            if(true === $kernel->config('layout.enabled', false)) {
-                $layout = new \Alloy\View\Template($kernel->config('layout.template', 'app'));
+
+            // Get layout to use
+            $layoutName = null;
+            if($content instanceof Alloy\View\Template) {
+                $layoutName = $content->layout();
+            }
+            if(null === $layoutName) {
+                $layoutName = $kernel->config('layout.template', 'app');
+            }
+
+            if($layoutName && true === $kernel->config('layout.enabled', false)) {
+                $layout = new \Alloy\View\Template($layoutName);
                 // Pass along set response status and data if we can
                 if($content instanceof Alloy\Module\Response) {
                     $layout->status($content->status());
