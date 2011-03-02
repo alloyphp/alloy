@@ -380,7 +380,7 @@ class Kernel
         // Run init() setup only if supported
         if(true === $init) {
             if(method_exists($sModuleObject, 'init')) {
-                    $sModuleObject->init();
+                $sModuleObject->init();
             }
         }
         
@@ -392,20 +392,27 @@ class Kernel
      * Load and return instantiated plugin class
      *
      * @param string $plugin Name of the plugin to get the instance for
+     * @throws \InvalidArgumentException When plugin is not found by name
      * @return object
      */
     public function plugin($plugin, $init = true)
     {
-        // Clean module name to prevent possible security vulnerabilities
-        $sPlugin = preg_replace('/[^a-zA-Z0-9_]/', '', $plugin);
-        
-        // Upper-case beginning of each word
-        $sPlugin = str_replace(' ', '\\', ucwords(str_replace('_', ' ', $sPlugin)));
-        $sPluginClass = 'Plugin\\' . $sPlugin . '\Plugin';
+        // Module plugin
+        //   ex: 'Module\User'
+        if(false !== strpos($plugin, 'Module\\')) {
+            $sPluginClass = $plugin . '\Plugin';
+
+        // Named plugin
+        //   ex: 'Spot'
+        } else {
+            // Upper-case beginning of each word
+            $sPlugin = str_replace(' ', '\\', ucwords(str_replace('_', ' ', $plugin)));
+            $sPluginClass = 'Plugin\\' . $sPlugin . '\Plugin';
+        }
         
         // Ensure class exists / can be loaded
-        if(!class_exists($sPluginClass, $init)) {
-            return false;
+        if(!class_exists($sPluginClass)) {
+            throw new \InvalidArgumentException("Unable to load plugin '" . $sPluginClass . "'. Remove from app config or ensure plugin files exist in 'app' or 'vendor' load paths.");
         }
         
         // Instantiate module class
@@ -627,6 +634,24 @@ class Kernel
         } else {
             return round($size/$tb,2)." TB";
         }
+    }
+
+
+    /**
+     * Generate random string
+     * 
+     * @param int $length Character length of returned random string
+     * @return string Random string generated
+     */
+    public function randomString($length = 32)
+    {
+        $string = "";
+        $possible = "abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789`~!@#$%^&*()-_+=";
+        for($i=0;$i < $length;$i++) {
+            $char = $possible[mt_rand(0, strlen($possible)-1)];
+            $string .= $char;
+        }
+        return $string;
     }
     
     

@@ -16,6 +16,7 @@ class Template extends Module\Response
     protected $_fileFormat;
     protected $_vars = array();
     protected $_path;
+    protected $_layout;
     
     // Extension type
     protected $_default_format = 'html';
@@ -23,6 +24,9 @@ class Template extends Module\Response
     
     // Helpers
     protected static $_helpers = array();
+
+    // Content blocks
+    protected static $_blocks = array();
     
     
     /**
@@ -44,6 +48,20 @@ class Template extends Module\Response
      * Setup for view, used for extensibility without overriding constructor
      */
     public function init() {}
+
+
+    /**
+     * Layout template getter/setter
+     */
+    public function layout($layout = null)
+    {
+        if(null === $layout) {
+            return $this->_layout;
+        }
+
+        $this->_layout = $layout;
+        return $this;
+    }
     
     
     /**
@@ -61,7 +79,7 @@ class Template extends Module\Response
      */
     public function cache($closure, $name)
     {
-        if(is_array($closure) || !is_callable($closure)) {
+        if(is_array($closure) || is_string($closure) || !is_callable($closure)) {
             throw new \InvalidArgumentException("Cache helper expected a closure");
         }
         
@@ -71,6 +89,43 @@ class Template extends Module\Response
             $cached = $helper->set($name, $closure);
         }
         echo $cached($this);
+    }
+
+
+    /**
+     * Block content
+     * Static global content blocks that can be set and used across views and layouts
+     * 
+     * @param string $name Block name
+     * @param closure $closure Closure or anonymous function for block to execute and display
+     */
+    public function block($name, $closure = null)
+    {
+        // Getter
+        if(null === $closure) {
+            $content = null;
+            if(isset(static::$_blocks[$name])) {
+                // Execute all closure callbacks
+                $blocks = static::$_blocks[$name];
+                ob_start();
+                foreach($blocks as $closure) {
+                    echo $closure();
+                }
+                $content = ob_get_clean();
+            }
+            
+            // Return content
+            return $content;
+        }
+
+        // Setter
+        if(is_array($closure) || is_string($closure) || !is_callable($closure)) {
+            throw new \InvalidArgumentException("Block expected a closure, given (" . gettype($closure) . ")");
+        }
+        
+        // Store closure
+        static::$_blocks[$name][] = $closure;
+        return $this;
     }
 
 
@@ -149,6 +204,7 @@ class Template extends Module\Response
     /**
      * Load and return generic view template
      * 
+     * @todo Look in config settings for custom view generics added or overriden by shortname
      * @return Alloy\View\Template
      */
     public function generic($name, $template = null)
@@ -162,6 +218,7 @@ class Template extends Module\Response
     /**
      * Load and return view helper
      * 
+     * @todo Look in config settings for custom view helpers added or overriden by shortname
      * @return Alloy\View\Helper\HelperAbstract
      */
     public function helper($name)
