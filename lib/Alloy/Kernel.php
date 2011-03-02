@@ -411,7 +411,7 @@ class Kernel
         }
         
         // Ensure class exists / can be loaded
-        if(!class_exists($sPluginClass)) {
+        if(!class_exists($sPluginClass, $init)) {
             throw new \InvalidArgumentException("Unable to load plugin '" . $sPluginClass . "'. Remove from app config or ensure plugin files exist in 'app' or 'vendor' load paths.");
         }
         
