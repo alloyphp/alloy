@@ -1,12 +1,8 @@
 <IfModule mod_rewrite.c>
-	RewriteEngine On
+    RewriteEngine On
 	
-	# Reroute any incoming request that is not an existing directory or file
-	RewriteCond %{REQUEST_FILENAME} !-f
-	# Prevent common static files from being loaded as pages
-	RewriteCond %{REQUEST_URI} !.*\.(ico|txt|css|jpg|jpeg|png|gif|bmp|zip|js|pdf)$
-	RewriteRule ^(.*)$ index.php?u=$1 [L,QSA]
+    # Reroute any incoming request that is not an existing directory or file
+    RewriteCond %{REQUEST_FILENAME} !-d
+    RewriteCond %{REQUEST_FILENAME} !-f
+    RewriteRule ^(.*)$ index.php?u=$1 [L,QSA]
 </IfModule>
-
-ErrorDocument 404 /index.php?u=error/404
-ErrorDocument 500 /index.php?u=error/500
