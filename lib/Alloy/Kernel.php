@@ -134,6 +134,7 @@ class Kernel
         }
         
         // Return new class instance
+        // Reflection is known for incurring overhead - hack to avoid it if we can
         $paramCount = count($params);
         if(0 === $paramCount) {
             $instance = new $className();
@@ -230,7 +231,7 @@ class Kernel
     {
         $response = $this->factory(__NAMESPACE__ . '\Response');
         if(is_numeric($statusCode)) {
-                $response->status($statusCode);
+            $response->status($statusCode);
         }
         return $response;
     }
@@ -252,7 +253,7 @@ class Kernel
     /**
      * Return a resource object to work with
      */
-    public function resource($data)
+    public function resource($data = array())
     {
         return new Resource($data);
     }
@@ -360,7 +361,7 @@ class Kernel
      * @param string $module Name of the module class
      * @return object
      */
-    public function module($module, $init = true)
+    public function module($module, $init = true, $dispatchAction = null)
     {
         // Clean module name to prevent possible security vulnerabilities
         $sModule = preg_replace('/[^a-zA-Z0-9_]/', '', $module);
@@ -380,7 +381,7 @@ class Kernel
         // Run init() setup only if supported
         if(true === $init) {
             if(method_exists($sModuleObject, 'init')) {
-                $sModuleObject->init();
+                $sModuleObject->init($dispatchAction);
             }
         }
         
@@ -437,7 +438,7 @@ class Kernel
             $sModuleObject = $module;
         } else {
             // Get module instance
-            $sModuleObject = $this->module($module);
+            $sModuleObject = $this->module($module, true, $action);
             
             // Does module exist?
             if(false === $sModuleObject) {
@@ -451,19 +452,7 @@ class Kernel
         }
 
         // Handle result
-        $params = array_values($params); // Ensure params are numerically indexed
-        $paramCount = count($params);
-        if(0 === $paramCount) {
-            $result = $sModuleObject->$action();
-        } elseif(1 === $paramCount) {
-            $result = $sModuleObject->$action(current($params));
-        } elseif(2 === $paramCount) {
-            $result = $sModuleObject->$action($params[0], $params[1]);
-        } elseif(3 === $paramCount) {
-            $result = $sModuleObject->$action($params[0], $params[1], $params[2]);
-        } else {
-            $result = call_user_func_array(array($sModuleObject, $action), $params);
-        }
+        $result = call_user_func_array(array($sModuleObject, $action), $params);
         
         return $result;
     }
