@@ -1,5 +1,6 @@
 <?php
 namespace Alloy\Module;
+use Alloy;
 
 /**
  * Base application module controller
@@ -12,13 +13,12 @@ namespace Alloy\Module;
 abstract class ControllerAbstract
 {
     protected $kernel;
-    protected $_file = __FILE__;
     
     
     /**
      * Kernel to handle dependenies
      */
-    public function __construct(\Alloy\Kernel $kernel)
+    public function __construct(Alloy\Kernel $kernel)
     {
         $this->kernel = $kernel;
     }
@@ -27,7 +27,7 @@ abstract class ControllerAbstract
     /**
      * Called immediately upon instantiation, before the action is called
      */
-    public function init() {}
+    public function init($action = null) {}
     
     
     /**
@@ -35,7 +35,7 @@ abstract class ControllerAbstract
      */
     public function path()
     {
-        $class = get_called_class();
+        $class = get_called_class(); // Thank you late static binding!
         $path = str_replace('\\', '/', str_replace('\\Controller', '', $class));
         return \Kernel()->config('path.app') . '/' . $path;
     }
@@ -43,7 +43,7 @@ abstract class ControllerAbstract
     
     /**
      * Return current module name, based on class naming conventions
-     * Expected: Module_[Name]_Controller
+     * Expected: \Module\[Name]\Controller
      */
     public function name()
     {
@@ -61,10 +61,9 @@ abstract class ControllerAbstract
      */
     public function template($file, $format = null)
     {
-        $kernel = \Kernel();
-        $format = ($format) ?: $kernel->request()->format;
-        $view = new \Alloy\View\Template($file, $format, $this->path() . "/views/");
-        $view->format($kernel->request()->format);
+        $kernel = $this->kernel;
+        $format = (null !== $format) ? $format : $kernel->request()->format;
+        $view = new Alloy\View\Template($file, $format, $this->path() . "/views/");
         return $view;
     }
 
@@ -77,9 +76,8 @@ abstract class ControllerAbstract
      */
     public function response($content, $status = 200)
     {
-        $res = new \Alloy\Module\Response();
-        $res->content($content)
+        $res = new Alloy\Module\Response();
+        return $res->content($content)
             ->status($status);
-        return $res;
     }
 }
