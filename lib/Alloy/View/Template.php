@@ -11,6 +11,8 @@ use Alloy\Module;
  */
 class Template extends Module\Response
 {
+    const BLOCK_DEFAULT = 1;
+
     // Template specific stuff
     protected $_file;
     protected $_fileFormat;
@@ -91,41 +93,19 @@ class Template extends Module\Response
         echo $cached($this);
     }
 
-
+    
     /**
-     * Block content
-     * Static global content blocks that can be set and used across views and layouts
+     * Load and return named block
      * 
-     * @param string $name Block name
-     * @param closure $closure Closure or anonymous function for block to execute and display
+     * @param string $name Name of the block
+     * @return Alloy\View\Template\Block
      */
     public function block($name, $closure = null)
     {
-        // Getter
-        if(null === $closure) {
-            $content = null;
-            if(isset(static::$_blocks[$name])) {
-                // Execute all closure callbacks
-                $blocks = static::$_blocks[$name];
-                ob_start();
-                foreach($blocks as $closure) {
-                    echo $closure();
-                }
-                $content = ob_get_clean();
-            }
-            
-            // Return content
-            return $content;
+        if(!isset(self::$_blocks[$name])) {
+            self::$_blocks[$name] = new Template\Block($name, $closure);
         }
-
-        // Setter
-        if(is_array($closure) || is_string($closure) || !is_callable($closure)) {
-            throw new \InvalidArgumentException("Block expected a closure, given (" . gettype($closure) . ")");
-        }
-        
-        // Store closure
-        static::$_blocks[$name][] = $closure;
-        return $this;
+        return self::$_blocks[$name];
     }
 
 
