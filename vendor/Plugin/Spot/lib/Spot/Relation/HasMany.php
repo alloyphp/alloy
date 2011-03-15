@@ -12,7 +12,7 @@ class HasMany extends RelationAbstract implements \Countable, \IteratorAggregate
     /**
      * Load query object with current relation data
      *
-     * @return Spot_Query
+     * @return \Spot\Query
      */
     protected function toQuery()
     {
@@ -23,11 +23,11 @@ class HasMany extends RelationAbstract implements \Countable, \IteratorAggregate
     /**
      * Find first entity in the set
      *
-     * @return Spot_Entity
+     * @return \Spot\Entity
      */
     public function first()
     {
-        return $this->all()->first();
+        return $this->toQuery()->first();
     }
     
     
@@ -48,22 +48,13 @@ class HasMany extends RelationAbstract implements \Countable, \IteratorAggregate
      * SPL IteratorAggregate function
      * Called automatically when attribute is used in a 'foreach' loop
      *
-     * @return Spot_Entity_Collection
+     * @return \Spot\Entity\Collection
      */
     public function getIterator()
     {
         // Load related records for current row
         $data = $this->execute();
         return $data ? $data : array();
-    }
-    
-    
-    /**
-     * Passthrough for method chaining on the Query object
-     */
-    public function __call($func, $args)
-    {
-        return call_user_func_array(array($this->execute(), $func), $args);
     }
     
     

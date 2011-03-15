@@ -15,7 +15,7 @@ class HasOne extends RelationAbstract
 	 */
 	protected function toQuery()
 	{
-		return $this->mapper()->first($this->entityName(), $this->conditions())->order($this->relationOrder());
+		return $this->mapper()->all($this->entityName(), $this->conditions())->order($this->relationOrder())->first();
 	}
 	
 	
@@ -55,20 +55,6 @@ class HasOne extends RelationAbstract
 		$entity = $this->execute();
 		if($entity) {
 			$entity->$var = $value;
-		}
-	}
-	
-	
-	/**
-	 * Passthrough for method calls on entity
-	 */
-	public function __call($func, $args)
-	{
-		$entity = $this->execute();
-		if($entity) {
-			return call_user_func_array(array($entity, $func), $args);
-		} else {
-			return false;
 		}
 	}
 }

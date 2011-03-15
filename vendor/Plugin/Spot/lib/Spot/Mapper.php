@@ -495,6 +495,7 @@ class Mapper
         }
     
         if(is_array($conditions)) {
+            $conditions = array(0 => array('conditions' => $conditions));
             return $this->connection($entityName)->delete($this->datasource($entityName), $conditions, $options);
         } else {
             throw new $this->_exceptionClass(__METHOD__ . " conditions must be an array, given " . gettype($conditions) . "");
@@ -542,7 +543,7 @@ class Mapper
     {
         $entityName = get_class($entity);
         $relations = array();
-        $rels = $this->entityRelationConditions($entity);
+        $rels = $this->relations($entityName);
         if(count($rels) > 0) {
             foreach($rels as $field => $relation) {
                 $relationEntity = isset($relation['entity']) ? $relation['entity'] : false;
@@ -559,38 +560,12 @@ class Mapper
                 $relationClass = '\\Spot\\Relation\\' . $relation['type'];
                 
                 // Set field equal to relation class instance
-                $relationObj = new $relationClass($this, $relationEntity, $relation);
+                $relationObj = new $relationClass($this, $entity, $relation);
                 $relations[$field] = $relationObj;
                 $entity->$field = $relationObj;
             }
         }
         return $relations;
-    }
-    
-    
-    /**
-     * Replace entity value placeholders on relation definitions
-     * Currently replaces ':entity.[col]' with the field value from the passed entity object
-     */
-    public function entityRelationConditions($entity)
-    {
-        $entityName = get_class($entity);
-        $rels = $this->relations($entityName);
-        if(count($rels) > 0) {
-            foreach($rels as $field => $relation) {
-                // Load foreign keys with data from current row
-                // Replace ':entity.[col]' with the field value from the passed entity object
-                if(isset($relation['where'])) {
-                    foreach($relation['where'] as $relationCol => $col) {
-                        if(is_string($col) && strpos($col, ':entity.') !== false) {
-                            $col = str_replace(':entity.', '', $col);
-                            $rels[$field]['where'][$relationCol] = $entity->$col;
-                        }
-                    }
-                }
-            }
-        }
-        return $rels;
     }
     
     

@@ -86,7 +86,7 @@ class Collection implements \Iterator, \Countable, \ArrayAccess
 		if(null === $keyColumn && null === $valueColumn) {
 			$return = array();
 			foreach($this->_results as $row) {
-				$return[] = $row->data();
+				$return[] = $row->toArray();
 			}
 
 		// Key column name

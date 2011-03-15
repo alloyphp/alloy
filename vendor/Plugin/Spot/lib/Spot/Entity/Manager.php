@@ -1,5 +1,6 @@
 <?php
 namespace Spot\Entity;
+use Spot;
 
 /**
  * Entity Manager for storing information about entities
@@ -32,11 +33,11 @@ class Manager
     public function fields($entityName)
     {
         if(!is_string($entityName)) {
-            throw new namespace\Exception(__METHOD__ . " only accepts a string. Given (" . gettype($entityName) . ")");
+            throw new \Spot\Exception(__METHOD__ . " only accepts a string. Given (" . gettype($entityName) . ")");
         }
         
-        if(!is_subclass_of($entityName, 'Spot\Entity')) {
-            throw new namespace\Exception($entityName . " must be subclass of 'Spot\Entity'.");
+        if(!is_subclass_of($entityName, '\Spot\Entity')) {
+            throw new \Spot\Exception($entityName . " must be subclass of '\Spot\Entity'.");
         }
         
         if(isset(self::$_fields[$entityName])) {
