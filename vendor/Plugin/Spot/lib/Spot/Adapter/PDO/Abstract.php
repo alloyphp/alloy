@@ -384,7 +384,7 @@ abstract class PDO_Abstract extends AdapterAbstract implements AdapterInterface
             if($stmt) {
                 // Execute
                 if($stmt->execute($binds)) {
-                    $result = true;
+                    $result = $stmt->rowCount();
                 } else {
                     $result = false;
                 }
