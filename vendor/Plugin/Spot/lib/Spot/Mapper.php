@@ -291,6 +291,20 @@ class Mapper
         
         return $entity;
     }
+
+
+    /**
+     * Get a new entity object and set given data on it
+     *
+     * @param string $entityClass Name of the entity class
+     * @param array $data array of key/values to set on new Entity instance
+     * @return object INstance of $entityClass with $data set on it
+     */
+    public function create($entityClass, array $data)
+    {
+        return $this->get($entityClass)
+            ->data($data);
+    }
     
     
     /**
@@ -488,9 +502,7 @@ class Mapper
         if(is_object($entityName)) {
             $entity = $entityName;
             $entityName = get_class($entityName);
-            $conditions = array(
-                0 => array('conditions' => array($this->primaryKeyField($entityName) => $this->primaryKey($entity)))
-                );
+            $conditions = array($this->primaryKeyField($entityName) => $this->primaryKey($entity));
             // @todo Clear entity from identity map on delete, when implemented
         }
     
