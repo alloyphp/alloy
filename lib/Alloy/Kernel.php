@@ -488,9 +488,11 @@ class Kernel
             $action = $action . (false === strpos($action, 'Action') ? 'Action' : ''); // Append with 'Action' to limit scope of available functions from HTTP request
         }
         
-        // Prepend request object as first parameter
-        array_unshift($params, $request);
-        
+        foreach ($params as $key => $val) {
+            $request->$key = $val;
+        }
+        $params = Array($request);
+
         // Run normal dispatch
         return $this->dispatch($module, $action, $params);
     }
