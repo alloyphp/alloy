@@ -22,6 +22,9 @@ class Form extends \Alloy\View\Template
     {
         // Use local path by default
         $this->path(__DIR__ . '/templates/');
+
+        // Default enctype
+        $this->set('enctype', 'appliaction/x-www-form-urlencoded');
     }
     
     
@@ -45,6 +48,34 @@ class Form extends \Alloy\View\Template
     public function method($method = 'POST')
     {
         $this->set('method', strtoupper($method));
+        return $this;
+    }
+
+
+    /**
+     * Encoding type of form
+     *
+     * @param string $enctype Encoding type to use
+     */
+    public function enctype($enctype = null)
+    {
+        $this->set('enctype', $enctype);
+        return $this;
+    }
+
+
+    /**
+     * Encoding type of form
+     *
+     * @param string $enctype Encoding type to use
+     */
+    public function type($type = null)
+    {
+        if('file' == $type || 'upload' == $type) {
+            $this->set('enctype', 'multipart/form-data');
+        } else {
+            $this->set('enctype', 'appliaction/x-www-form-urlencoded');
+        }
         return $this;
     }
     

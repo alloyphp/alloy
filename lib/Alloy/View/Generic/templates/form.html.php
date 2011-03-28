@@ -4,7 +4,7 @@ $formMethod = strtoupper(($method == 'GET' || $method == 'POST') ? $method : 'po
 $formMethodRest = ($formMethod == 'POST' && $method != 'POST') ? $method : false;
 ?>
 
-<form action="<?php echo $action; ?>" method="post">
+<form action="<?php echo $action; ?>" method="post" enctype="<?php echo $enctype; ?>">
   <ol class="app_form">
   <?php if($fields && count($fields) >0): ?>
   <?php
