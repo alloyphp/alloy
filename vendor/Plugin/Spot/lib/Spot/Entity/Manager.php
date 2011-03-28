@@ -21,6 +21,7 @@ class Manager
     // Connection and datasource info
     protected static $_connection = array();
     protected static $_datasource = array();
+    protected static $_datasourceOptions = array();
     
     
     /**
@@ -51,7 +52,10 @@ class Manager
                 throw new \InvalidArgumentException("Entity must have a datasource defined. Please define a protected property named '_datasource' on your '" . $entityName . "' entity class.");
             }
             self::$_datasource[$entityName] = $entityDatasource;
-            
+
+            // Datasource Options
+            $entityDatasourceOptions = $entityName::datasourceOptions();
+            self::$_datasourceOptions[$entityName] = $entityDatasourceOptions;
             
             // Connection info
             $entityConnection = $entityName::connection();
@@ -66,6 +70,7 @@ class Manager
                 'required' => false,
                 'null' => true,
                 'unsigned' => false,
+                'fulltext' => false,
     
                 'primary' => false,
                 'index' => false,
@@ -254,5 +259,20 @@ class Manager
             $this->fields($entityName);
         }
         return self::$_datasource[$entityName];
+    }
+
+
+    /**
+     * Get datasource options for given entity class
+     *
+     * @param array Options to pass
+     * @return string
+     */
+    public function datasourceOptions($entityName)
+    {
+        if(!isset(self::$_datasourceOptions[$entityName])) {
+            $this->fields($entityName);
+        }
+        return self::$_datasourceOptions[$entityName];
     }
 }

@@ -50,15 +50,32 @@ abstract class PDO_Abstract extends AdapterAbstract implements AdapterInterface
     {
         return $this->connection()->quote($string);
     }
+
+
+    /**
+     * Ensure migration options are full and have all keys required
+     */
+    public function formatMigrateOptions(array $options)
+    {
+        return $options;
+    }
     
     
     /**
      * Migrate table structure changes to database
      * @param String $table Table name
      * @param Array $fields Fields and their attributes as defined in the mapper
+     * @param Array $options Options that may affect migrations or how tables are setup
      */
-    public function migrate($table, array $fields)
+    public function migrate($table, array $fields, array $options = array())
     {
+        // Setup defaults for options that do not exist
+        $options = $options + array(
+            'engine' => $this->_engine,
+            'charset' => $this->_charset,
+            'collate' => $this->_collate,
+        );
+
         // Get current fields for table
         $tableExists = false;
         $tableColumns = $this->getColumnsForTable($table, $this->_database);
@@ -68,18 +85,22 @@ abstract class PDO_Abstract extends AdapterAbstract implements AdapterInterface
         }
         if($tableExists) {
             // Update table
-            $this->migrateTableUpdate($table, $fields);
+            $this->migrateTableUpdate($table, $fields, $options);
         } else {
             // Create table
-            $this->migrateTableCreate($table, $fields);
+            $this->migrateTableCreate($table, $fields, $options);
         }
     }
     
     
     /**
      * Execute a CREATE TABLE command
+     * 
+     * @param String $table Table name
+     * @param Array $fields Fields and their attributes as defined in the mapper
+     * @param Array $options Options that may affect migrations or how tables are setup
      */
-    public function migrateTableCreate($table, array $formattedFields)
+    public function migrateTableCreate($table, array $formattedFields, array $options = array())
     {
         /*
             STEPS:
@@ -95,7 +116,7 @@ abstract class PDO_Abstract extends AdapterAbstract implements AdapterInterface
         }
         
         // Get syntax for table with fields/columns
-        $sql = $this->migrateSyntaxTableCreate($table, $formattedFields, $columnsSyntax);
+        $sql = $this->migrateSyntaxTableCreate($table, $formattedFields, $columnsSyntax, $options);
         
         // Add query to log
         \Spot\Log::addQuery($this, $sql);
@@ -107,8 +128,12 @@ abstract class PDO_Abstract extends AdapterAbstract implements AdapterInterface
     
     /**
      * Execute an ALTER/UPDATE TABLE command
+     * 
+     * @param String $table Table name
+     * @param Array $fields Fields and their attributes as defined in the mapper
+     * @param Array $options Options that may affect migrations or how tables are setup
      */
-    public function migrateTableUpdate($table, array $formattedFields)
+    public function migrateTableUpdate($table, array $formattedFields, array $options = array())
     {
         /*
             STEPS:
@@ -146,7 +171,7 @@ abstract class PDO_Abstract extends AdapterAbstract implements AdapterInterface
         
         // Get syntax for table with fields/columns
         if ( !empty($columnsSyntax) ) {
-            $sql = $this->migrateSyntaxTableUpdate($table, $formattedFields, $columnsSyntax);
+            $sql = $this->migrateSyntaxTableUpdate($table, $formattedFields, $columnsSyntax, $options);
             
             // Add query to log
             \Spot\Log::addQuery($this, $sql);
@@ -240,8 +265,8 @@ abstract class PDO_Abstract extends AdapterAbstract implements AdapterInterface
         
         return $result;
     }
-    
-    
+
+
     /**
      * Build a select statement in SQL
      * Can be overridden by adapters for custom syntax
@@ -300,7 +325,7 @@ abstract class PDO_Abstract extends AdapterAbstract implements AdapterInterface
             if($e->getCode() == "42S02") {
                 throw new \Spot\Exception_Datasource_Missing("Table or datasource '" . $query->datasource . "' does not exist");
             }
-            return false;
+            throw $e;
         }
         
         return $result;
@@ -531,6 +556,22 @@ abstract class PDO_Abstract extends AdapterAbstract implements AdapterInterface
                     case '>=':
                     case ':gte':
                         $operator = '>=';
+                    break;
+                    // REGEX matching
+                    case '~=':
+                    case '=~':
+                    case ':regex':
+                        $operator = "REGEX";
+                    break;
+                    // LIKE
+                    case ':like':
+                        $operator = "LIKE";
+                    break;
+                    // FULLTEXT search
+                    // MATCH(col) AGAINST(search)
+                    case ':fulltext':
+                        $colParam = preg_replace('/\W+/', '_', $col) . $ci;
+                        $whereClause = "MATCH(" . $col . ") AGAINST(:" . $colParam . ")";
                     break;
                     // ALL - Find ALL values in a set - Kind of like IN(), but seeking *all* the values
                     case ':all':

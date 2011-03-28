@@ -10,6 +10,7 @@ namespace Spot;
 abstract class Entity
 {
     protected static $_datasource;
+    protected static $_datasourceOptions = array();
     protected static $_connection;
     
     // Entity data storage
@@ -50,12 +51,24 @@ abstract class Entity
      */
     public static function datasource($ds = null)
     {
-        $class = get_called_class();
         if(null !== $ds) {
-            $class::$_datasource = $ds;
+            static::$_datasource = $ds;
             return $this;
         }
-        return $class::$_datasource;
+        return static::$_datasource;
+    }
+
+
+    /**
+     * Datasource options getter/setter
+     */
+    public static function datasourceOptions($ds = null)
+    {
+        if(null !== $ds) {
+            static::$_datasourceOptions = $ds;
+            return $this;
+        }
+        return static::$_datasourceOptions;
     }
     
     
@@ -64,12 +77,11 @@ abstract class Entity
      */
     public static function connection($connection = null)
     {
-        $class = get_called_class();
         if(null !== $connection) {
-            $class::$_connection = $connection;
+            static::$_connection = $connection;
             return $this;
         }
-        return $class::$_connection;
+        return static::$_connection;
     }
     
     

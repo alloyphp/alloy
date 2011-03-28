@@ -544,7 +544,12 @@ class Mapper
      */
     public function migrate($entityName)
     {
-        return $this->connection($entityName)->migrate($this->datasource($entityName), $this->fields($entityName));
+        return $this->connection($entityName)
+            ->migrate(
+                $this->datasource($entityName),
+                $this->fields($entityName), 
+                $this->entityManager()->datasourceOptions($entityName)
+                );
     }
     
     

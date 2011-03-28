@@ -17,6 +17,7 @@ class Query implements \Countable, \IteratorAggregate
     public $fields = array();
     public $datasource;
     public $conditions = array();
+    public $search = array();
     public $order = array();
     public $group = array();
     public $limit;
@@ -124,6 +125,47 @@ class Query implements \Countable, \IteratorAggregate
     {
         return $this->where($conditions, $type, "AND");
     }
+
+
+    /**
+     * Search criteria (FULLTEXT, LIKE, or REGEX, depending on storage engine and driver)
+     *
+     * @param mixed $fields Single string field or array of field names to use for searching
+     * @param string $query Search keywords or query
+     * @param array $options Array of options to pass to db engine
+     * @return $this
+     */
+    public function search($fields, $query, array $options = array())
+    {
+        $fields = (array) $fields;
+        $entityDatasourceOptions = $this->mapper()->entityManager()->datasourceOptions($this->entityName());
+        $fieldString = '`' . implode('`, `', $fields) . '`';
+        $fieldTypes = $this->mapper()->fields($this->entityName());
+
+        // See if we can use FULLTEXT search
+        $whereType = ':like';
+        $connection = $this->mapper()->connection($this->entityName());
+        // Only on MySQL
+        if($connection instanceof \Spot\Adapter\Mysql) {
+            // Only for MyISAM engine
+            if(isset($entityDatasourceOptions['engine'])) {
+                $engine = $entityDatasourceOptions['engine'];
+                if('myisam' == strtolower($engine)) {
+                    $whereType = ':fulltext';
+                    // Only if ALL included columns allow fulltext according to entity definition
+                    if(in_array($fields, array_keys($this->mapper()->fields($this->entityName())))) {
+                        // FULLTEXT
+                        $whereType = ':fulltext';
+                    }
+                }
+            }
+        }
+
+        // @todo Normal queries can't search mutliple fields, so make them separate searches instead of stringing them together
+
+        // Resolve search criteria
+        return $this->where(array($fieldString . ' ' . $whereType => $query));
+    }
     
     
     /**
@@ -161,7 +203,6 @@ class Query implements \Countable, \IteratorAggregate
      */
     public function group(array $fields = array())
     {
-        $groupBy = array();
         foreach($fields as $field) {
             $this->group[] = $field;
         }

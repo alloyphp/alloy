@@ -57,7 +57,7 @@ abstract class RelationAbstract
      */
     public function entityName()
     {
-        return $this->_entityName;
+        return ($this->_entityName == ':self') ? get_class($this->sourceEntity()) : $this->_entityName;
     }
     
     

@@ -103,6 +103,19 @@ class Mysql extends PDO_Abstract implements AdapterInterface
 
 
 	/**
+     * Ensure migration options are full and have all keys required
+     */
+    public function formatMigrateOptions(array $options)
+    {
+        return $options + array(
+            'engine' => $this->_engine,
+            'charset' => $this->_charset,
+            'collate' => $this->_collate,
+        );
+    }
+
+
+	/**
 	 * Syntax for each column in CREATE TABLE command
 	 *
 	 * @param string $fieldName Field name
@@ -157,10 +170,14 @@ class Mysql extends PDO_Abstract implements AdapterInterface
 	 * @param string $table Table name
 	 * @param array $formattedFields Array of fields with all settings
 	 * @param array $columnsSyntax Array of SQL syntax of columns produced by 'migrateSyntaxFieldCreate' function
+	 * @param Array $options Options that may affect migrations or how tables are setup
 	 * @return string SQL syntax
 	 */
-	public function migrateSyntaxTableCreate($table, array $formattedFields, array $columnsSyntax)
+	public function migrateSyntaxTableCreate($table, array $formattedFields, array $columnsSyntax, array $options)
 	{
+		$options = $this->formatMigrateOptions($options);
+
+		// Begin syntax soup
 		$syntax = "CREATE TABLE IF NOT EXISTS `" . $table . "` (\n";
 		// Columns
 		$syntax .= implode(",\n", $columnsSyntax);
@@ -172,6 +189,7 @@ class Mysql extends PDO_Abstract implements AdapterInterface
 			'unique' => array(),
 			'index' => array()
 		);
+		$fulltextFields = array();
 		$usedKeyNames = array();
 		foreach($formattedFields as $fieldName => $fieldInfo) {
 			// Determine key field name (can't use same key name twice, so we have to append a number)
@@ -199,8 +217,21 @@ class Mysql extends PDO_Abstract implements AdapterInterface
 				$tableKeys['index'][$fieldKeyName][] = $fieldName;
 				$usedKeyNames[] = $fieldKeyName;
 			}
+			// FULLTEXT search
+			if($fieldInfo['fulltext']) {
+				$fulltextFields[] = $fieldName;
+			}
 		}
-		
+
+		// FULLTEXT
+		if($fulltextFields) {
+			// Ensure table type is MyISAM if FULLTEXT columns have been specified
+			if('myisam' !== strtolower($options['engine'])) {
+				$options['engine'] = 'MyISAM';
+			} 
+			$syntax .= "\n, FULLTEXT(`" . implode('`, `', $fulltextFields) . "`)";
+		}
+
 		// PRIMARY
 		if($tableKeys['primary']) {
 			$syntax .= "\n, PRIMARY KEY(`" . implode('`, `', $tableKeys['primary']) . "`)";
@@ -215,7 +246,7 @@ class Mysql extends PDO_Abstract implements AdapterInterface
 		}
 
 		// Extra
-		$syntax .= "\n) ENGINE=" . $this->_engine . " DEFAULT CHARSET=" . $this->_charset . " COLLATE=" . $this->_collate . ";";
+		$syntax .= "\n) ENGINE=" . $options['engine'] . " DEFAULT CHARSET=" . $options['charset'] . " COLLATE=" . $options['collate'] . ";";
 
 		return $syntax;
 	}
@@ -242,14 +273,21 @@ class Mysql extends PDO_Abstract implements AdapterInterface
 	 * @param array $columnsSyntax Array of SQL syntax of columns produced by 'migrateSyntaxFieldUpdate' function
 	 * @return string SQL syntax
 	 */
-	public function migrateSyntaxTableUpdate($table, array $formattedFields, array $columnsSyntax)
+	public function migrateSyntaxTableUpdate($table, array $formattedFields, array $columnsSyntax, array $options)
 	{
 		/*
+		  Example:
+
 			ALTER TABLE `posts`
 			CHANGE `title` `title` VARCHAR( 255 ) CHARACTER SET utf8 COLLATE utf8_unicode_ci NOT NULL ,
 			CHANGE `status` `status` VARCHAR( 40 ) CHARACTER SET utf8 COLLATE utf8_unicode_ci NULL DEFAULT 'draft'
 		*/
+
+		$options = $this->formatMigrateOptions($options);
+
+		// Begin syntax soup
 		$syntax = "ALTER TABLE `" . $table . "` \n";
+
 		// Columns
 		$syntax .= implode(",\n", $columnsSyntax);
 		
@@ -260,6 +298,7 @@ class Mysql extends PDO_Abstract implements AdapterInterface
 			'unique' => array(),
 			'index' => array()
 		);
+		$fulltextFields = array();
 		$usedKeyNames = array();
 		foreach($formattedFields as $fieldName => $fieldInfo) {
 			// Determine key field name (can't use same key name twice, so we have to append a number)
@@ -287,6 +326,19 @@ class Mysql extends PDO_Abstract implements AdapterInterface
 				$tableKeys['index'][$fieldKeyName][] = $fieldName;
 				$usedKeyNames[] = $fieldKeyName;
 			}
+			// FULLTEXT search
+			if($fieldInfo['fulltext']) {
+				$fulltextFields[] = $fieldName;
+			}
+		}
+
+		// FULLTEXT
+		if($fulltextFields) {
+			// Ensure table type is MyISAM if FULLTEXT columns have been specified
+			if('myisam' !== strtolower($options['engine'])) {
+				$options['engine'] = 'MyISAM';
+			} 
+			$syntax .= "\n, FULLTEXT(`" . implode('`, `', $fulltextFields) . "`)";
 		}
 		
 		// PRIMARY
@@ -303,7 +355,8 @@ class Mysql extends PDO_Abstract implements AdapterInterface
 		}
 
 		// Extra
-		$syntax .= ";";
+		$syntax .= "\n) ENGINE=" . $options['engine'] . " DEFAULT CHARSET=" . $options['charset'] . " COLLATE=" . $options['collate'] . ";";
+
 		return $syntax;
 	}
 }
