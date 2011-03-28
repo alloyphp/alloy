@@ -468,7 +468,7 @@ class Kernel
      *
      * @param string $moduleName Name of module to be called
      * @param optional string $action function name to call on module
-     * @param optional array $params parameters to pass to module function
+     * @param optional array $params parameters to merge onto Request object
      *
      * @return mixed String or object that has __toString method
      */
@@ -488,11 +488,11 @@ class Kernel
             $action = $action . (false === strpos($action, 'Action') ? 'Action' : ''); // Append with 'Action' to limit scope of available functions from HTTP request
         }
         
-        // Prepend request object as first parameter
-        array_unshift($params, $request);
+        // Set params on Request object
+        $request->setParams($params);
         
         // Run normal dispatch
-        return $this->dispatch($module, $action, $params);
+        return $this->dispatch($module, $action, array($request));
     }
     
     
