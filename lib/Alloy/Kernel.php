@@ -488,17 +488,9 @@ class Kernel
             $action = $action . (false === strpos($action, 'Action') ? 'Action' : ''); // Append with 'Action' to limit scope of available functions from HTTP request
         }
         
-<<<<<<< HEAD
         // Set params on Request object
         $request->setParams($params);
         
-=======
-        foreach ($params as $key => $val) {
-            $request->$key = $val;
-        }
-        $params = Array($request);
-
->>>>>>> Merging parameters with dispatchRequest into Request object instead of opposite
         // Run normal dispatch
         return $this->dispatch($module, $action, array($request));
     }
