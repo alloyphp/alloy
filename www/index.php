@@ -6,6 +6,12 @@ require dirname(__DIR__) . '/app/init.php';
  * Run
  */
 try {
+    // Error and session setup
+    set_error_handler(array($kernel, 'errorHandler'));
+    ini_set("session.cookie_httponly", true); // Mitigate XSS javascript cookie attacks for browers that support it
+    ini_set("session.use_only_cookies", true); // Don't allow session_id in URLs
+    session_start();
+    
     // Load plugins
     if($plugins = $kernel->config('plugins', false)) {
         if(!is_array($plugins)) {
@@ -17,12 +23,6 @@ try {
         }
     }
     $kernel->events()->trigger('boot_start');
-
-    // Error and session setup
-    set_error_handler(array($kernel, 'errorHandler'));
-    ini_set("session.cookie_httponly", true); // Mitigate XSS javascript cookie attacks for browers that support it
-    ini_set("session.use_only_cookies", true); // Don't allow session_id in URLs
-    session_start();
     
     // Global setup based on config settings
     date_default_timezone_set($kernel->config('i18n.timezone', 'America/Chicago'));
@@ -44,7 +44,8 @@ try {
         
         $requestUrl = isset($cliArgs['u']) ? $cliArgs['u'] : '/';
         $qs = parse_url($requestUrl, PHP_URL_QUERY);
-        $cliRequestParams = $request->queryStringToArray($qs);
+        $cliRequestParams = array();
+        parse_str($qs, $cliRequestParams);
         
         // Set parsed query params back on request object
         $request->setParams($cliRequestParams);

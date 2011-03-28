@@ -409,6 +409,73 @@ class Request
     {
         return ($this->header('X_REQUESTED_WITH') == 'XMLHttpRequest');
     }
+
+
+    /**
+     * Is the request coming from a mobile device?
+     *
+     * Works with iPhone, Android, Windows Mobile, Windows Phone 7, Symbian, and other mobile browsers
+     *
+     * @return boolean
+     */
+    public function isMobile()
+    {
+        $op = strtolower($_SERVER['HTTP_X_OPERAMINI_PHONE']);
+        $ua = strtolower($_SERVER['HTTP_USER_AGENT']);
+        $ac = strtolower($_SERVER['HTTP_ACCEPT']);
+
+        return (
+            strpos($ac, 'application/vnd.wap.xhtml+xml') !== false
+            || strpos($ac, 'text/vnd.wap.wml') !== false
+            || $op != ''
+            || strpos($ua, 'iphone') !== false
+            || strpos($ua, 'android') !== false
+            || strpos($ua, 'iemobile') !== false 
+            || strpos($ua, 'kindle') !== false
+            || strpos($ua, 'sony') !== false 
+            || strpos($ua, 'symbian') !== false 
+            || strpos($ua, 'nokia') !== false 
+            || strpos($ua, 'samsung') !== false 
+            || strpos($ua, 'mobile') !== false
+            || strpos($ua, 'windows ce') !== false
+            || strpos($ua, 'epoc') !== false
+            || strpos($ua, 'opera mini') !== false
+            || strpos($ua, 'nitro') !== false
+            || strpos($ua, 'j2me') !== false
+            || strpos($ua, 'midp-') !== false
+            || strpos($ua, 'cldc-') !== false
+            || strpos($ua, 'netfront') !== false
+            || strpos($ua, 'mot') !== false
+            || strpos($ua, 'up.browser') !== false
+            || strpos($ua, 'up.link') !== false
+            || strpos($ua, 'audiovox') !== false
+            || strpos($ua, 'blackberry') !== false
+            || strpos($ua, 'ericsson,') !== false
+            || strpos($ua, 'panasonic') !== false
+            || strpos($ua, 'philips') !== false
+            || strpos($ua, 'sanyo') !== false
+            || strpos($ua, 'sharp') !== false
+            || strpos($ua, 'sie-') !== false
+            || strpos($ua, 'portalmmm') !== false
+            || strpos($ua, 'blazer') !== false
+            || strpos($ua, 'avantgo') !== false
+            || strpos($ua, 'danger') !== false
+            || strpos($ua, 'palm') !== false
+            || strpos($ua, 'series60') !== false
+            || strpos($ua, 'palmsource') !== false
+            || strpos($ua, 'pocketpc') !== false
+            || strpos($ua, 'smartphone') !== false
+            || strpos($ua, 'rover') !== false
+            || strpos($ua, 'ipaq') !== false
+            || strpos($ua, 'au-mic,') !== false
+            || strpos($ua, 'alcatel') !== false
+            || strpos($ua, 'ericy') !== false
+            || strpos($ua, 'up.link') !== false
+            || strpos($ua, 'vodafone/') !== false
+            || strpos($ua, 'wap1.') !== false
+            || strpos($ua, 'wap2.') !== false
+        );
+    }
     
     
     /**
@@ -474,25 +541,5 @@ class Request
         }
         unset($in);
         return true;
-    }
-    
-    
-    /**
-    * Parse query string into key/value associative array
-    *   Input: ?foo=bar&bar=baz
-    *   Output: array('foo' => 'bar', 'bar' => 'baz')
-    */
-    public function queryStringToArray($qs)
-    {
-        $qs = html_entity_decode($qs);
-        $qs = explode('&', $qs);
-        $arr = array();
-        
-        foreach($qs as $val) {
-            $x = explode('=', $val);
-            $arr[$x[0]] = isset($x[1]) ? $x[1] : null;
-        }
-        unset($val, $x, $qs);
-        return $arr;
     }
 }
