@@ -1,4 +1,10 @@
 <?php
+$request = \Kernel()->request();
+if ($request->isAjax() || $request->isCli()) {
+    echo $content;
+    return;
+}
+
 $asset = $view->helper('Asset');
 
 // If page title has been set by sub-template

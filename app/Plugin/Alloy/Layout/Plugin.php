@@ -1,6 +1,6 @@
 <?php
 namespace Plugin\Alloy\Layout;
-use Alloy;
+use Alloy, RuntimeException;
 
 /**
  * Layout Plugin
@@ -21,68 +21,48 @@ class Plugin
     }
 
 
-    /**
-     * Wrap new layout view around result content
-     */
-    public function wrapLayout($content)
-    {
-        $kernel = \Kernel();
-        $request = $kernel->request();
+    public function wrapLayout($content) {
+        $kernel   = \Kernel();
+        $request  = $kernel->request();
         $response = $kernel->response();
 
-        // Wrap returned content in a layout
-        if($request->format == 'html' && !$request->isAjax() && !$request->isCli()) {
+        $response->contentType('text/html');
 
-            // Get layout to use
-            $layoutName = null;
+        $layoutName = null;
+        if($content instanceof Alloy\View\Template) {
+            $layoutName = $content->layout();
+        }
+        if(null === $layoutName) {
+            $layoutName = $kernel->config('layout.template', 'app');
+        }
+
+        if($layoutName && true === $kernel->config('layout.enabled', false)) {
+            $layout = new \Alloy\View\Template($layoutName, $request->format);
+
+            $layout->path($kernel->config('path.layouts'))
+                ->format($request->format)
+                ->verify(true);
+
+            // Pass along set response status and data if we can
+            if($content instanceof Alloy\Module\Response) {
+                $layout->status($content->status());
+                $layout->errors($content->errors());
+            }
+
+            // Pass set title up to layout to override at template level
             if($content instanceof Alloy\View\Template) {
-                $layoutName = $content->layout();
-            }
-            if(null === $layoutName) {
-                $layoutName = $kernel->config('layout.template', 'app');
+                // Force render layout so we can pull out variables set in template
+                $contentRendered = $content->content();
+                $layout->head()->title($content->head()->title());
+                $content = $contentRendered;
             }
 
-            if($layoutName && true === $kernel->config('layout.enabled', false)) {
-                $layout = new \Alloy\View\Template($layoutName);
-                // Pass along set response status and data if we can
-                if($content instanceof Alloy\Module\Response) {
-                    $layout->status($content->status());
-                    $layout->errors($content->errors());
-                }
+            $layout->set(array(
+                'kernel'  => $kernel,
+                'content' => $content
+            ));
 
-                // Pass set title up to layout to override at template level
-                if($content instanceof Alloy\View\Template) {
-                    // Force render layout so we can pull out variables set in template
-                    $contentRendered = $content->content();
-                    $layout->head()->title($content->head()->title());
-                    $content = $contentRendered;
-                }
-
-                $layout->path($kernel->config('path.layouts'))
-                    ->format($request->format)
-                    ->set(array(
-                        'kernel' => $kernel,
-                        'content' => $content
-                        ));
-
-                $content = $layout;
-            }
-            $response->contentType('text/html');
-            
-        } elseif(in_array($request->format, array('json', 'xml'))) {
-            // No cache and hide potential errors
-            ini_set('display_errors', 0);
-            $response->header("Expires", "Mon, 26 Jul 1997 05:00:00 GMT"); 
-            $response->header("Last-Modified", gmdate( "D, d M Y H:i:s" ) . "GMT"); 
-            $response->header("Cache-Control", "no-cache, must-revalidate"); 
-            $response->header("Pragma", "no-cache");
-            
-            // Correct content-type
-            if('json' == $request->format) {
-                $response->contentType('application/json');
-            } elseif('xml' == $request->format) {
-                $response->contentType('text/xml');
-            }
+            return $layout;
         }
 
         return $content;

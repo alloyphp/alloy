@@ -368,8 +368,33 @@ class Template extends Module\Response
         $partial = new static($template, $this->format(), $this->path());
         return $partial->set($vars);
     }
-    
-    
+
+    public function verify($throw = false) {
+        $vpath    = $this->path();
+        $template = $this->filePath();
+        $vfile    = $vpath . $template;
+
+        // Empty template name
+        if(empty($vpath)) {
+            if ($throw) {
+                throw new \RuntimeException("Base template path is not set!  Use '\$view->path('/path/to/template')' to set root path to template files!");
+            }
+
+            return false;
+        }
+
+        // Ensure template file exists
+        if(!file_exists($vfile)) {
+            if ($throw) {
+                throw new \RuntimeException("The template file '" . $template . "' does not exist.<br />Path: " . $vpath);
+            }
+
+            return false;
+        }
+
+        return true;
+    }
+
     /**
      * Read template file into content string and return it
      *
@@ -377,20 +402,10 @@ class Template extends Module\Response
      */
     public function content($parsePHP = true)
     {
-        $vpath = $this->path();
-        $template = $this->filePath();
-        $vfile = $vpath . $template;
-        
-        // Empty template name
-        if(empty($vpath)) {
-            throw new \RuntimeException("Base template path is not set!  Use '\$view->path('/path/to/template')' to set root path to template files!");
-        }
-        
-        // Ensure template file exists
-        if(!file_exists($vfile)) {
-            throw new \RuntimeException("The template file '" . $template . "' does not exist.<br />Path: " . $vpath);
-        }
-        
+        $this->verify(true);
+
+        $vfile = $this->path() . $this->filePath();
+
         // Include() and parse PHP code
         if($parsePHP) {
             ob_start();
