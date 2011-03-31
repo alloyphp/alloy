@@ -19,6 +19,7 @@ class Template extends Module\Response
     protected $_vars = array();
     protected $_path;
     protected $_layout;
+    protected $_exists;
     
     // Extension type
     protected $_default_format = 'html';
@@ -369,31 +370,45 @@ class Template extends Module\Response
         return $partial->set($vars);
     }
 
-    public function verify($throw = false) {
+
+    /**
+     * Verify template exists and optionally throw an exception if not
+     *
+     * @param boolean $throwException Throw an exception
+     * @throws Alloy\View\Exception\TemplateMissing
+     * @return boolean
+     */
+    public function exists($throw = false)
+    {
+        // Avoid multiple file_exists checks
+        if($this->_exists) {
+            return true;
+        }
+
         $vpath    = $this->path();
         $template = $this->filePath();
         $vfile    = $vpath . $template;
 
-        // Empty template name
+        // Ensure path has been set
         if(empty($vpath)) {
-            if ($throw) {
-                throw new \RuntimeException("Base template path is not set!  Use '\$view->path('/path/to/template')' to set root path to template files!");
+            if(true === $throw) {
+                throw new Exception\TemplateMissing("Base template path is not set!  Use '\$view->path('/path/to/template')' to set root path to template files!");
             }
-
             return false;
         }
 
         // Ensure template file exists
         if(!file_exists($vfile)) {
-            if ($throw) {
-                throw new \RuntimeException("The template file '" . $template . "' does not exist.<br />Path: " . $vpath);
+            if(true === $throw) {
+                throw new Exception\TemplateMissing("The template file '" . $template . "' does not exist.<br />Path: " . $vpath);
             }
-
             return false;
         }
 
+        $this->_exists = true;
         return true;
     }
+
 
     /**
      * Read template file into content string and return it
@@ -402,7 +417,7 @@ class Template extends Module\Response
      */
     public function content($parsePHP = true)
     {
-        $this->verify(true);
+        $this->exists(true);
 
         $vfile = $this->path() . $this->filePath();
 

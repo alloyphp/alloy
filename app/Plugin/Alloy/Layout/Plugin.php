@@ -21,7 +21,13 @@ class Plugin
     }
 
 
-    public function wrapLayout($content) {
+    /**
+     * Wrap layout around returned content from primary dispatch
+     *
+     * @return mixed $content Raw content string, Alloy\Module\Response object, or generic object that implements __toString
+     */
+    public function wrapLayout($content)
+    {
         $kernel   = \Kernel();
         $request  = $kernel->request();
         $response = $kernel->response();
@@ -32,17 +38,19 @@ class Plugin
         if($content instanceof Alloy\View\Template) {
             $layoutName = $content->layout();
         }
-        if(null === $layoutName) {
+        // Use config template if none other specified and request is not Ajax or CLI
+        if(null === $layoutName && !$request->isAjax() && !$request->isCli()) {
             $layoutName = $kernel->config('layout.template', 'app');
         }
 
         if($layoutName && true === $kernel->config('layout.enabled', false)) {
             $layout = new \Alloy\View\Template($layoutName, $request->format);
+            $layout->path($kernel->config('path.layouts'))
+                ->format($request->format);
 
-            if (false === $layout->path($kernel->config('path.layouts'))
-                ->format($request->format)
-                ->verify()) {
-                    return $content;
+            // Ensure layout exists
+            if (false === $layout->exists()) {
+                return $content;
             }
 
             // Pass along set response status and data if we can
