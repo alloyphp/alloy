@@ -39,9 +39,11 @@ class Plugin
         if($layoutName && true === $kernel->config('layout.enabled', false)) {
             $layout = new \Alloy\View\Template($layoutName, $request->format);
 
-            $layout->path($kernel->config('path.layouts'))
+            if (false === $layout->path($kernel->config('path.layouts'))
                 ->format($request->format)
-                ->verify(true);
+                ->verify()) {
+                    return $content;
+            }
 
             // Pass along set response status and data if we can
             if($content instanceof Alloy\Module\Response) {
