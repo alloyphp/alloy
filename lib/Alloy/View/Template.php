@@ -222,6 +222,7 @@ class Template extends Module\Response
             return $this->_path;
         } else {
             $this->_path = $path;
+            $this->_exists = false;
             return $this; // Fluent interface
         }
     }
@@ -239,6 +240,7 @@ class Template extends Module\Response
         } else {
             $this->_file = $view;
             $this->_fileFormat = ($format) ? $format : $this->_default_extenstion;
+            $this->_exists = false;
             return $this; // Fluent interface
         }
     }
