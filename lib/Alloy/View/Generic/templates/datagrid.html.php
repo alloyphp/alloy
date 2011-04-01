@@ -27,9 +27,7 @@ $ci = 0;
   ?>
     <tr>
       <td colspan="<?php echo $ci; ?>" class="app_datagrid_nodata">
-        <?php
-          echo $noDataCallback();
-        ?>
+        <?php echo $noDataCallback(); ?>
       </td>
     </tr>
   <?php endif; ?>

@@ -1,16 +1,17 @@
 <?php
 namespace Alloy\View\Generic;
+use Alloy\View\Template;
+use Alloy\View\Exception;
 
 /**
- * Generic Dategrid View
+ * Generic Datagrid View
  * 
  * @package Alloy
  * @license http://www.opensource.org/licenses/bsd-license.php
  * @link http://alloyframework.com/
  */
-class Datagrid extends \Alloy\View\Template
+class Datagrid extends Template
 {
-    protected $_actions = array();
     protected $_columns = array();
     
     
@@ -33,7 +34,7 @@ class Datagrid extends \Alloy\View\Template
     {
         // Check data
         if(!is_array($data) && !($data instanceof \Traversable)) {
-            throw new \Alloy\View\Exception("Data provided must be defined by using either an array or Traversable object - given (" . gettype($data) . ").");
+            throw new Exception("Data provided must be defined by using either an array or Traversable object - given (" . gettype($data) . ").");
         }
         
         $this->set('columnData', $data);
@@ -56,54 +57,6 @@ class Datagrid extends \Alloy\View\Template
         
         // Pass callback to template
         $this->set('noDataCallback', $callback);
-        
-        return $this;
-    }
-    
-    
-    /**
-     * Set heading/title
-     *
-     * @param string $name Heading title
-     */
-    public function heading($heading)
-    {
-        $this->set('heading', $heading);
-        return $this;
-    }
-    
-    
-    /**
-     * Actions setter/getter
-     */
-    public function actions(array $actions = array())
-    {
-        if(count($actions) > 0 ) {
-            $this->_actions = $actions;
-            return $this;
-        }
-        return $this->_actions;
-    }
-    
-    
-    /**
-     * Add new action to datagrid
-     *
-     * @param string $name Action title text that will be displayed to the user
-     * @param string $callback Closure for displaying content when there is no data to display
-     */
-    public function action($name, $callback)
-    {
-        // Check callback
-        if(!is_callable($callback)) {
-            throw new \Alloy\View\Exception("Action must be defined by using a closure or callback");
-        }
-        
-        // Set column
-        $this->_actions[$name] = array(
-            'title' => $name,
-            'callback' => $callback
-        );
         
         return $this;
     }
@@ -153,7 +106,6 @@ class Datagrid extends \Alloy\View\Template
     {
         // Set template vars
         $this->set('data', $this->_data);
-        $this->set('actions', $this->actions());
         $this->set('columns', $this->columns());
         
         return parent::content($parsePHP);

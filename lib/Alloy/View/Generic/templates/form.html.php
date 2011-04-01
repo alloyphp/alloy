@@ -5,14 +5,14 @@ $formMethodRest = ($formMethod == 'POST' && $method != 'POST') ? $method : false
 ?>
 
 <form action="<?php echo $action; ?>" method="post" enctype="<?php echo $enctype; ?>">
-  <ol class="app_form">
+  <div class="app_form">
   <?php if($fields && count($fields) >0): ?>
   <?php
   foreach($fields as $fieldName => $fieldOpts):
     $fieldLabel = isset($fieldOpts['title']) ? $fieldOpts['title'] : ucwords(str_replace('_', ' ', $fieldName));
     $fieldType = isset($fieldOpts['type']) ? $fieldOpts['type'] : 'string';
     ?>
-    <li class="app_form_field app_form_field_<?php echo strtolower($fieldOpts['type']); ?>">
+    <div class="app_form_field app_form_field_<?php echo strtolower($fieldOpts['type']); ?>">
       <label><?php echo $fieldLabel; ?></label>
       <span>
       <?php
@@ -52,10 +52,10 @@ $formMethodRest = ($formMethod == 'POST' && $method != 'POST') ? $method : false
       }
       ?>
       </span>
-    </li>
+    </div>
   <?php endforeach; ?>
   <?php endif; ?>
-    <li class="app_form_hidden">
+    <div class="app_form_hidden">
       <?php
       // Print out set data without fields as hidden fields in form
       $setData = $view->data();
@@ -72,10 +72,10 @@ $formMethodRest = ($formMethod == 'POST' && $method != 'POST') ? $method : false
       <?php if($formMethodRest): ?>
       <input type="hidden" name="_method" value="<?php echo $formMethodRest; ?>" />
       <?php endif; ?>
-    </li>
-    <li class="app_form_actions">
+    </div>
+    <div class="app_form_actions">
       <button type="submit" class="app_action_primary"><?php echo $view->submit(); ?></button>
       <!--<a href="#" class="app_action_cancel">Cancel</a>-->
-    </li>
-  </ol>
+    </div>
+  </div>
 </form>
