@@ -31,7 +31,10 @@ if($title = $view->head()->title()) {
       </ul>
     <?php endif; ?>
 
-    <?php echo $content; ?>
+    <?php
+    // Display main content
+    echo $content;
+    ?>
     
 </body>
 </html>

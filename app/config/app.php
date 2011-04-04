@@ -21,11 +21,11 @@ $app['path']['layouts'] = $app['path']['root'] . $app['dir']['layouts'];
 
 // URLs
 $isHttps = (!isset($_SERVER['HTTPS']) || strtolower($_SERVER['HTTPS']) != 'on') ? false : true;
-$app['url']['root'] = 'http' . (($isHttps) ? 's' : '' ) . '://' . (isset($_SERVER['HTTP_HOST']) ? $_SERVER['HTTP_HOST'] : 'localhost') . '/' . str_replace('\\', '/', substr($app['path']['root'] . $app['dir']['www'], strlen($_SERVER['DOCUMENT_ROOT'])+1));
-$app['url']['assets'] = $app['url']['root'] . str_replace($app['dir']['www'], '', $app['dir']['assets']);
+$cfg['url']['root'] = 'http' . (($isHttps) ? 's' : '' ) . '://' . (isset($_SERVER['HTTP_HOST']) ? $_SERVER['HTTP_HOST'] : 'localhost') . '/' . str_replace('\\', '/', substr($app['path']['root'] . $app['dir']['www'], strlen($_SERVER['DOCUMENT_ROOT'])+1));
+$cfg['url']['assets'] = $cfg['url']['root'] . str_replace($app['dir']['www'], '', $app['dir']['assets']);
 
 // Use Apache/IIS/nginx rewrite on URLs?
-$app['url']['rewrite'] = true;
+$cfg['url']['rewrite'] = true;
 
 // Autoload libs
 $app['autoload']['namespaces'] = array(
@@ -77,7 +77,9 @@ $app['session']['lifetime'] = 28000;
 $app['i18n'] = array(
     'charset' => 'UTF-8',
     'language' => 'en_US',
-    'timezone' => 'America/Chicago'
+    'timezone' => 'America/Chicago',
+    'date_format' => 'M d, Y',
+    'time_format' => 'H:i:s'
 );
 
 return $cfg + array('app' => $app);
