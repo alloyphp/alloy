@@ -190,7 +190,7 @@ class Template extends Module\Response
      */
     public function generic($name, $template = null)
     {
-        $helperClass = 'Alloy\View\Generic\\' . $name;
+        $helperClass = 'Alloy\View\Generic\\' . ucfirst($name);
         $template = (null === $template) ? strtolower($name) : $template;
         return new $helperClass($template);
     }
@@ -204,7 +204,7 @@ class Template extends Module\Response
      */
     public function helper($name)
     {
-        $helperClass = 'Alloy\View\Helper\\' . $name;
+        $helperClass = 'Alloy\View\Helper\\' . ucfirst($name);
         
         if(!isset(self::$_helpers[$helperClass])) {
             self::$_helpers[$helperClass] = new $helperClass(\Kernel(), $this);
@@ -340,7 +340,7 @@ class Template extends Module\Response
      */
     public function toDate($input = null, $format = 'M d, Y')
     {
-        $format = \Kernel()->config('i18n.date_format', $format);
+        $format = \Kernel()->config('app.i18n.date_format', $format);
         return $input ? date($format, (is_numeric($input) ? $input : strtotime($input))) : date($format);
     }
     
@@ -354,7 +354,7 @@ class Template extends Module\Response
      */
     public function toDateTime($input = null, $format = null)
     {
-        $format = (null !== $format) ? $format : (\Kernel()->config('i18n.date_format') . ' ' . \Kernel()->config('i18n.time_format'));
+        $format = (null !== $format) ? $format : (\Kernel()->config('app.i18n.date_format') . ' ' . \Kernel()->config('app.i18n.time_format'));
         return $input ? date($format, (is_numeric($input) ? $input : strtotime($input))) : date($format);
     }
     
