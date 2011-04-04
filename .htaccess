@@ -1,5 +1,5 @@
 <IfModule mod_rewrite.c>
     RewriteEngine on
-    RewriteRule ^$ www/    [L]
-    RewriteRule (.*) www/$1    [L]
+    RewriteRule ^$ app/www/    [L]
+    RewriteRule (.*) app/www/$1    [L]
 </IfModule>

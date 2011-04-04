@@ -1,55 +1,63 @@
 <?php
 // Configuration
-$cfg = array();
-$cfg['env']['https'] = (!isset($_SERVER['HTTPS']) || strtolower($_SERVER['HTTPS']) != 'on') ? false : true;
+$cfg = require dirname(dirname(__DIR__)) . '/alloy/config/app.php';
+$alloy = $cfg['alloy'];
+$app = array();
 
-$cfg['path']['root'] = dirname(dirname(__DIR__));
-
-// Directories
-$cfg['dir']['app'] = '/app/';
-$cfg['dir']['config'] = $cfg['dir']['app'] . 'config/';
-$cfg['dir']['www'] = '/www/';
-$cfg['dir']['assets'] = $cfg['dir']['www'] . 'assets/';
-$cfg['dir']['lib'] = '/lib/';
-$cfg['dir']['vendor'] = '/vendor/';
-$cfg['dir']['layouts'] = $cfg['dir']['app'] . 'layouts/';
+// Directories (from install root)
+$app['dir']['root'] = '/';
+$app['dir']['config'] = $app['dir']['root'] . 'config/';
+$app['dir']['www'] = $app['dir']['root'] . 'www/';
+$app['dir']['assets'] = $app['dir']['www'] . 'assets/';
+$app['dir']['lib'] = $app['dir']['root'] . 'lib/';
+$app['dir']['layouts'] = $app['dir']['root'] . 'layouts/';
 
 // Full root paths
-$cfg['path']['app'] = dirname(__DIR__);
-$cfg['path']['config'] = __DIR__;
-$cfg['path']['www'] = $cfg['path']['root'] . $cfg['dir']['www'];
-$cfg['path']['lib'] = $cfg['path']['root'] . $cfg['dir']['lib'];
-$cfg['path']['vendor'] = $cfg['path']['root'] . $cfg['dir']['vendor'];
-$cfg['path']['layouts'] = $cfg['path']['root'] . $cfg['dir']['layouts'];
+$app['path']['root'] = dirname(__DIR__);
+$app['path']['config'] = __DIR__;
+$app['path']['www'] = $app['path']['root'] . $app['dir']['www'];
+$app['path']['lib'] = $app['path']['root'] . $app['dir']['lib'];
+$app['path']['layouts'] = $app['path']['root'] . $app['dir']['layouts'];
 
 // URLs
-$cfg['url']['request'] = (isset($_GET['url']) ? urldecode($_GET['url']) : '' );
-$cfg['url']['root'] = 'http' . (($cfg['env']['https']) ? 's' : '' ) . '://' . (isset($_SERVER['HTTP_HOST']) ? $_SERVER['HTTP_HOST'] : 'localhost') . '/' . str_replace('\\', '/', substr($cfg['path']['root'] . $cfg['dir']['www'], strlen($_SERVER['DOCUMENT_ROOT'])+1));
-$cfg['url']['assets'] = $cfg['url']['root'] . str_replace($cfg['dir']['www'], '', $cfg['dir']['assets']);
+$isHttps = (!isset($_SERVER['HTTPS']) || strtolower($_SERVER['HTTPS']) != 'on') ? false : true;
+$app['url']['root'] = 'http' . (($isHttps) ? 's' : '' ) . '://' . (isset($_SERVER['HTTP_HOST']) ? $_SERVER['HTTP_HOST'] : 'localhost') . '/' . str_replace('\\', '/', substr($app['path']['root'] . $app['dir']['www'], strlen($_SERVER['DOCUMENT_ROOT'])+1));
+$app['url']['assets'] = $app['url']['root'] . str_replace($app['dir']['www'], '', $app['dir']['assets']);
 
-// Use Apache/IIS rewrite on URLs?
-$cfg['url']['rewrite'] = true;
+// Use Apache/IIS/nginx rewrite on URLs?
+$app['url']['rewrite'] = true;
 
-// Debug?
-$cfg['debug'] = false;
-
-// In Development Mode?
-$cfg['mode']['development'] = true;
+// Autoload libs
+$app['autoload']['namespaces'] = array(
+    'Alloy' => $alloy['path']['lib'],
+    'App' => $app['path']['lib'],
+    'Module' => array($app['path']['root'], $alloy['path']['root']),
+    'Plugin' => array($app['path']['root'], $alloy['path']['root']),
+);
+$app['autoload']['prefixes'] = array(
+    'Zend_' => $app['path']['lib']
+);
 
 // Plugins loaded
-$cfg['plugins'] = array(
+$app['plugins'] = array(
     'Alloy_Layout', # app/Plugin/Alloy/Layout
     'Spot' # vendor/Plugin/Spot
 );
 
 // Layout to wrap around response (if Alloy_Layout plugin enabled)
-$cfg['layout'] = array(
+$app['layout'] = array(
     'enabled' => true,
     'template' => 'app'
 );
 
-// Database (Optional - only used if module loads a mapper)
-$cfg['database']['master'] = array(
+// Debug?
+$app['debug'] = false;
+
+// In Development Mode?
+$app['mode']['development'] = true;
+
+// Database (Optional - only used if your app uses it)
+$app['database']['master'] = array(
     'adapter' => 'mysql',
     'host' => 'localhost',
     'username' => 'root',
@@ -63,13 +71,13 @@ $cfg['database']['master'] = array(
 );
 
 // Session Settings
-$cfg['session']['lifetime'] = 28000;
+$app['session']['lifetime'] = 28000;
 
 // Locale Settings
-$cfg['i18n'] = array(
+$app['i18n'] = array(
     'charset' => 'UTF-8',
     'language' => 'en_US',
     'timezone' => 'America/Chicago'
 );
 
-return $cfg;
+return $cfg + array('app' => $app);

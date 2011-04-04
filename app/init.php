@@ -30,19 +30,18 @@ $cfgAlloy = require(__DIR__ . '/config/app.php');
 
 // Host-based config file for overriding default settings in different environments
 $cfgHost = array();
-$cfgHostFile = $cfg['path']['config'] . '/' . strtolower(php_uname('n')) . '/app.php';
+$cfgHostFile = $cfgAlloy['app']['path']['config'] . '/' . strtolower(php_uname('n')) . '/app.php';
 if(file_exists($cfgHostFile)) {
     $cfgHost = require($cfgHostFile);
     // Override lib path if provided before manually requiring in base classes
-    if(isset($cfgHost['path']['lib'])) {
-        $cfgAlloy['path']['lib'] = $cfgHost['path']['lib'];
+    if(isset($cfgHost['app']['path']['lib'])) {
+        $cfgAlloy['app']['path']['lib'] = $cfgHost['app']['path']['lib'];
     }
 }
 
 // Ensure at least a lib path is set
-if(!isset($cfgAlloy['path']['lib'])) {
-    var_dump($cfgAlloy);
-    throw new \InvalidArgumentException("Configuration must have at least \$cfg['path']['lib'] set in order to load required classes.");
+if(!isset($cfgAlloy['app']['path']['lib'])) {
+    throw new \InvalidArgumentException("Configuration must have at least \$cfg['app']['path']['lib'] set in order to load required classes.");
 }
 
 /**
@@ -50,7 +49,7 @@ if(!isset($cfgAlloy['path']['lib'])) {
  */
 try {
     // Get Kernel with config and host config
-    require_once $cfgAlloy['path']['lib'] . '/Alloy/Kernel.php';
+    require_once $cfgAlloy['alloy']['path']['lib'] . '/Alloy/Kernel.php';
     $kernel = \Kernel($cfgAlloy);
     $kernel->config($cfgHost);
     unset($cfgAlloy, $cfgHost);
@@ -61,17 +60,10 @@ try {
     $loader = $kernel->loader();
 
     // Register classes with namespaces
-    $loader->registerNamespaces(array(
-        'Alloy' => $kernel->config('path.lib'),
-        'App' => $kernel->config('path.lib'),
-        'Module' => $kernel->config('path.app'),
-        'Plugin' => array($kernel->config('path.app'), $kernel->config('path.vendor')),
-    ));
+    $loader->registerNamespaces($kernel->config('app.autoload.namespaces', array()));
 
     // Register a library using the PEAR naming convention
-    $loader->registerPrefixes(array(
-        'Zend_' => $kernel->config('path.lib'),
-    ));
+    $loader->registerPrefixes($kernel->config('app.autoload.prefixes', array()));
     
     // Activate the autoloader
     $loader->register();
@@ -79,8 +71,8 @@ try {
     /**
      * Development Mode & Debug Handling
      */
-    if($kernel->config('mode.development')) {
-        if($kernel->config('debug')) {
+    if($kernel->config('app.mode.development')) {
+        if($kernel->config('app.debug')) {
             // Enable debug mode
             $kernel->debug(true);
         }
@@ -89,7 +81,7 @@ try {
         error_reporting(0);
         ini_set('display_errors', 'Off');
     }
-} catch(Exception $e) {
+} catch(\Exception $e) {
     echo $e->getTraceAsString();
     exit();
 }

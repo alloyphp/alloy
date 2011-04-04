@@ -1,5 +1,5 @@
 <?php
-namespace Alloy;
+namespace Alloy\Exception;
 
 /**
  * HTTP Status Exception
@@ -8,4 +8,4 @@ namespace Alloy;
  * @link http://alloyframework.com/
  * @license http://www.opensource.org/licenses/bsd-license.php
  */
-class Exception_Http extends \Exception {}
+class Http extends \Exception {}

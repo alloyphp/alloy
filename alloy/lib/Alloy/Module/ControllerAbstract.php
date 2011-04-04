@@ -37,7 +37,7 @@ abstract class ControllerAbstract
     {
         $class = get_called_class(); // Thank you late static binding!
         $path = str_replace('\\', '/', str_replace('\\Controller', '', $class));
-        return \Kernel()->config('path.app') . '/' . $path;
+        return \Kernel()->config('app.path.root') . '/' . $path;
     }
     
     

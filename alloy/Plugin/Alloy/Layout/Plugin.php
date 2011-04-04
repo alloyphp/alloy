@@ -40,12 +40,12 @@ class Plugin
         }
         // Use config template if none other specified and request is not Ajax or CLI
         if(null === $layoutName && !$request->isAjax() && !$request->isCli()) {
-            $layoutName = $kernel->config('layout.template', 'app');
+            $layoutName = $kernel->config('app.layout.template', 'app');
         }
 
-        if($layoutName && true === $kernel->config('layout.enabled', false)) {
+        if($layoutName && true === $kernel->config('app.layout.enabled', false)) {
             $layout = new \Alloy\View\Template($layoutName, $request->format);
-            $layout->path($kernel->config('path.layouts'))
+            $layout->path($kernel->config('app.path.layouts'))
                 ->format($request->format);
 
             // Ensure layout exists
