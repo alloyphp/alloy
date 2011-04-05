@@ -89,11 +89,16 @@ try {
     
     // Raise 404 error on boolean false result
     if(false === $content) {
-        throw new \Alloy\Exception_FileNotFound("Requested file or page not found. Please check the URL and try again.");
+        throw new \Alloy\Exception\FileNotFound("Requested file or page not found. Please check the URL and try again.");
     }
 
     // Run resulting content through filter
     $content = $kernel->events()->filter('dispatch_content', $content);
+
+    // Explicitly convert response to string so Exceptions won't get caught in __toString method
+    if($content instanceof Alloy\Module\Response) {
+        $content = $content->content();
+    }
 
 // Authentication Error
 } catch(\Alloy\Exception\Auth $e) {
