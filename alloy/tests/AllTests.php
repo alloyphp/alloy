@@ -1,5 +1,5 @@
 <?php
-require_once dirname(__DIR__) . '/app/init.php';
+require_once dirname(dirname(__DIR__)) . '/app/init.php';
 
 
 /**
