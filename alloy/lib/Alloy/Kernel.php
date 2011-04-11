@@ -447,7 +447,7 @@ class Kernel
             
             // Does module exist?
             if(false === $sModuleObject) {
-                throw new Exception_FileNotFound("Module '" . $module ."' not found");
+                throw new Exception\FileNotFound("Module '" . $module ."' not found");
             }
         }
 
@@ -460,7 +460,7 @@ class Kernel
         
         // Module action callable (includes __call magic function if method missing)?
         if(!is_callable(array($sModuleObject, $action))) {
-            throw new Exception_FileNotFound("Module '" . $module ."' does not have a callable method '" . $action . "'");
+            throw new Exception\FileNotFound("Module '" . $module ."' does not have a callable method '" . $action . "'");
         }
 
         // Handle result
