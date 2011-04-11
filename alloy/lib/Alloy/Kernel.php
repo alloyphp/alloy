@@ -25,6 +25,7 @@ class Kernel
     protected static $traceTimeLast = 0;
     protected static $debug = false;
     
+    protected $lastDispatch = array();
     protected $instances = array();
     protected $callbacks = array();
     
@@ -449,6 +450,13 @@ class Kernel
                 throw new Exception_FileNotFound("Module '" . $module ."' not found");
             }
         }
+
+        // Store last dispatch request info
+        $this->lastDispatch = array(
+            'module' => $module,
+            'action' => $action,
+            'params' => $params
+        );
         
         // Module action callable (includes __call magic function if method missing)?
         if(!is_callable(array($sModuleObject, $action))) {
@@ -493,6 +501,17 @@ class Kernel
         
         // Run normal dispatch
         return $this->dispatch($module, $action, array($request));
+    }
+
+
+    /**
+     * Get information about the last dispatch request executed
+     *
+     * @return array Dispatch information
+     */
+    public function lastDispatch()
+    {
+        return $this->lastDispatch;
     }
     
     
