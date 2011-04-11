@@ -145,11 +145,19 @@ if($content instanceof \Exception) {
     // Content still an exception, default display
     if($content instanceof \Exception) {
         $e = $content;
-        $content = "<h1>ERROR</h1><p>" . get_class($e) . " (Code: " . $e->getCode() . ")<br />" . $e->getMessage() . "</p>";
-        // Show debugging info?
+        $content = "<h1>ERROR</h1>";
+        $content .= "<p>" . get_class($e) . " (Code: " . $e->getCode() . ")<br />\n";
+        $content .= $e->getMessage() . "</p>";
+
+        // Show debugging info
         if($kernel && ($kernel->config('app.debug') || $kernel->config('app.mode.development'))) {
-            $content .= "<p>File: " . $e->getFile() . " (" . $e->getLine() . ")</p>";
-            $content .= "<pre>" . $e->getTraceAsString() . "</pre>";
+            $content .= "<h2>Stack Trace</h2>";
+            $content .= "<p>File: " . $e->getFile() . " (" . $e->getLine() . ")</p>\n";
+            $content .= "<pre>" . $e->getTraceAsString() . "</pre>\n";
+
+            // Request Data
+            $content .= "<h2>Request Data</h2>";
+            $content .= $kernel->dump($request->params());
         }
     }
 }

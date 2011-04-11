@@ -771,12 +771,11 @@ class Kernel
     public function dump()
     {
         $objects = func_get_args();
+        $content = "\n<pre>\n";
         foreach($objects as $object) {
-            echo "<h1>Dumping " . gettype($object) . "</h1><br />\n";
-            echo "\n<pre>\n";
-            print_r($object);
-            echo "\n</pre>\n";
+            $content .= print_r($object, true);
         }
+        return $content . "\n</pre>\n";
     }
     
     
