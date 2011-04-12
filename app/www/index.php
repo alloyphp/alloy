@@ -101,6 +101,7 @@ try {
 
     // Explicitly convert response to string so Exceptions won't get caught in __toString method
     if($content instanceof Alloy\Module\Response) {
+        $responseStatus = $content->status();
         $content = $content->content();
     }
 
@@ -167,24 +168,15 @@ if($kernel) {
     $response = $kernel->response();
     
     // Set content and send response
-    if($responseStatus != 200) {
-        $response->status($responseStatus);
-    }
-
-    // Pass along set response status and data if we can
-    if($content instanceof Alloy\Module\Response) {
-        $response->status($content->status());
-    }
-    
+    $response->status($responseStatus);
     $response->content($content);
     $response->send();
     
     // Debugging on?
     if($kernel->config('app.debug')) {
         echo "<hr />";
-        echo "<pre>";
-        print_r($kernel->trace());
-        echo "</pre>";
+        echo "<h2>Event Trace</h2>";
+        echo $kernel->dump($kernel->trace());
     }
 
     // Notify that response has been sent
