@@ -303,7 +303,7 @@ class Request
             $method = strtoupper($this->post('_method'));
         }
 
-        return isset($_SERVER['REQUEST_METHOD']) ? strtoupper($_SERVER['REQUEST_METHOD']) : 'GET';
+        return $method;
     }
     
     
