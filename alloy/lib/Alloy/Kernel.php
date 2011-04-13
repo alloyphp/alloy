@@ -484,10 +484,6 @@ class Kernel
     {
         $request = $this->request();
         $requestMethod = $request->method();
-        // Emulate REST for browsers
-        if($request->isPost() && $request->post('_method')) {
-            $requestMethod = $request->post('_method');
-        }
         
         // Append 'Action' or 'Method'
         if(strtolower($requestMethod) == strtolower($action)) {

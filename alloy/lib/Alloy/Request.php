@@ -296,6 +296,13 @@ class Request
     */
     public function method()
     {
+        $method = isset($_SERVER['REQUEST_METHOD']) ? strtoupper($_SERVER['REQUEST_METHOD']) : 'GET';
+
+        // Emulate REST for browsers
+        if($method == "POST" && $this->post('_method')) {
+            $method = strtoupper($this->post('_method'));
+        }
+
         return isset($_SERVER['REQUEST_METHOD']) ? strtoupper($_SERVER['REQUEST_METHOD']) : 'GET';
     }
     

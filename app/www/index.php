@@ -66,10 +66,6 @@ try {
     
     // Router - Match HTTP request and return named params
     $requestMethod = $request->method();
-    // Emulate REST for browsers
-    if($request->isPost() && $request->post('_method')) {
-        $requestMethod = $request->post('_method');
-    }
     $params = $router->match($requestMethod, $requestUrl);
     
     // Set matched params back on request object
