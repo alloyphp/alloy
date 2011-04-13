@@ -79,6 +79,14 @@ class Router
             }
         }
         
+        if ($params) {
+            // If we have an after match callback, we can use it to modify params
+            $mcb = $route->afterMatch();
+            if(null !== $mcb) {
+                $params = call_user_func($mcb, $params);
+            }
+        }
+
         return $params;
     }
     

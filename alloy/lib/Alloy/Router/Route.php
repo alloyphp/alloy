@@ -35,6 +35,7 @@ class Router_Route
 
     // Callbacks
     protected $_condition;
+    protected $_afterMatch;
     
     
     /**
@@ -295,5 +296,27 @@ class Router_Route
         }
 
         return $this->_condition;
+    }
+
+
+    /**
+     * After match callback
+     *
+     * @param callback $callback Callback function to be used to modify params after a successful match
+     * @throws \InvalidArgumentException When supplied argument is not a valid callback
+     * @return callback
+     */
+    public function afterMatch($callback = null)
+    {
+        // Setter
+        if(null !== $callback) {
+            if(!is_callable($callback)) {
+                throw new \InvalidArgumentException("The after match callback provided is not valid. Given (" . gettype($callback) . ")");
+            }
+            $this->_afterMatch = $callback;
+            return $this;
+        }
+
+        return $this->_afterMatch;
     }
 }
