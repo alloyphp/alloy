@@ -176,4 +176,16 @@ class Test_Router extends \PHPUnit_Framework_TestCase
         $this->router->route('module', '/<:module>')
             ->condition('funnystuff');
     }
+
+    public function testRouteAfterMatchCallback()
+    {
+        $this->router->route('module', '/<:module>')
+            ->afterMatch(function($params) {
+                $params['module'] = 'someValue';
+                return $params;
+            });
+        
+        $params = $this->router->match("GET", "anything");
+        $this->assertEquals(array('module' => 'someValue'), $params);
+    }
 }
