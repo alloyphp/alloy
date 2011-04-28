@@ -1,10 +1,12 @@
 <?php
 $form = $view->helper('Form');
-$formMethod = strtoupper(($method == 'GET' || $method == 'POST') ? $method : 'post');
+$action = isset($action) ? $action : '';
+$method = isset($method) ? $method : 'GET';
+$formMethod = strtoupper(($method == 'GET' || $method == 'POST') ? $method : 'POST');
 $formMethodRest = ($formMethod == 'POST' && $method != 'POST') ? $method : false;
 ?>
 
-<form action="<?php echo $action; ?>" method="post" enctype="<?php echo $enctype; ?>">
+<form action="<?php echo $action; ?>" method="<?php echo $formMethod; ?>" enctype="<?php echo $enctype; ?>">
   <div class="app_form">
   <?php if($fields && count($fields) >0): ?>
   <?php
