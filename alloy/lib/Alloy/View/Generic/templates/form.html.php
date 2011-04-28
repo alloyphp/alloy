@@ -16,6 +16,10 @@ $formMethodRest = ($formMethod == 'POST' && $method != 'POST') ? $method : false
     ?>
     <div class="app_form_field app_form_field_<?php echo strtolower($fieldOpts['type']); ?>">
       <label><?php echo $fieldLabel; ?></label>
+      <?php
+      // Content that comes before the field
+      echo isset($fieldOpts['before']) ? '<span class="app_form_field_before">' . $fieldOpts['before'] . '</span>' : '';
+      ?>
       <span>
       <?php
       // Adjust field depending on field type
@@ -54,6 +58,10 @@ $formMethodRest = ($formMethod == 'POST' && $method != 'POST') ? $method : false
       }
       ?>
       </span>
+      <?php
+      // Content that comes after the field
+      echo isset($fieldOpts['after']) ? '<span class="app_form_field_after">' . $fieldOpts['after'] . '</span>' : '';
+      ?>
     </div>
   <?php endforeach; ?>
   <?php endif; ?>
