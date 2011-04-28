@@ -30,30 +30,56 @@ class Request
         switch (true) {
             case isset($this->_params[$key]):
                 $value = $this->_params[$key];
-            break;
+                break;
             
             case isset($_GET[$key]):
                 $value = $_GET[$key];
-            break;
+                break;
             
             case isset($_POST[$key]):
                 $value = $_POST[$key];
-            break;
+                break;
             
             case isset($_COOKIE[$key]):
                 $value = $_COOKIE[$key];
-            break;
+                break;
             
             case isset($_SERVER[$key]):
                 $value = $_SERVER[$key];
-            break;
+                break;
                 
             case isset($_ENV[$key]):
-                    $value = $_ENV[$key];
-            break;
+                $value = $_ENV[$key];
+                break;
                 
             default:
-            return $default;
+                $value = $default;
+        }
+
+        // Key not found, default is being used
+        if($value === $default) {
+            // Check for dot-separator (convenience access for nested array values)
+            if(strpos($key, '.') !== false) {
+                // Get all dot-separated key parts
+                $keyParts = explode('.', $key);
+
+                // Remove first key because we're going to start with it
+                $keyFirst = array_shift($keyParts);
+
+                // Get root value array to begin
+                $value = $this->get($keyFirst);
+
+                // Loop over remaining key parts to see if value can be found in resulting array
+                foreach($keyParts as $keyPart) {
+                    if(is_array($value)) {
+                        if(isset($value[$keyPart])) {
+                            $value = $value[$keyPart];
+                        } else {
+                            $value = $default;
+                        }   
+                    }
+                }
+            }
         }
         
         return $value;
