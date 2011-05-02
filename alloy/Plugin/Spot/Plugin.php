@@ -81,11 +81,20 @@ class Plugin
     /**
      * Return view object for the add/edit form
      *
-     * @param \Spot\Entity $entity Entity object to build form from and set data with
+     * @param mixed $entity \Spot\Entity object or class name to build form from and set data with
      */
-    public function spotForm(Spot\Entity $entity)
+    public function spotForm($entity)
     {
-        $entityClass = get_class($entity);
+        if(is_object($entity) && $entity instanceof \Spot\Entity) {
+            $entityClass = get_class($entity);
+        } elseif(is_string($entity)) {
+            $entityClass = $entity;
+            // Get new blank instance of entity to prefill form defaults
+            $entity = $this->mapper()->get($entity);
+        } else {
+            throw new \InvalidArgumentException(__METHOD__ . " helper method takes string or instance of \Spot\Entity, given (" . gettype($entity) . ")");
+        }
+
         $view = new \Alloy\View\Generic\Form('form');
         $view->action('')
             ->method('post')
