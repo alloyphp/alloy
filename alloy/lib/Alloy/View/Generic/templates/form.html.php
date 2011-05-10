@@ -17,8 +17,8 @@ $formMethodRest = ($formMethod == 'POST' && $method != 'POST') ? $method : false
     $fieldType = isset($fieldOpts['type']) ? $fieldOpts['type'] : 'string';
     $fieldData = $view->data($fieldName);
     // Empty and non-zero value
-    if(empty($fieldData) && !is_numeric($fieldData) && is_scalar($fieldOpts['default'])) {
-      $fieldData = isset($fieldOpts['default']) ? $fieldOpts['default'] : null;
+    if(empty($fieldData) && !is_numeric($fieldData)) {
+      $fieldData = (isset($fieldOpts['default']) && is_scalar($fieldOpts['default'])) ? $fieldOpts['default'] : null;
     }
     ?>
     <div class="app_form_field app_form_field_<?php echo strtolower($fieldOpts['type']); ?>">
