@@ -563,6 +563,7 @@ class Kernel
         }
         
         // Return fully assembled URL
+        $url = str_replace('///', '/', $url);
         return $url;
     }
     
