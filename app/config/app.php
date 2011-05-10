@@ -32,7 +32,7 @@ $urlBase = $requestPath;
 
 // Replace last occurance of request URL in full path if found
 $pathPos = strpos($requestPath, $requestUrl);
-if(false !== $pathPos) {
+if($requestUrl != '/' && false !== $pathPos) {
     $urlBase = substr_replace($urlBase, '', $pathPos, strlen($requestUrl));
 }
 
