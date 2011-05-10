@@ -26,22 +26,22 @@ if(!function_exists('Kernel')) {
 /**
  * Configuration settings
  */
-$cfgAlloy = require(__DIR__ . '/config/app.php');
+$cfgPath = __DIR__ . '/config';
 
 // Host-based config file for overriding default settings in different environments
-$cfgHost = array();
-$cfgHostFile = $cfgAlloy['app']['path']['config'] . '/' . strtolower(php_uname('n')) . '/app.php';
+$cfg = array();
+$cfgHostFile = $cfgPath . '/' . strtolower(php_uname('n')) . '/app.php';
 if(file_exists($cfgHostFile)) {
-    $cfgHost = require($cfgHostFile);
-    // Override lib path if provided before manually requiring in base classes
-    if(isset($cfgHost['app']['path']['lib'])) {
-        $cfgAlloy['app']['path']['lib'] = $cfgHost['app']['path']['lib'];
-    }
+    // Host-based config file
+    $cfg = require($cfgHostFile);
+} else {
+    // Default config file
+    $cfg = require($cfgPath . '/app.php');
 }
 
-// Ensure at least a lib path is set
-if(!isset($cfgAlloy['app']['path']['lib'])) {
-    throw new \InvalidArgumentException("Configuration must have at least \$cfg['app']['path']['lib'] set in order to load required classes.");
+// Ensure at least a lib path is set for both alloy and app
+if(!isset($cfg['alloy']['path']['lib']) || !isset($cfg['app']['path']['lib'])) {
+    throw new \InvalidArgumentException("Configuration must have at least \$cfg['alloy']['path']['lib'] and \$cfg['app']['path']['lib'] set in order to load required classes.");
 }
 
 /**
@@ -49,10 +49,9 @@ if(!isset($cfgAlloy['app']['path']['lib'])) {
  */
 try {
     // Get Kernel with config and host config
-    require_once $cfgAlloy['alloy']['path']['lib'] . '/Alloy/Kernel.php';
-    $kernel = \Kernel($cfgAlloy);
-    $kernel->config($cfgHost);
-    unset($cfgAlloy, $cfgHost);
+    require_once $cfg['alloy']['path']['lib'] . '/Alloy/Kernel.php';
+    $kernel = \Kernel($cfg);
+    unset($cfg);
 
     /**
      * Class autoloaders - uses PHP 5.3 SplClassLoader
@@ -82,6 +81,8 @@ try {
         ini_set('display_errors', 'Off');
     }
 } catch(\Exception $e) {
+    echo '<pre>';
     echo $e->getTraceAsString();
+    echo '</pre>';
     exit();
 }

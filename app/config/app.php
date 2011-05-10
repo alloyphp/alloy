@@ -26,9 +26,15 @@ $app['path']['layouts'] = $app['path']['root'] . $app['dir']['layouts'];
 
 // Request URL from .htaccess or query string
 // ------------------------------------------
-$requestUrl = isset($_GET['u']) ? $_GET['u'] : '';
+$requestUrl = '/' . (isset($_GET['u']) ? $_GET['u'] : '');
 $requestPath = parse_url($_SERVER['REQUEST_URI'], PHP_URL_PATH);
-$urlBase = str_replace($requestUrl, '', $requestPath);
+$urlBase = $requestPath;
+
+// Replace last occurance of request URL in full path if found
+$pathPos = strpos($requestPath, $requestUrl);
+if(false !== $pathPos) {
+    $urlBase = substr_replace($urlBase, '', $pathPos, strlen($requestUrl));
+}
 
 // URL info
 $isHttps = (!isset($_SERVER['HTTPS']) || strtolower($_SERVER['HTTPS']) != 'on') ? false : true;
