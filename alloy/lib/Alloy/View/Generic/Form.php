@@ -25,6 +25,9 @@ class Form extends \Alloy\View\Template
 
         // Default enctype
         $this->set('enctype', 'appliaction/x-www-form-urlencoded');
+
+        // Default settings
+        $this->set('_form_tags', true);
     }
     
     
@@ -174,6 +177,18 @@ class Form extends \Alloy\View\Template
         } else {
             $this->_submitButtonText = $text;
         }
+        return $this;
+    }
+
+
+    /**
+     * Display <form> tags or not
+     *
+     * @param boolean $show Show form tags or not
+     */
+    public function formTags($show = true)
+    {
+        $this->set('_form_tags', $show);
         return $this;
     }
     

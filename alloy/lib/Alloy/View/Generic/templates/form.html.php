@@ -6,13 +6,20 @@ $formMethod = strtoupper(($method == 'GET' || $method == 'POST') ? $method : 'PO
 $formMethodRest = ($formMethod == 'POST' && $method != 'POST') ? $method : false;
 ?>
 
+<?php if($_form_tags): ?>
 <form action="<?php echo $action; ?>" method="<?php echo $formMethod; ?>" enctype="<?php echo $enctype; ?>">
+<?php endif;?>
   <div class="app_form">
   <?php if($fields && count($fields) >0): ?>
   <?php
   foreach($fields as $fieldName => $fieldOpts):
     $fieldLabel = isset($fieldOpts['title']) ? $fieldOpts['title'] : ucwords(str_replace('_', ' ', $fieldName));
     $fieldType = isset($fieldOpts['type']) ? $fieldOpts['type'] : 'string';
+    $fieldData = $view->data($fieldName);
+    // Empty and non-zero value
+    if(empty($fieldData) && !is_numeric($fieldData) && is_scalar($fieldOpts['default'])) {
+      $fieldData = isset($fieldOpts['default']) ? $fieldOpts['default'] : null;
+    }
     ?>
     <div class="app_form_field app_form_field_<?php echo strtolower($fieldOpts['type']); ?>">
       <label><?php echo $fieldLabel; ?></label>
@@ -32,29 +39,29 @@ $formMethodRest = ($formMethod == 'POST' && $method != 'POST') ? $method : false
         
         case 'bool':
         case 'boolean':
-          echo $form->checkbox($fieldName, (int) $view->data($fieldName));
+          echo $form->checkbox($fieldName, (int) $fieldData);
         break;
         
         case 'int':
         case 'integer':
-          echo $form->text($fieldName, $view->data($fieldName), array('size' => 10));
+          echo $form->text($fieldName, $fieldData, array('size' => 10));
         break;
         
         case 'string':
-          echo $form->text($fieldName, $view->data($fieldName), array('size' => 40));
+          echo $form->text($fieldName, $fieldData, array('size' => 40));
         break;
         
         case 'select':
           $options = isset($fieldOpts['options']) ? $fieldOpts['options'] : array();
-          echo $form->select($fieldName, $options, $view->data($fieldName));
+          echo $form->select($fieldName, $options, $fieldData);
         break;
         
         case 'password':
-          echo $form->input('password', $fieldName, $view->data($fieldName), array('size' => 25));
+          echo $form->input('password', $fieldName, $fieldData, array('size' => 25));
         break;
         
         default:
-          echo $form->input($fieldType, $fieldName, $view->data($fieldName));
+          echo $form->input($fieldType, $fieldName, $fieldData);
       }
       ?>
       </span>
@@ -83,9 +90,14 @@ $formMethodRest = ($formMethod == 'POST' && $method != 'POST') ? $method : false
       <input type="hidden" name="_method" value="<?php echo $formMethodRest; ?>" />
       <?php endif; ?>
     </div>
+    <?php if($_submit = $view->submit()): ?>
     <div class="app_form_actions">
-      <button type="submit" class="app_action_primary"><?php echo $view->submit(); ?></button>
+      <button type="submit" class="app_action_primary"><?php echo $_submit; ?></button>
       <!--<a href="#" class="app_action_cancel">Cancel</a>-->
     </div>
+    <?php endif; ?>
   </div>
+
+<?php if($_form_tags): ?>
 </form>
+<?php endif; ?>
