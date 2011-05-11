@@ -16,7 +16,8 @@ $router->route('module_action', '/<:module>/<:action>(.<:format>)') // :format o
     ->post(array('action' => 'post'));
 
 $router->route('module', '/<:module>(.<:format>)') // :format optional
-    ->defaults(array('action' => 'index', 'format' => 'html'));
+    ->defaults(array('action' => 'index', 'format' => 'html'))
+    ->post(array('action' => 'post'));
 
 $router->route('default', '/')
     ->defaults(array('module' => 'Home', 'action' => 'index', 'format' => 'html'));
