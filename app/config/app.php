@@ -42,7 +42,7 @@ $urlHost = (isset($_SERVER['HTTP_HOST']) ? $_SERVER['HTTP_HOST'] : 'localhost');
 // ------------------------------------------
 
 // URL Config values
-$cfg['url']['root'] = 'http' . (($isHttps) ? 's' : '' ) . '://' . $urlHost . '' . $urlBase;
+$cfg['url']['root'] = 'http' . (($isHttps) ? 's' : '' ) . '://' . $urlHost . '' . rtrim($urlBase, '/') . '/';
 $cfg['url']['assets'] = $cfg['url']['root'] . str_replace($app['dir']['www'], '', $app['dir']['assets']);
 
 // Use Apache/IIS/nginx rewrite on URLs?
