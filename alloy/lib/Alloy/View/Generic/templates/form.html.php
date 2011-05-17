@@ -27,7 +27,7 @@ $formMethodRest = ($formMethod == 'POST' && $method != 'POST') ? $method : false
       // Content that comes before the field
       echo isset($fieldOpts['before']) ? '<span class="app_form_field_before">' . $fieldOpts['before'] . '</span>' : '';
       ?>
-      <span>
+      <span class="app_form_field_input">
       <?php
       // Adjust field depending on field type
       switch($fieldType) {
