@@ -1,9 +1,9 @@
-<ul class="app_treeview">
+<?php echo $beforeItemSetCallback(); ?>
   <?php
   if(isset($itemData)):
     foreach($itemData as $item):
     ?>
-    <li class="app_treeview_item">
+      <?php echo $beforeItemCallback($item); ?>
         <?php echo $itemCallback($item); ?>
         <?php
         // Item children (hierarchy)
@@ -17,15 +17,12 @@
           endif;
         endif;
         ?>
-    </li>
+      <?php echo $afterItemCallback($item); ?>
     <?php
     endforeach;
   
   // noData display
   elseif(isset($noDataCallback)):
-  ?>
-  <li class="app_treeview_nodata">
-    <?php echo $noDataCallback(); ?>
-  </li>
-  <?php endif; ?>
-</ul>
+    $noDataCallback();
+  endif; ?>
+<?php echo $afterItemSetCallback(); ?>

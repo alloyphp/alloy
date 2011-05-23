@@ -19,6 +19,12 @@ class Treeview extends Template
     {
         // Use local path by default
         $this->path(__DIR__ . '/templates/');
+
+        // Default item template callbacks
+        $this->set('beforeItemSetCallback', function() { return "<ul class=\"app_treeview\">\n"; });
+        $this->set('afterItemSetCallback', function() { return "</ul>\n"; });
+        $this->set('beforeItemCallback', function() { return "<li class=\"app_treeview_item\">\n"; });
+        $this->set('afterItemCallback', function() { return "</li>\n"; });
     }
     
     
@@ -78,6 +84,42 @@ class Treeview extends Template
 
 
     /**
+     * Before item callback
+     *
+     * @param string $callback Closure for display HTML
+     * @throws \Alloy\View\Exception
+     */
+    public function beforeItem($callback)
+    {
+        // Check callback
+        if(!is_callable($callback)) {
+            throw new Exception("Template item must be defined by using a closure or callback");
+        }
+
+        $this->set('beforeItemCallback', $callback);
+        return $this;
+    }
+
+
+    /**
+     * After item callback
+     *
+     * @param string $callback Closure for display HTML
+     * @throws \Alloy\View\Exception
+     */
+    public function afterItem($callback)
+    {
+        // Check callback
+        if(!is_callable($callback)) {
+            throw new Exception("Template item must be defined by using a closure or callback");
+        }
+
+        $this->set('afterItemCallback', $callback);
+        return $this;
+    }
+
+
+    /**
      * Item children callback
      *
      * @param string $callback Closure for displaying single item in the tree
@@ -91,6 +133,42 @@ class Treeview extends Template
         }
 
         $this->set('itemChildrenCallback', $callback);
+        return $this;
+    }
+
+
+    /**
+     * Before item set callback
+     *
+     * @param string $callback Closure for display HTML
+     * @throws \Alloy\View\Exception
+     */
+    public function beforeItemSet($callback)
+    {
+        // Check callback
+        if(!is_callable($callback)) {
+            throw new Exception("Template item must be defined by using a closure or callback");
+        }
+
+        $this->set('beforeItemSetCallback', $callback);
+        return $this;
+    }
+
+
+    /**
+     * After item set callback
+     *
+     * @param string $callback Closure for display HTML
+     * @throws \Alloy\View\Exception
+     */
+    public function afterItemSet($callback)
+    {
+        // Check callback
+        if(!is_callable($callback)) {
+            throw new Exception("Template item must be defined by using a closure or callback");
+        }
+
+        $this->set('afterItemSetCallback', $callback);
         return $this;
     }
     
