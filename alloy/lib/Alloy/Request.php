@@ -16,23 +16,6 @@ class Request
     // Request parameters
     protected $_params = array();
     
-
-    /**
-     * Ensure magic quotes are not mucking up request data
-     */
-    public function __construct()
-    {
-        // Die magic_quotes, just die...
-        if(get_magic_quotes_gpc()) {
-            $stripslashes_gpc = function(&$value, $key) {
-                $value = stripslashes($value);
-            };
-            array_walk_recursive($_GET, $stripslashes_gpc);
-            array_walk_recursive($_POST, $stripslashes_gpc);
-            array_walk_recursive($_COOKIE, $stripslashes_gpc);
-            array_walk_recursive($_REQUEST, $stripslashes_gpc);
-        }
-    }
     
     /**
     * Access values contained in the superglobals as public members
@@ -47,56 +30,30 @@ class Request
         switch (true) {
             case isset($this->_params[$key]):
                 $value = $this->_params[$key];
-                break;
+            break;
             
             case isset($_GET[$key]):
                 $value = $_GET[$key];
-                break;
+            break;
             
             case isset($_POST[$key]):
                 $value = $_POST[$key];
-                break;
+            break;
             
             case isset($_COOKIE[$key]):
                 $value = $_COOKIE[$key];
-                break;
+            break;
             
             case isset($_SERVER[$key]):
                 $value = $_SERVER[$key];
-                break;
+            break;
                 
             case isset($_ENV[$key]):
-                $value = $_ENV[$key];
-                break;
+                    $value = $_ENV[$key];
+            break;
                 
             default:
-                $value = $default;
-        }
-
-        // Key not found, default is being used
-        if($value === $default) {
-            // Check for dot-separator (convenience access for nested array values)
-            if(strpos($key, '.') !== false) {
-                // Get all dot-separated key parts
-                $keyParts = explode('.', $key);
-
-                // Remove first key because we're going to start with it
-                $keyFirst = array_shift($keyParts);
-
-                // Get root value array to begin
-                $value = $this->get($keyFirst);
-
-                // Loop over remaining key parts to see if value can be found in resulting array
-                foreach($keyParts as $keyPart) {
-                    if(is_array($value)) {
-                        if(isset($value[$keyPart])) {
-                            $value = $value[$keyPart];
-                        } else {
-                            $value = $default;
-                        }   
-                    }
-                }
-            }
+            return $default;
         }
         
         return $value;
@@ -219,7 +176,8 @@ class Request
     public function query($key = null, $default = null)
         {
         if (null === $key) {
-            return $_GET;
+            // Return _GET params without routing param or other params set by Alloy or manually on the request object
+            return array_diff_key($_GET, $this->param() + array('u' => 1));
         }
         
         return (isset($_GET[$key])) ? $_GET[$key] : $default;
@@ -339,14 +297,7 @@ class Request
     */
     public function method()
     {
-        $method = isset($_SERVER['REQUEST_METHOD']) ? strtoupper($_SERVER['REQUEST_METHOD']) : 'GET';
-
-        // Emulate REST for browsers
-        if($method == "POST" && $this->post('_method')) {
-            $method = strtoupper($this->post('_method'));
-        }
-
-        return $method;
+        return isset($_SERVER['REQUEST_METHOD']) ? strtoupper($_SERVER['REQUEST_METHOD']) : 'GET';
     }
     
     
@@ -568,5 +519,28 @@ class Request
     public function isFlash()
     {
         return ($this->header('USER_AGENT') == 'Shockwave Flash');
+    }
+    
+    
+    /**
+     * Apply a user-defined function to all request parameters
+     *
+     * @string $function user-defined function
+     */
+    public function map($function)
+    {
+        $in = array(&$_GET, &$_POST, &$_COOKIE);
+        while (list($k,$v) = each($in)) {
+            if(is_array($v)) {
+                foreach ($v as $key => $val) {
+                    if (!is_array($val)) {
+                        $in[$k][$key] = $function($val);
+                    }
+                    $in[] =& $in[$k][$key];
+                }
+            }
+        }
+        unset($in);
+        return true;
     }
 }
