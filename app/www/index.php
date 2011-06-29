@@ -145,19 +145,32 @@ if($content instanceof \Exception) {
     // Content still an exception, default display
     if($content instanceof \Exception) {
         $e = $content;
-        $content = "<h1>ERROR</h1>";
-        $content .= "<p>" . get_class($e) . " (Code: " . $e->getCode() . ")<br />\n";
-        $content .= $e->getMessage() . "</p>";
+        $request = $kernel->request();
 
-        // Show debugging info
-        if($kernel && ($kernel->config('app.debug') || $kernel->config('app.mode.development'))) {
-            $content .= "<h2>Stack Trace</h2>";
-            $content .= "<p>File: " . $e->getFile() . " (" . $e->getLine() . ")</p>\n";
-            $content .= "<pre>" . $e->getTraceAsString() . "</pre>\n";
+        // HTML formatted message
+        if('html' == $request->format) {
+            $content = "<h1>ERROR</h1>";
+            $content .= "<p>" . get_class($e) . " (Code: " . $e->getCode() . ")<br />\n";
+            $content .= $e->getMessage() . "</p>";
 
-            // Request Data
-            $content .= "<h2>Request Data</h2>";
-            $content .= $kernel->dump($request->params());
+            // Show debugging info
+            if($kernel && ($kernel->config('app.debug') || $kernel->config('app.mode.development'))) {
+                $content .= "<h2>Stack Trace</h2>";
+                $content .= "<p>File: " . $e->getFile() . " (" . $e->getLine() . ")</p>\n";
+                $content .= "<pre>" . $e->getTraceAsString() . "</pre>\n";
+
+                // Request Data
+                $content .= "<h2>Request Data</h2>";
+                $content .= $kernel->dump($request->params());
+            }
+        } else {
+            // Resource object
+            $content = $kernel->resource(array(
+                'exception' => array(
+                    'code' => $e->getCode(),
+                    'message' => $e->getMessage()
+                )
+            ));
         }
     }
 }
@@ -172,7 +185,7 @@ if($kernel) {
     $response->send();
     
     // Debugging on?
-    if($kernel->config('app.debug')) {
+    if('html' == $kernel->request()->format && $kernel->config('app.debug')) {
         echo "<hr />";
         echo "<h2>Event Trace</h2>";
         echo $kernel->dump($kernel->trace());
