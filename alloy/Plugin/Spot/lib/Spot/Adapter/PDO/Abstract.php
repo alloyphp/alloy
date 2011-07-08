@@ -141,6 +141,9 @@ abstract class PDO_Abstract extends AdapterAbstract implements AdapterInterface
             * Use column syntax array to get table syntax
             * Run SQL
         */
+
+        //var_dump($formattedFields);
+        //exit(__FILE__);
         
         // Prepare fields and get syntax for each
         $tableColumns = $this->getColumnsForTable($table, $this->_database);
@@ -571,7 +574,7 @@ abstract class PDO_Abstract extends AdapterAbstract implements AdapterInterface
                     // MATCH(col) AGAINST(search)
                     case ':fulltext':
                         $colParam = preg_replace('/\W+/', '_', $col) . $ci;
-                        $whereClause = "MATCH(" . $col . ") AGAINST(:" . $colParam . ")";
+                        $whereClause = "MATCH(" . $col . ") AGAINST(:" . $colParam . " IN BOOLEAN MODE)";
                     break;
                     // ALL - Find ALL values in a set - Kind of like IN(), but seeking *all* the values
                     case ':all':
