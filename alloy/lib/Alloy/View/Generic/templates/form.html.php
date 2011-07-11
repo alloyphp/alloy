@@ -39,8 +39,6 @@ $formMethodRest = ($formMethod == 'POST' && $method != 'POST') ? $method : false
         
         case 'bool':
         case 'boolean':
-          // Requires both hidden field and checkboxso value will be passed if not checked
-          echo $form->input('hidden', $fieldName, 0, array('id' => false)) . "\n";
           echo $form->checkbox($fieldName, (int) $fieldData);
         break;
         

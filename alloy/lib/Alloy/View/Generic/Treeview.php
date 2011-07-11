@@ -12,6 +12,9 @@ use Alloy\View\Exception;
  */
 class Treeview extends Template
 {
+    protected static $_level = 0;
+
+
     /**
      * Setup form object
      */
@@ -19,6 +22,10 @@ class Treeview extends Template
     {
         // Use local path by default
         $this->path(__DIR__ . '/templates/');
+
+        // Default settings
+        $this->set('levelMin', 0);
+        $this->set('levelMax', 0);
 
         // Default item template callbacks
         $this->set('beforeItemSetCallback', function() { return "<ul class=\"app_treeview\">\n"; });
@@ -171,6 +178,30 @@ class Treeview extends Template
         $this->set('afterItemSetCallback', $callback);
         return $this;
     }
+
+
+    /**
+     * Set minimum level at which to begin item display
+     *
+     * @param int $level Level at which to beign item display
+     */
+    public function levelMin($level = null)
+    {
+        $this->set('levelMin', $level);
+        return $this;
+    }
+
+
+    /**
+     * Set maximum level to display
+     *
+     * @param int $level Level at which to stop item display
+     */
+    public function levelMax($level = null)
+    {
+        $this->set('levelMax', $level);
+        return $this;
+    }
     
     
     /**
@@ -178,8 +209,15 @@ class Treeview extends Template
      */
     public function content($parsePHP = true)
     {
+        // Set static level tracker
+        //self::$_level = 0;
+
         // Set template vars
-        
-        return parent::content($parsePHP);
+        $content = parent::content($parsePHP);
+
+        // Reset static level tracker
+        self::$_level = 0;
+
+        return $content;
     }
 }
