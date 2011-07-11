@@ -19,6 +19,15 @@ if($levelMaxCheck):
   if(isset($itemData)):
     foreach($itemData as $item):
 
+      // Check filter if set
+      if(isset($itemFilter)):
+        $filterResult = $itemFilter($item);
+        // Skip current item on boolean false filter result
+        if(false === $filterResult):
+          continue;
+        endif;
+      endif;
+
       if($levelMinCheck):
         // Item before
         echo str_repeat("\t", $currentLevel) . $beforeItemCallback($item);

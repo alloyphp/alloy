@@ -181,6 +181,24 @@ class Treeview extends Template
 
 
     /**
+     * Filter callback
+     *
+     * @param string $callback Closure for determining if an item in the tree should be displayed
+     * @throws \Alloy\View\Exception
+     */
+    public function filter($callback)
+    {
+        // Check callback
+        if(!is_callable($callback)) {
+            throw new Exception("Filter must be defined by using a closure or callback");
+        }
+
+        $this->set('itemFilter', $callback);
+        return $this;
+    }
+
+
+    /**
      * Set minimum level at which to begin item display
      *
      * @param int $level Level at which to beign item display
