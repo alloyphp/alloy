@@ -42,27 +42,7 @@ try {
     
     // Handle both HTTP and CLI requests
     $request = $kernel->request();
-    if($request->isCli()) {
-        // CLI request
-        $cliArgs = getopt("u:");
-        
-        $requestUrl = isset($cliArgs['u']) ? $cliArgs['u'] : '/';
-        $qs = parse_url($requestUrl, PHP_URL_QUERY);
-        $cliRequestParams = array();
-        parse_str($qs, $cliRequestParams);
-        
-        // Set parsed query params back on request object
-        $request->setParams($cliRequestParams);
-        
-        // Set requestUrl and remove query string if present so router can parse it as expected
-        if($qsPos = strpos($requestUrl, '?')) {
-            $requestUrl = substr($requestUrl, 0, $qsPos);
-        }
-        
-    } else {
-        // HTTP request
-        $requestUrl = isset($_GET['u']) ? $_GET['u'] : '/';
-    }
+    +$requestUrl = $request->url();
     
     // Router - Match HTTP request and return named params
     $requestMethod = $request->method();
