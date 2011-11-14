@@ -35,6 +35,12 @@ class Request
             array_walk_recursive($_COOKIE, $stripslashes_gpc);
             array_walk_recursive($_REQUEST, $stripslashes_gpc);
         }
+
+        // Properly handle PUT and DELETE request params
+        if($this->isPut() || $this->isDelete()) {
+            parse_str(file_get_contents('php://input'), $params);
+            $this->params($params);
+        }
     }
 
 
