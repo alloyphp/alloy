@@ -134,8 +134,14 @@ class Plugin
             if($content instanceof \Spot\Exception_Datasource_Missing
               ||'42S02' == $content->getCode()
               || false !== stripos($content->getMessage(), 'Base table or view not found')) {
-                // Table not found - auto-install module to cause Entity migrations
+                // Last dispatch attempt
                 $ld = $kernel->lastDispatch();
+
+                // Debug trace message
+                $mName = is_object($ld['module']) ? get_class($ld['module']) : $ld['module'];
+                $kernel->trace("PDO Exception on module '" . $mName . "' when dispatching '" . $ld['action'] . "' Attempting auto-install in Spot plugin at " . __METHOD__ . "", $content);
+
+                // Table not found - auto-install module to cause Entity migrations
                 $content = $kernel->dispatch($ld['module'], 'install');
             }
         }
