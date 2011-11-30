@@ -547,7 +547,7 @@ class Kernel
         }
         if(count($queryParams) > 0) {
             // Build query string from array $qsData
-            $queryString = http_build_query($queryParams, '', '&amp;');
+            $queryString = http_build_query($queryParams, '', '&');
         } else {
             $queryString = false;
         }
@@ -559,7 +559,7 @@ class Kernel
         if($this->config('url.rewrite')) {
             $url = $urlBase . $url . (($queryString !== false) ? '?' . $queryString : '');
         } else {
-            $url = $urlBase . '?u=' . $url . (($queryString !== false) ? '&amp;' . $queryString : '');
+            $url = $urlBase . '?u=' . $url . (($queryString !== false) ? '&' . $queryString : '');
         }
         
         // Return fully assembled URL
