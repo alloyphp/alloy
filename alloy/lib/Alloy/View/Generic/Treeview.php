@@ -199,6 +199,17 @@ class Treeview extends Template
 
 
     /**
+     * Get currnet level 
+     *
+     * @param int $level Current level
+     */
+    public function level()  
+    {
+        return self::$_level;  
+    }
+
+
+    /**
      * Set minimum level at which to begin item display
      *
      * @param int $level Level at which to beign item display
