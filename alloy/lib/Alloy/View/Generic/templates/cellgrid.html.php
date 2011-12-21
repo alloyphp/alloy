@@ -23,11 +23,11 @@
         $ri = 0;
       endif;
     endforeach;
-  else:
+  elseif(isset($noDataCallback)):
   ?>
   <tr>
     <td class="app_cellgrid_nodata">
-      <?php echo $noDataCallback(); ?>
+      <?php echo $noDataCallback() ?>
     </td>
   </tr>
   <?php endif; ?>
