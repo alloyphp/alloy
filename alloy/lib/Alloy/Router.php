@@ -147,12 +147,11 @@ class Router
                 $params = array_combine(array_keys($namedParamsMatched), $matches);
 
                 if(strtoupper($method) != "GET") {
-                    if(isset($params['action'])) {
-                        $params = array_merge($route->namedParams(), $route->defaults(), $params, $route->methodDefaults($method), array('action' => $params['action']));
-                    } else {
-                        // Default REST behavior is to be 'greedy' and always use the REST method defaults if supplied
-                        $params = array_merge($route->namedParams(), $route->defaults(), $params, $route->methodDefaults($method));
-                    }
+                    // 1) Determine which actions are set in $params that are also in 'methodDefaults'
+                    // 2) Override the 'methodDefaults' with the explicitly set $params
+                    $setParams = array_intersect_key($params, $route->methodDefaults($method));
+                    $methodParams = array_merge($route->namedParams(), $route->defaults(), $params, $route->methodDefaults($method), $setParams);
+                    $params = $methodParams;
                 } else {
                     $params = array_merge($route->namedParams(), $route->defaults(), $route->methodDefaults($method), $params);
                 }
