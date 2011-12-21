@@ -64,4 +64,54 @@ class Test_Router_Url_Rest extends \PHPUnit_Framework_TestCase
         $this->assertEquals('164', $params['id']);
         $this->assertEquals('html', $params['format']);
     }
+
+    public function testRouteRestWithAction()
+    {
+        $router = $this->router;
+        $route = $router->route('test', '/<:module>/<:action>')
+            ->defaults(array('format' => 'html', 'action' => 'index'))
+            ->get(array('action' => 'view'));
+        
+        // Match URL
+        $params = $router->match("GET", "/user/list");
+        
+        // Check matched params
+        $this->assertEquals('user', $params['module']);
+        $this->assertEquals('list', $params['action']);
+        $this->assertEquals('html', $params['format']);
+    }
+
+    public function testRouteRestWithActionPost()
+    {
+        $router = $this->router;
+        $route = $router->route('test', '/<:module>(/<:action>)')
+            ->defaults(array('format' => 'html', 'action' => 'index'))
+            ->post(array('action' => 'new'));
+        
+        // Match URL with action
+        $params = $router->match("POST", "/user/list");
+        
+        // Check matched params
+        $this->assertEquals('user', $params['module']);
+        // Expect to preserve action POSTED to
+        $this->assertEquals('list', $params['action']);
+        $this->assertEquals('html', $params['format']);
+    }
+
+    public function testRouteRestWithoutActionPost()
+    {
+        $router = $this->router;
+        $route = $router->route('test', '/<:module>(/<:action>)')
+            ->defaults(array('format' => 'html', 'action' => 'index'))
+            ->post(array('action' => 'new'));
+        
+        // Match URL without action
+        $params = $router->match("POST", "/user");
+        
+        // Check matched params
+        $this->assertEquals('user', $params['module']);
+        // Expect to fill-in with supplied method action 'new'
+        $this->assertEquals('new', $params['action']);
+        $this->assertEquals('html', $params['format']);
+    }
 }

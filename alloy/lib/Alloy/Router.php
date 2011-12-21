@@ -145,14 +145,18 @@ class Router
                     throw new \InvalidArgumentException("Error matching URL to route params: matched(" . count($matches) . ") != named(" . count($namedParamsMatched) . ")");
                 }
                 $params = array_combine(array_keys($namedParamsMatched), $matches);
-                
-                
+
                 if(strtoupper($method) != "GET") {
-                    // Default REST behavior is to be 'greedy' and always use the REST method defaults if supplied
-                    $params = array_merge($route->namedParams(), $route->defaults(), $params, $route->methodDefaults($method));
+                    if(isset($params['action'])) {
+                        $params = array_merge($route->namedParams(), $route->defaults(), $params, $route->methodDefaults($method), array('action' => $params['action']));
+                    } else {
+                        // Default REST behavior is to be 'greedy' and always use the REST method defaults if supplied
+                        $params = array_merge($route->namedParams(), $route->defaults(), $params, $route->methodDefaults($method));
+                    }
                 } else {
                     $params = array_merge($route->namedParams(), $route->defaults(), $route->methodDefaults($method), $params);
                 }
+                //$params = array_merge($route->namedParams(), $route->defaults(), $route->methodDefaults($method), $params);
             }
         }
         return array_map('urldecode', $params);
