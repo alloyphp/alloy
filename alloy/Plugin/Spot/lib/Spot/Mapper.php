@@ -210,6 +210,12 @@ class Mapper
         $results = array();
         $resultsIdentities = array();
         
+        // Ensure PDO only gives key => value pairs, not index-based fields as well
+        // Raw PDOStatement objects generally only come from running raw SQL queries or other custom stuff
+        if($cursor instanceof \PDOStatement) {
+            $cursor->setFetchMode(\PDO::FETCH_ASSOC);
+        }
+
         // Fetch all results into new entity class
         // @todo Move this to collection class so entities will be lazy-loaded by Collection iteration
         foreach($cursor as $data) {
@@ -310,21 +316,17 @@ class Mapper
     /**
      * Find records with custom query
      *
-     * @throws \Spot\Exception
+     * @param string $entityName Name of the entity class
+     * @param string $sql Raw query or SQL to run against the datastore
+     * @param array Optional $conditions Array of binds in column => value pairs to use for prepared statement
      */
-    public function query()
-    {
-        $args = func_get_args();
-        
-        // Remove entityName (first element)
-        $entityName = array_shift($args);
-        
-        $result = $this->connection($entityName)->query($args);
+    public function query($entityName, $sql, array $params = array())
+    {   
+        $result = $this->connection($entityName)->query($sql, $params);
         if($result) {
-            return $this->collection($result);
-        } else {
-            return false;
+            return $this->collection($entityName, $result);
         }
+        return false;
     }
     
     

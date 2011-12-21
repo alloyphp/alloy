@@ -79,6 +79,12 @@ interface AdapterInterface
 	public function read(\Spot\Query $query, array $options = array());
 	
 	
+	/*
+	 * Count number of rows in source based on conditions
+	 */
+	public function count(\Spot\Query $query, array $options = array());
+	
+	
 	/**
 	 * Update entity
 	 */

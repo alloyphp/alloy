@@ -150,17 +150,17 @@ abstract class AdapterAbstract
      *
      * The format of the supplied DSN is in its fullest form:
      * <code>
-     *  adapter(dbsyntax)://username:password@protocol+hostspec/database?option=8&another=true
+     *  adapter(dbsyntax)://username:password@protocol+host/database?option=8&another=true
      * </code>
      *
      * Most variations are allowed:
      * <code>
-     *  adapter://username:password@protocol+hostspec:110//usr/db_file.db?mode=0644
-     *  adapter://username:password@hostspec/database_name
-     *  adapter://username:password@hostspec
-     *  adapter://username@hostspec
-     *  adapter://hostspec/database
-     *  adapter://hostspec
+     *  adapter://username:password@protocol+host:110//usr/db_file.db?mode=0644
+     *  adapter://username:password@host/database_name
+     *  adapter://username:password@host
+     *  adapter://username@host
+     *  adapter://host/database
+     *  adapter://host
      *  adapter(dbsyntax)
      *  adapter
      * </code>
@@ -173,7 +173,7 @@ abstract class AdapterAbstract
      *  + adapter:  Database backend used in PHP (mysql, odbc etc.)
      *  + dbsyntax: Database used with regards to SQL syntax etc.
      *  + protocol: Communication protocol to use (tcp, unix etc.)
-     *  + hostspec: Host specification (hostname[:port])
+     *  + host: Host specification (hostname[:port])
      *  + database: Database to use on the DBMS server
      *  + username: User name for login
      *  + password: Password for login
@@ -191,7 +191,7 @@ abstract class AdapterAbstract
             'username' => FALSE,
             'password' => FALSE,
             'protocol' => FALSE,
-            'hostspec' => FALSE,
+            'host'     => FALSE,
             'port'     => FALSE,
             'socket'   => FALSE,
             'database' => FALSE,
@@ -238,7 +238,7 @@ abstract class AdapterAbstract
         }
 
         // Get (if found): username and password
-        // $dsn => username:password@protocol+hostspec/database
+        // $dsn => username:password@protocol+host/database
         if ( ( $at = strrpos( (string) $dsn, '@' ) ) !== FALSE )
         {
             $str = substr( $dsn, 0, $at );
@@ -254,7 +254,7 @@ abstract class AdapterAbstract
             }
         }
 
-        // Find protocol and hostspec
+        // Find protocol and host
 
         if ( preg_match( '|^([^(]+)\((.*?)\)/?(.*?)$|', $dsn, $match ) )
         {
@@ -265,7 +265,7 @@ abstract class AdapterAbstract
         }
         else
         {
-            // $dsn => protocol+hostspec/database (old format)
+            // $dsn => protocol+host/database (old format)
             if ( strpos( $dsn, '+' ) !== FALSE )
             {
                 list( $proto, $dsn ) = explode( '+', $dsn, 2 );
@@ -288,11 +288,11 @@ abstract class AdapterAbstract
         {
             if ( strpos( $proto_opts, ':' ) !== FALSE )
             {
-                list( $parsed['hostspec'], $parsed['port'] ) = explode( ':', $proto_opts );
+                list( $parsed['host'], $parsed['port'] ) = explode( ':', $proto_opts );
             }
             else
             {
-                $parsed['hostspec'] = $proto_opts;
+                $parsed['host'] = $proto_opts;
             }
         }
         elseif ( $parsed['protocol'] == 'unix' )

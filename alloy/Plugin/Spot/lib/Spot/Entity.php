@@ -128,32 +128,33 @@ abstract class Entity
         }
     }
 
-    /**
-     * Alias of self::data()
-     */
-    public function toArray()
-    {
-        return $this->data();
-    }
-
-
+    
     /**
      * Return array of field data with data from the field names listed removed
      *
      * @param array List of field names to exclude in data list returned
      */
-     public function dataExcept(array $except)
-     {
-         return array_diff_key($this->data(), array_flip($except));
-     }
+    public function dataExcept(array $except)
+    {
+        return array_diff_key($this->data(), array_flip($except));
+    }
 
-    
+
     /**
      * Gets data that has been modified since object construct
      */
     public function dataModified()
     {
         return $this->_dataModified;
+    }
+
+
+    /**
+     * Alias of self::data()
+     */
+    public function toArray()
+    {
+        return $this->data();
     }
     
     

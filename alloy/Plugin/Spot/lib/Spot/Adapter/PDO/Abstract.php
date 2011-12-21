@@ -28,7 +28,7 @@ abstract class PDO_Abstract extends AdapterAbstract implements AdapterInterface
                 
                 // Establish connection
                 try {
-                    $dsn = $dsnp['adapter'].':host='.$dsnp['hostspec'].';dbname='.$dsnp['database'];
+                    $dsn = $dsnp['adapter'].':host='.$dsnp['host'].';dbname='.$dsnp['database'];
                     $this->_connection = new \PDO($dsn, $dsnp['username'], $dsnp['password'], $this->_options);
                     // Throw exceptions by default
                     $this->_connection->setAttribute(\PDO::ATTR_ERRMODE, \PDO::ERRMODE_EXCEPTION);
@@ -141,9 +141,6 @@ abstract class PDO_Abstract extends AdapterAbstract implements AdapterInterface
             * Use column syntax array to get table syntax
             * Run SQL
         */
-
-        //var_dump($formattedFields);
-        //exit(__FILE__);
         
         // Prepare fields and get syntax for each
         $tableColumns = $this->getColumnsForTable($table, $this->_database);
@@ -334,6 +331,54 @@ abstract class PDO_Abstract extends AdapterAbstract implements AdapterInterface
         return $result;
     }
     
+    /*
+     * Count number of rows in source based on conditions
+     */
+    public function count(\Spot\Query $query, array $options = array())
+    {
+	$conditions = $this->statementConditions($query->conditions);
+	$binds = $this->statementBinds($query->params());
+	$sql = "
+            SELECT COUNT(*) as count
+            FROM " . $query->datasource . "
+            " . ($conditions ? 'WHERE ' . $conditions : '') . "
+            " . ($query->group ? 'GROUP BY ' . implode(', ', $query->group) : '');
+        
+         // Unset any NULL values in binds (compared as "IS NULL" and "IS NOT NULL" in SQL instead)
+        if($binds && count($binds) > 0) {
+            foreach($binds as $field => $value) {
+                if(null === $value) {
+                    unset($binds[$field]);
+                }
+            }
+        }
+        
+        // Add query to log
+        \Spot\Log::addQuery($this, $sql,$binds);
+        
+        $result = false;
+        try {
+            // Prepare count query
+            $stmt = $this->connection()->prepare($sql);
+            
+            //if prepared, execute
+            if($stmt && $stmt->execute($binds)) {
+                //the count is returned in the first column
+		$result = (int) $stmt->fetchColumn();
+            } else {
+                $result = false;
+            }
+        } catch(PDOException $e) {
+            // Table does not exist
+            if($e->getCode() == "42S02") {
+                throw new \Spot\Exception_Datasource_Missing("Table or datasource '" . $query->datasource . "' does not exist");
+            }
+            throw $e;
+        }
+        
+        return $result;
+    }
+	
     /**
      * Update entity
      */
@@ -574,7 +619,7 @@ abstract class PDO_Abstract extends AdapterAbstract implements AdapterInterface
                     // MATCH(col) AGAINST(search)
                     case ':fulltext':
                         $colParam = preg_replace('/\W+/', '_', $col) . $ci;
-                        $whereClause = "MATCH(" . $col . ") AGAINST(:" . $colParam . " IN BOOLEAN MODE)";
+                        $whereClause = "MATCH(" . $col . ") AGAINST(:" . $colParam . ")";
                     break;
                     // ALL - Find ALL values in a set - Kind of like IN(), but seeking *all* the values
                     case ':all':

@@ -206,6 +206,24 @@ class Mongodb extends AdapterAbstract implements AdapterInterface
 		return $this->toCollection($query, $cursor);
 	}
 	
+	/*
+	 * Count number of rows in source based on criteria
+	 */
+	public function count(\Spot\Query $query, array $options = array())
+	{
+		// Load criteria
+		$criteria = $this->queryConditions($query);
+		
+		//find and return count
+		$count = $this->mongoCollection($query->datasource)->find($criteria)->count();
+		
+		// Add query to log
+		Spot_Log::addQuery($this, $criteria);
+
+		// Return count
+		return is_numeric($count) ? (int)$count : 0;
+	}
+	
 	/**
 	 * Update entity
 	 */

@@ -280,9 +280,11 @@ class Query implements \Countable, \IteratorAggregate
      */
     public function count()
     {
-        // Execute query and return count
-        $result = $this->execute();
-        return ($result !== false) ? count($result) : 0;
+		// Execute query
+		$result = $this->mapper()->connection($this->entityName())->count($this);
+		
+		//return count
+        return is_numeric($result) ? $result : 0;
     }
     
     
