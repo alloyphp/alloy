@@ -110,7 +110,7 @@ class Manager
                 }
                 
                 // Format field will full set of default options
-                if(isset($fieldInfo['type']) && isset($fieldTypeDefaults[$fieldOpts['type']])) {
+                if(isset($fieldOpts['type']) && isset($fieldTypeDefaults[$fieldOpts['type']])) {
                     // Include type defaults
                     $fieldOpts = array_merge($fieldDefaults, $fieldTypeDefaults[$fieldOpts['type']], $fieldOpts);
                 } else {
