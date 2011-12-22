@@ -149,7 +149,7 @@ class Router
                 if(strtoupper($method) != "GET") {
                     // 1) Determine which actions are set in $params that are also in 'methodDefaults'
                     // 2) Override the 'methodDefaults' with the explicitly set $params
-                    $setParams = array_intersect_key($params, $route->methodDefaults($method));
+                    $setParams = array_filter(array_intersect_key($params, $route->methodDefaults($method)));
                     $methodParams = array_merge($route->namedParams(), $route->defaults(), $params, $route->methodDefaults($method), $setParams);
                     $params = $methodParams;
                 } else {
