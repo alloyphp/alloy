@@ -1,6 +1,8 @@
 <?php
 namespace Module\Home;
-use App, Alloy;
+
+use App;
+use Alloy, Alloy\Request;
 
 /**
  * Home Module
@@ -14,7 +16,7 @@ class Controller extends App\Module\ControllerAbstract
      * Index
      * @method GET
      */
-    public function indexAction(Alloy\Request $request)
+    public function indexAction(Request $request)
     {
     	$greeting = "Hello World";
 
@@ -29,7 +31,7 @@ class Controller extends App\Module\ControllerAbstract
      * Return raw string content
      * @method GET
      */
-    public function helloAction(Alloy\Request $request)
+    public function helloAction(Request $request)
     {
         return "Hello World!";
     }
@@ -39,7 +41,7 @@ class Controller extends App\Module\ControllerAbstract
      * Returns 400 "Bad Request" HTTP Status
      * @method GET
      */
-    public function helloBadAction(Alloy\Request $request)
+    public function helloBadAction(Request $request)
     {
         // Set to any HTTP status code you want
         return $this->response("Hello Bad Request!", 400);
@@ -52,7 +54,7 @@ class Controller extends App\Module\ControllerAbstract
      * 
      * @method GET
      */
-    public function hello404(Alloy\Request $request)
+    public function hello404Action(Request $request)
     {
         return false;
     }
