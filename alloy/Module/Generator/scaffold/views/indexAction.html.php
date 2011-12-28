@@ -11,7 +11,7 @@ $table->data($items);
 
 // Add each column heading and cell output callback
 foreach($fields as $field => $info) {
-  $table->column($field, function($item) use($field, $info) {
+  $table->column($kernel->formatUnderscoreWord($field), function($item) use($field, $info) {
     return $item->$field;
   });
 }
