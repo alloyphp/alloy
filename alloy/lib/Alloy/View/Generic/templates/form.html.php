@@ -21,14 +21,13 @@ $formMethodRest = ($formMethod == 'POST' && $method != 'POST') ? $method : false
       $fieldData = (isset($fieldOpts['default']) && is_scalar($fieldOpts['default'])) ? $fieldOpts['default'] : null;
     }
     ?>
-    <div class="app_form_field app_form_field_<?php echo strtolower($fieldOpts['type']); ?>">
+    <div class="clearfix app_form_field app_form_field_<?php echo strtolower($fieldOpts['type']); ?>">
       <label><?php echo $fieldLabel; ?></label>
+      <div class="input">
       <?php
       // Content that comes before the field
-      echo isset($fieldOpts['before']) ? '<span class="app_form_field_before">' . $fieldOpts['before'] . '</span>' : '';
-      ?>
-      <span class="app_form_field_input">
-      <?php
+      echo isset($fieldOpts['before']) ? '<span class="help-block">' . $fieldOpts['before'] . '</span>' : '';
+
       // Adjust field depending on field type
       switch($fieldType) {
         case 'text':
@@ -65,12 +64,12 @@ $formMethodRest = ($formMethod == 'POST' && $method != 'POST') ? $method : false
         default:
           echo $form->input($fieldType, $fieldName, $fieldData);
       }
-      ?>
-      </span>
-      <?php
+
       // Content that comes after the field
-      echo isset($fieldOpts['after']) ? '<span class="app_form_field_after">' . $fieldOpts['after'] . '</span>' : '';
+      echo isset($fieldOpts['after']) ? '<span class="help-inline">' . $fieldOpts['after'] . '</span>' : '';
+      echo isset($fieldOpts['help']) ? '<span class="help-block">' . $fieldOpts['help'] . '</span>' : '';
       ?>
+      </div>
     </div>
   <?php endforeach; ?>
   <?php endif; ?>
@@ -88,13 +87,13 @@ $formMethodRest = ($formMethod == 'POST' && $method != 'POST') ? $method : false
         endif;
       endforeach;
       ?>
-      <?php if($formMethodRest): ?>
+      <?php if(isset($formMethodRest)): ?>
       <input type="hidden" name="_method" value="<?php echo $formMethodRest; ?>" />
       <?php endif; ?>
     </div>
     <?php if($_submit = $view->submit()): ?>
-    <div class="app_form_actions">
-      <button type="submit" class="app_action_primary"><?php echo $_submit; ?></button>
+    <div class="actions app_form_actions">
+      <button type="submit" class="btn primary"><?php echo $_submit; ?></button>
       <!--<a href="#" class="app_action_cancel">Cancel</a>-->
     </div>
     <?php endif; ?>

@@ -1,4 +1,4 @@
-<h2>New Item</h2>
+<?php $view->head()->title('New Item'); ?>
 
 <?php
 // Create new item

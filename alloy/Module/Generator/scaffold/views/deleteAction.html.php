@@ -1,4 +1,4 @@
-<h2>Delete Item</h2>
+<?php $view->head()->title('Delete Item'); ?>
 
 <p>Really delete this item?</p>
 

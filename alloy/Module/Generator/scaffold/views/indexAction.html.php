@@ -1,5 +1,6 @@
+<?php $view->head()->title('Listing Items'); ?>
 
-<a href="<?php echo $kernel->url(array('module' => '{$generator.name}', 'action' => 'new'), 'module_action'); ?>" class="btn primary">New {$generator.name}</a>
+<p><a href="<?php echo $kernel->url(array('module' => '{$generator.name}', 'action' => 'new'), 'module_action'); ?>" class="btn primary">New {$generator.name}</a></p>
 
 <?php
 // Use generic datagrid table
@@ -10,12 +11,15 @@ $table->data($items);
 
 // Add each column heading and cell output callback
 foreach($fields as $field => $info) {
-  $table->column('Image', function($item) use($field, $info) {
+  $table->column($field, function($item) use($field, $info) {
     return $item->$field;
   });
 }
 
 // Edit/delete links
+$table->column('View', function($item) use($view) {
+  return $view->link('View', array('module' => '{$generator.name}', 'item' => $item->id), 'module_item');
+});
 $table->column('Edit', function($item) use($view) {
   return $view->link('Edit', array('module' => '{$generator.name}', 'item' => $item->id, 'action' => 'edit'), 'module_item_action');
 });

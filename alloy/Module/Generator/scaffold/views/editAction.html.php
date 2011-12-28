@@ -1,4 +1,4 @@
-<h2>Edit Item</h2>
+<?php $view->head()->title('Edit Item'); ?>
 
 <?php
 // Edit existing item
