@@ -15,6 +15,8 @@ namespace Alloy;
 */
 class Kernel
 {
+    const VERSION = '0.7.5';
+
     protected static $self;
     
     protected static $cfg = array();

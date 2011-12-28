@@ -120,13 +120,12 @@ class Template extends Module\Response
      * @return mixed   value if the key is found
      * @return null    if key is not found
      */
-    public function get($var)
+    public function get($var, $default = null)
     {
         if(isset($this->_vars[$var])) {
             return $this->_vars[$var];
-        } else {
-            return null;
         }
+        return $default;
     }
     
     
