@@ -2,7 +2,7 @@
 
 <?php
 // Create new item
-$form->action($kernel->url(array('module' => '{$generator.name}'), 'module'))
+$form->action($kernel->url(array('module' => '{$generator.name_url}'), 'module'))
   ->method('post');
 echo $form->content();
 ?>

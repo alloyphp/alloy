@@ -6,7 +6,7 @@
 // Delete item
 $form = $view->generic('Form');
 
-$form->action($kernel->url(array('module' => '{$generator.name}', 'item' => $item->id), 'module_item'))
+$form->action($kernel->url(array('module' => '{$generator.name_url}', 'item' => $item->id), 'module_item'))
   ->method('delete')
   ->submit('Delete');
 echo $form->content();

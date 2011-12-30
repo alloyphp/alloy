@@ -1,5 +1,5 @@
 <?php
-namespace Module\{$generator.name};
+namespace Module\{$generator.namespace};
 use Spot;
 
 class Entity extends Spot\Entity

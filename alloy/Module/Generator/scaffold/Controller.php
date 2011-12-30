@@ -1,5 +1,5 @@
 <?php
-namespace Module\{$generator.name};
+namespace Module\{$generator.namespace};
 
 use App;
 use Alloy, Alloy\Request;
@@ -9,7 +9,7 @@ use Alloy, Alloy\Request;
  */
 class Controller extends App\Module\ControllerAbstract
 {
-    const ENTITY = 'Module\{$generator.name}\Entity';
+    const ENTITY = 'Module\{$generator.namespace}\Entity';
 
     /**
      * Public listing/index
@@ -87,7 +87,7 @@ class Controller extends App\Module\ControllerAbstract
 
         // Attempt save
         if($mapper->save($item)) {
-            $itemUrl = $kernel->url(array('module' => '{$generator.name}', 'item' => $item->id), 'module_item');
+            $itemUrl = $kernel->url(array('module' => '{$generator.name_url}', 'item' => $item->id), 'module_item');
 
             // HTML
             if('html' == $request->format) {
@@ -168,7 +168,13 @@ class Controller extends App\Module\ControllerAbstract
             return false;
         }
 
+        // Set all POST data that can be set
         $item->data($request->post());
+        
+        // Ensure 'id' cannot be modified
+        $item->id = (int) $request->item;
+
+        // Update 'last modified' date
         $item->date_modified = new \DateTime();
 
         // Common save functionality
@@ -211,7 +217,7 @@ class Controller extends App\Module\ControllerAbstract
 
         $mapper->delete($item);
 
-        return $kernel->redirect($kernel->url(array('module' => '{$generator.name}'), 'module'));
+        return $kernel->redirect($kernel->url(array('module' => '{$generator.name_url}'), 'module'));
     }
 
 

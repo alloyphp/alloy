@@ -6,4 +6,4 @@
   </p>
 <?php endforeach; ?>
 
-<?php echo $view->link('&lt; Listing', array('module' => '{$generator.name}'), 'module', array('class' => 'btn')); ?>
+<?php echo $view->link('&lt; Listing', array('module' => '{$generator.name_url}'), 'module', array('class' => 'btn')); ?>

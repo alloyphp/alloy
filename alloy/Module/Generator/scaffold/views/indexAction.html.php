@@ -1,6 +1,6 @@
 <?php $view->head()->title('Listing Items'); ?>
 
-<p><a href="<?php echo $kernel->url(array('module' => '{$generator.name}', 'action' => 'new'), 'module_action'); ?>" class="btn primary">New {$generator.name}</a></p>
+<p><a href="<?php echo $kernel->url(array('module' => '{$generator.name_url}', 'action' => 'new'), 'module_action'); ?>" class="btn primary">New {$generator.name}</a></p>
 
 <?php
 // Use generic datagrid table
@@ -18,13 +18,13 @@ foreach($fields as $field => $info) {
 
 // Edit/delete links
 $table->column('View', function($item) use($view) {
-  return $view->link('View', array('module' => '{$generator.name}', 'item' => $item->id), 'module_item');
+  return $view->link('View', array('module' => '{$generator.name_url}', 'item' => $item->id), 'module_item');
 });
 $table->column('Edit', function($item) use($view) {
-  return $view->link('Edit', array('module' => '{$generator.name}', 'item' => $item->id, 'action' => 'edit'), 'module_item_action');
+  return $view->link('Edit', array('module' => '{$generator.name_url}', 'item' => $item->id, 'action' => 'edit'), 'module_item_action');
 });
 $table->column('Delete', function($item) use($view) {
-  return $view->link('Delete', array('module' => '{$generator.name}', 'item' => $item->id, 'action' => 'delete'), 'module_item_action');
+  return $view->link('Delete', array('module' => '{$generator.name_url}', 'item' => $item->id, 'action' => 'delete'), 'module_item_action');
 });
 
 // Output table

@@ -2,7 +2,7 @@
 
 <?php
 // Edit existing item
-$form->action($kernel->url(array('module' => '{$generator.name}', 'item' => $item->id), 'module_item'))
+$form->action($kernel->url(array('module' => '{$generator.name_url}', 'item' => $item->id), 'module_item'))
   ->method('put');
 echo $form->content();
 ?>

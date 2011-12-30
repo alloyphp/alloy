@@ -32,8 +32,17 @@ class Controller extends Alloy\Module\ControllerAbstract
          *
          * $name string Name of module
          */
-        $name = $kernel->formatUnderscoreWord($request->name);
-        $name_table = strtolower($name);
+        $name = preg_replace('/[^a-zA-Z0-9_ ]/', '', $kernel->formatUnderscoreWord($request->name));
+        $name_table = preg_replace('/\s+/', '_', strtolower($name));
+
+        // URL-usable name
+        $name_url = preg_replace('/\s+/', '_', $name);
+
+        // Directory path
+        $name_dir = preg_replace('/\s+/', '/', $name);
+
+        // Valid PHP namespace
+        $namespace = preg_replace('/\s+/', '\\', $name);
 
         // TODO: Make this dynamic and generated (allow user field definitions)
         $fields = array(
@@ -51,14 +60,22 @@ class Controller extends Alloy\Module\ControllerAbstract
         }
 
         // Set tag variables
-        $generatorTagNames = compact('name', 'name_table', 'fields', 'field_string');
+        $generatorTagNames = compact('name', 'name_table', 'name_sanitized', 'name_url', 'name_dir', 'namespace', 'fields', 'field_string');
 
         echo PHP_EOL;
 
         // File paths
         $scaffoldPath = __DIR__ . '/scaffold/';
-        $modulePath = $kernel->config('app.path.root') .'/Module/' . $name . '/';
-        echo 'Module Path = ' . $modulePath;
+        $modulePath = $kernel->config('app.path.root') .'/Module/' . $name_dir . '/';
+        
+        // Output
+        echo 'Generator Module Info' . PHP_EOL;
+        echo '-----------------------------------------------------------------------' . PHP_EOL;
+        echo 'Name               = ' . $name . PHP_EOL;
+        echo 'Namespace          = ' . $namespace . PHP_EOL;
+        echo 'Datasource (Table) = ' . $name_table . PHP_EOL;
+        echo 'Path               = ' . $modulePath . PHP_EOL;
+        echo '-----------------------------------------------------------------------' . PHP_EOL;
         echo PHP_EOL;
 
         // Variables (in 'generator' namespace):
