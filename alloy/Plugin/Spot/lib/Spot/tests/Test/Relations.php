@@ -54,12 +54,12 @@ class Test_Relations extends PHPUnit_Framework_TestCase
 				'name' => 'Testy McTester',
 				'email' => 'test@test.com',
 				'body' => 'This is a test comment. Yay!',
-				'date_created' => $mapper->connection('Entity_Post_Comment')->dateTime()
+				'date_created' => new \DateTime()
 			));
 		try {
 			$commentSaved = $mapper->save($comment);
 			if(!$commentSaved) {
-				print_r($mapper->errors());
+				print_r($comment->errors());
 				$this->fail("Comment NOT saved");
 			}
 		} catch(Exception $e) {

@@ -601,18 +601,14 @@ class Mapper
         foreach($this->fields($entityName) as $field => $fieldAttrs) {
             if(isset($fieldAttrs['required']) && true === $fieldAttrs['required']) {
                 // Required field
-                if(empty($entity->$field)) {
-                    $this->error($field, "Required field '" . $field . "' was left blank");
+                if($this->isEmpty($entity->$field)) {
+                    $entity->error($field, "Required field '" . $field . "' was left blank");
                 }
             }
         }
     
-        // Check for errors
-        if($this->hasErrors()) {
-            return false;
-        } else {
-            return true;
-        }
+        // Return error result
+        return !$entity->hasErrors();
     }
     
     
@@ -624,18 +620,21 @@ class Mapper
      */
     public function isEmpty($value)
     {
-        return (empty($value) && 0 !== $value);
+        return empty($value) && !is_numeric($value);
     }
     
     
     /**
      * Check if any errors exist
      *
+     * @deprecated Please use Entity::hasErrors instead
      * @param string $field OPTIONAL field name
      * @return boolean
      */
     public function hasErrors($field = null)
     {
+        trigger_error('Error checks at the Mapper level have been deprecated in favor of checking error at the Entity level. Please use Entity::hasErrors instead. Mapper error methods will be completely removed in v1.0.', E_DEPRECATED);
+
         if(null !== $field) {
             return isset($this->_errors[$field]) ? count($this->_errors[$field]) : false;
         }
@@ -646,13 +645,16 @@ class Mapper
     /**
      * Get array of error messages
      *
+     * @deprecated Please use Entity::errors instead
      * @return array
      */
     public function errors($msgs = null)
     {
+        trigger_error('Error checks at the Mapper level have been deprecated in favor of checking error at the Entity level. Please use Entity::errors instead. Mapper error methods will be completely removed in v1.0.', E_DEPRECATED);
+
         // Return errors for given field
         if(is_string($msgs)) {
-            return isset($this->_errors[$field]) ? $this->_errors[$field] : array();
+            return isset($this->_errors[$msgs]) ? $this->_errors[$msgs] : array();
     
         // Set error messages from given array
         } elseif(is_array($msgs)) {
@@ -672,6 +674,9 @@ class Mapper
      */
     public function error($field, $msg)
     {
+        // Deprecation warning
+        trigger_error('Adding errors at the Mapper level have been deprecated in favor of adding errors at the Entity level. Please use Entity::error instead. Mapper error methods will be completely removed in v1.0.', E_DEPRECATED);
+
         if(is_array($msg)) {
             // Add array of error messages about field
             foreach($msg as $msgx) {

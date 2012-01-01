@@ -54,4 +54,30 @@ class Test_Entity extends PHPUnit_Framework_TestCase
         
         $this->assertEquals($testData, $data);
     }
+
+    public function testEntityErrors()
+    {
+        $post = new Entity_Post(array(
+            'title' => 'My Awesome Post',
+            'body' => '<p>Body</p>'
+        ));
+        $postErrors = array(
+            'title' => array('Title cannot contain the word awesome')
+        );
+
+        // Has NO errors
+        $this->assertTrue(!$post->hasErrors());
+
+        // Set errors
+        $post->errors($postErrors);
+
+        // Has errors
+        $this->assertTrue($post->hasErrors());
+
+        // Full error array
+        $this->assertEquals($postErrors, $post->errors());
+
+        // Errors for one key only
+        $this->assertEquals($postErrors['title'], $post->errors('title'));
+    }
 }

@@ -77,6 +77,6 @@ class Test_CRUD extends PHPUnit_Framework_TestCase
         $post = $mapper->first('Entity_Post', array('title' => "Test Post Modified"));
         $result = $mapper->delete($post);
 
-        $this->assertTrue($result);
+        $this->assertTrue((boolean) $result);
     }
 }

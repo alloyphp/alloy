@@ -17,6 +17,9 @@ abstract class Entity
     protected $_data = array();
     protected $_dataModified = array();
     
+    // Entity error messages (may be present after save attempt)
+    protected $_errors = array();
+
     
     /**
      * Constructor - allows setting of object properties with array on construct
@@ -62,10 +65,10 @@ abstract class Entity
     /**
      * Datasource options getter/setter
      */
-    public static function datasourceOptions($ds = null)
+    public static function datasourceOptions($dsOpts = null)
     {
-        if(null !== $ds) {
-            static::$_datasourceOptions = $ds;
+        if(null !== $dsOpts) {
+            static::$_datasourceOptions = $dsOpts;
             return $this;
         }
         return static::$_datasourceOptions;
@@ -155,6 +158,61 @@ abstract class Entity
     public function toArray()
     {
         return $this->data();
+    }
+
+
+    /**
+     * Check if any errors exist
+     *
+     * @param string $field OPTIONAL field name
+     * @return boolean
+     */
+    public function hasErrors($field = null)
+    {
+        if(null !== $field) {
+            return isset($this->_errors[$field]) ? count($this->_errors[$field]) > 0 : false;
+        }
+        return count($this->_errors) > 0;
+    }
+    
+    
+    /**
+     * Error message getter/setter
+     * 
+     * @param $field string|array String return errors with field key, array sets errors
+     * @return self|array|boolean Setter return self, getter returns array or boolean if key given and not found
+     */
+    public function errors($msgs = null)
+    {
+        // Return errors for given field
+        if(is_string($msgs)) {
+            return isset($this->_errors[$msgs]) ? $this->_errors[$msgs] : array();
+    
+        // Set error messages from given array
+        } elseif(is_array($msgs)) {
+            $this->_errors = $msgs;
+        }
+        return $this->_errors;
+    }
+    
+    
+    /**
+     * Add an error to error messages array
+     *
+     * @param string $field Field name that error message relates to
+     * @param mixed $msg Error message text - String or array of messages
+     */
+    public function error($field, $msg)
+    {
+        if(is_array($msg)) {
+            // Add array of error messages about field
+            foreach($msg as $msgx) {
+                $this->_errors[$field][] = $msgx;
+            }
+        } else {
+            // Add to error array
+            $this->_errors[$field][] = $msg;
+        }
     }
     
     
