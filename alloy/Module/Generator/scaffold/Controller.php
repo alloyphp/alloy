@@ -110,7 +110,7 @@ class Controller extends App\Module\ControllerAbstract
 
             // Set HTTP status and errors
             return $res->status(400)
-                ->errors($mapper->errors());
+                ->errors($item->errors());
         }
     }
 
