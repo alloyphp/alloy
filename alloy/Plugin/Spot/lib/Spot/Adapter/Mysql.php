@@ -357,7 +357,7 @@ class Mysql extends PDO_Abstract implements AdapterInterface
 		}
 
 		// Extra
-		$syntax .= "\n) ENGINE=" . $options['engine'] . " DEFAULT CHARSET=" . $options['charset'] . " COLLATE=" . $options['collate'] . ";";
+		$syntax .= ",\n ENGINE=" . $options['engine'] . " DEFAULT CHARSET=" . $options['charset'] . " COLLATE=" . $options['collate'] . ";";
 
 		return $syntax;
 	}

@@ -180,11 +180,13 @@ abstract class PDO_Abstract extends AdapterAbstract implements AdapterInterface
                 // Run SQL
                 $this->connection()->exec($sql);
             } catch(\PDOException $e) {
-                // Table does not exist
+                // Table does not exist - special Exception case
                 if($e->getCode() == "42S02") {
                     throw new \Spot\Exception_Datasource_Missing("Table '" . $table . "' does not exist");
                 }
-                return false;
+
+                // Re-throw exception
+                throw $e;
             }
         }
         return true;
@@ -248,7 +250,9 @@ abstract class PDO_Abstract extends AdapterAbstract implements AdapterInterface
             if($stmt) {
                 // Execute
                 if($stmt->execute($binds)) {
-                    $result = $this->connection()->lastInsertId();
+                    // Use 'id' if PK exists, otherwise returns true
+                    $id = $this->connection()->lastInsertId();
+                    $result = $id ? $id : true;
                 } else {
                     $result = false;
                 }
@@ -260,7 +264,9 @@ abstract class PDO_Abstract extends AdapterAbstract implements AdapterInterface
             if($e->getCode() == "42S02") {
                 throw new \Spot\Exception_Datasource_Missing("Table or datasource '" . $datasource . "' does not exist");
             }
-            return false;
+            
+            // Re-throw exception
+            throw $e;
         }
         
         return $result;
@@ -320,11 +326,13 @@ abstract class PDO_Abstract extends AdapterAbstract implements AdapterInterface
             } else {
                 $result = false;
             }
-        } catch(PDOException $e) {
+        } catch(\PDOException $e) {
             // Table does not exist
             if($e->getCode() == "42S02") {
                 throw new \Spot\Exception_Datasource_Missing("Table or datasource '" . $query->datasource . "' does not exist");
             }
+            
+            // Re-throw exception
             throw $e;
         }
         
@@ -368,11 +376,13 @@ abstract class PDO_Abstract extends AdapterAbstract implements AdapterInterface
             } else {
                 $result = false;
             }
-        } catch(PDOException $e) {
+        } catch(\PDOException $e) {
             // Table does not exist
             if($e->getCode() == "42S02") {
                 throw new \Spot\Exception_Datasource_Missing("Table or datasource '" . $query->datasource . "' does not exist");
             }
+            
+            // Re-throw exception
             throw $e;
         }
         
@@ -426,7 +436,9 @@ abstract class PDO_Abstract extends AdapterAbstract implements AdapterInterface
                 if($e->getCode() == "42S02") {
                     throw new \Spot\Exception_Datasource_Missing("Table or datasource '" . $datasource . "' does not exist");
                 }
-                return false;
+                
+                // Re-throw exception
+                throw $e;
             }
         } else {
             $result = false;
@@ -470,7 +482,9 @@ abstract class PDO_Abstract extends AdapterAbstract implements AdapterInterface
             if($e->getCode() == "42S02") {
                 throw new \Spot\Exception_Datasource_Missing("Table or datasource '" . $datasource . "' does not exist");
             }
-            return false;
+            
+            // Re-throw exception
+            throw $e;
         }
     }
     
@@ -492,7 +506,9 @@ abstract class PDO_Abstract extends AdapterAbstract implements AdapterInterface
             if($e->getCode() == "42S02") {
                 throw new \Spot\Exception_Datasource_Missing("Table or datasource '" . $datasource . "' does not exist");
             }
-            return false;
+            
+            // Re-throw exception
+            throw $e;
         }
     }
     
@@ -514,7 +530,9 @@ abstract class PDO_Abstract extends AdapterAbstract implements AdapterInterface
             if($e->getCode() == "42S02") {
                 throw new \Spot\Exception_Datasource_Missing("Table or datasource '" . $datasource . "' does not exist");
             }
-            return false;
+            
+            // Re-throw exception
+            throw $e;
         }
     }
     

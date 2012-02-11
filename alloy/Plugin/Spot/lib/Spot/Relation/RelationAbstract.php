@@ -38,7 +38,7 @@ abstract class RelationAbstract
 
         // Checks ...
         if(null === $this->_entityName) {
-            throw new \InvalidArgumentException("Relation description key 'entity' not set.");
+            throw new \InvalidArgumentException("Relation description key 'entity' must be set to an Entity class name.");
         }
     }
     
@@ -119,8 +119,8 @@ abstract class RelationAbstract
     public function __toString()
     {
         // Load related records for current row
-        $success = $this->findAllRelation();
-        return ($success) ? "1" : "0";
+        $res = $this->execute();
+        return ($res) ? "1" : "0";
     }
     
     
