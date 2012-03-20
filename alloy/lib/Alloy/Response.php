@@ -93,6 +93,9 @@ class Response
      */
     public function content($content = null)
     {
+        if(null === $content) {
+            return (string) $this->_content;
+        }
         $this->_content = $content;
     }
     public function appendContent($content)

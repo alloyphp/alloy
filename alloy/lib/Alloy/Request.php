@@ -397,6 +397,50 @@ class Request
 
         return $sm;
     }
+
+
+    /**
+     * Request URI, as seen by PHP
+     *
+     * @return string request URI from $_SERVER superglobal
+     */
+    public function uri()
+    {
+        return $this->server('REQUEST_URI');
+    }
+
+
+    /**
+     * Request scheme (http, https, or cli)
+     *
+     * @return string 'http', 'https', or 'cli'
+     */
+    public function scheme()
+    {
+        return ($this->isCli() ? 'cli' : ($this->isSecure() ? 'https' : 'http' ));
+    }
+
+
+    /**
+     * Request HTTP_HOST
+     *
+     * @return String request host from $_SERVER superglobal
+     */
+    public function host()
+    {
+        return $this->server('HTTP_HOST');
+    }
+
+
+    /**
+     * Request port
+     *
+     * @return integer request port
+     */
+    public function port()
+    {
+        return $this->server('SERVER_PORT');
+    }
     
     
     /**

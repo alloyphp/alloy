@@ -15,7 +15,7 @@ namespace Alloy;
 */
 class Kernel
 {
-    const VERSION = '0.7.5';
+    const VERSION = '0.8.0';
 
     protected static $self;
     
@@ -65,9 +65,21 @@ class Kernel
         // Save memory starting point
         static::$traceMemoryStart = memory_get_usage();
         static::$traceTimeStart = microtime(true);
+
         // Set last as current starting for good zero-base
         static::$traceMemoryLast = static::$traceMemoryStart;
         static::$traceTimeLast = static::$traceTimeStart;
+    }
+
+
+    /**
+     * Return current Alloy version string
+     *
+     * @return string Current Alloy version in dot-notation
+     */
+    public function version()
+    {
+        return static::VERSION;
     }
     
     
@@ -129,7 +141,7 @@ class Kernel
      */
     public function factory($className, array $params = array())
     {
-        $instanceHash = md5($className . var_export($params, true));
+        $instanceHash = md5($className . serialize($params));
         
         // Return already instantiated object instance if set
         if(isset($this->instances[$instanceHash])) {
@@ -213,15 +225,6 @@ class Kernel
     public function request()
     {
         return $this->factory(__NAMESPACE__ . '\Request');
-    }
-    
-    
-    /**
-     * Get HTTP REST client
-     */
-    public function client()
-    {
-        return $this->factory(__NAMESPACE__ . '\Client');
     }
     
     
@@ -397,9 +400,9 @@ class Kernel
      *
      * @param string $plugin Name of the plugin to get the instance for
      * @throws \InvalidArgumentException When plugin is not found by name
-     * @return object
+     * @return object Plugin object instance
      */
-    public function plugin($plugin, $init = true)
+    public function plugin($plugin, array $pluginConfig = array(), $init = true)
     {
         // Module plugin
         //   ex: 'Module\User'
@@ -415,17 +418,41 @@ class Kernel
         }
         
         // Ensure class exists / can be loaded
-        if(!class_exists($sPluginClass, (boolean)$init)) {
-            if ($init) {
-                throw new \InvalidArgumentException("Unable to load plugin '" . $sPluginClass . "'. Remove from app config or ensure plugin files exist in 'app' or 'alloy' load paths.");
+        if(!class_exists($sPluginClass, (boolean) $init)) {
+            if($init) {
+                throw new \InvalidArgumentException("Unable to load plugin '" . $sPluginClass . "'. Remove from app configuration file or ensure plugin files exist in 'app' or 'alloy' load paths.");
             }
 
             return false;
         }
         
-        // Instantiate module class
-        $sPluginObject = new $sPluginClass($this);
-        return $sPluginObject;
+        // Instantiate plugin class with params
+        return $this->factory($sPluginClass, array($this, $pluginConfig));
+    }
+
+
+    /**
+     * Load plugins if provided
+     *
+     * @param array $plugins Array of plugin names to load or key => config array format
+     *  Example:
+     *      array('plugin1', 'plugin2', 'plugin3' => array('foo' => 'bar', 'bar' => 'baz'), 'plugin4')
+     */
+    public function loadPlugins(array $plugins)
+    {
+        // Load plugins
+        if($plugins) {
+            foreach($plugins as $pluginName => $pluginConfig) {
+                // Config name supplied without config array - need to shift params
+                if(is_numeric($pluginName)) {
+                    $pluginName = $pluginConfig;
+                    $pluginConfig = array();
+                }
+
+                // Load plugin
+                $plugin = $this->plugin($pluginName, $pluginConfig);
+            }
+        }
     }
     
     
@@ -801,5 +828,14 @@ class Kernel
         } else {
             throw new \BadMethodCallException("Method '" . __CLASS__ . "::" . $method . "' not found or the command is not a valid callback type.");	
         }
+    }
+
+
+    /**
+     * Prevent PHP from trying to serialize cached object instances on Kernel
+     */
+    public function __sleep()
+    {
+        return array();
     }
 }
