@@ -20,7 +20,7 @@ abstract class PluginAbstract
     /**
      * Construct to set Kernel instance and config array passed
      */
-    public function __construct(Kernel $kernel, array $config)
+    public function __construct(Kernel $kernel, array $config = array())
     {
         $this->kernel = $kernel;
         $this->config = $config;
