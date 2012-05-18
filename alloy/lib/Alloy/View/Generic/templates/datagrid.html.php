@@ -3,7 +3,7 @@ $i = 0;
 $ci = 0;
 ?>
 
-<table cellpadding=="0" cellspacing="0" border="0" class="app_datagrid bordered-table zebra-striped">
+<table cellpadding=="0" cellspacing="0" border="0" class="app_datagrid table table-striped">
   <thead>
     <tr>
       <?php foreach($columns as $colName => $colOpts): $ci++; ?>

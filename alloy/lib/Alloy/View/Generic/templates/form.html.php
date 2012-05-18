@@ -21,9 +21,8 @@ $formMethodRest = ($formMethod == 'POST' && $method != 'POST') ? $method : false
       $fieldData = (isset($fieldOpts['default']) && is_scalar($fieldOpts['default'])) ? $fieldOpts['default'] : null;
     }
     ?>
-    <div class="clearfix app_form_field app_form_field_<?php echo strtolower($fieldOpts['type']); ?>">
+    <div class="app_form_field app_form_field_<?php echo strtolower($fieldOpts['type']); ?>">
       <label><?php echo $fieldLabel; ?></label>
-      <div class="input">
       <?php
       // Content that comes before the field
       echo isset($fieldOpts['before']) ? '<span class="help-block">' . $fieldOpts['before'] . '</span>' : '';
@@ -69,7 +68,6 @@ $formMethodRest = ($formMethod == 'POST' && $method != 'POST') ? $method : false
       echo isset($fieldOpts['after']) ? '<span class="help-inline">' . $fieldOpts['after'] . '</span>' : '';
       echo isset($fieldOpts['help']) ? '<span class="help-block">' . $fieldOpts['help'] . '</span>' : '';
       ?>
-      </div>
     </div>
   <?php endforeach; ?>
   <?php endif; ?>
@@ -92,9 +90,9 @@ $formMethodRest = ($formMethod == 'POST' && $method != 'POST') ? $method : false
       <?php endif; ?>
     </div>
     <?php if($_submit = $view->submit()): ?>
-    <div class="actions app_form_actions">
-      <button type="submit" class="btn primary"><?php echo $_submit; ?></button>
-      <!--<a href="#" class="app_action_cancel">Cancel</a>-->
+    <div class="form-actions">
+      <button type="submit" class="btn btn-primary"><?php echo $_submit; ?></button>
+      <a href="javascript:history.go(-1);" class="btn">Cancel</a>
     </div>
     <?php endif; ?>
   </div>

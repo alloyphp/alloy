@@ -23,7 +23,7 @@ if($pageTitle = $view->head()->title()) {
     <![endif]-->
 
     <!-- Styles -->
-    <?php echo $asset->stylesheet('bootstrap.css'); ?>
+    <?php echo $asset->stylesheet('bootstrap.min.css'); ?>
     <?php echo $asset->stylesheet('app.css'); ?>
 
     <!-- Fav and touch icons -->
@@ -36,19 +36,23 @@ if($pageTitle = $view->head()->title()) {
   <body>
 
     <div class="container">
-
-      <div class="content">
-        <div class="page-header">
-          <h1><?php echo $pageTitle; ?></h1>
+      <div class="row">
+        <div class="span12">
+          <div class="page-header">
+            <h1><?php echo $pageTitle; ?></h1>
+          </div>
         </div>
-        <div class="row">
-          <div class="span14">
-            
+      </div>
+
+      <div class="row">
+        <div class="span12">
+          <div class="content">
+          
             <?php
             // Display errors
             if($errors = $view->errors()):
             ?>
-            <div class="alert-message block-message error">
+            <div class="alert alert-error">
               <p><strong>Oops!</strong> There were some errors with your request:</p>
               <ul>
               <?php foreach($errors as $field => $fieldErrors): ?>
@@ -70,10 +74,12 @@ if($pageTitle = $view->head()->title()) {
       </div>
 
       <footer>
-        <p>&copy; Company 2011</p>
+        <p>&copy; Company <?php echo date('Y'); ?></p>
       </footer>
+    </div>
 
-    </div> <!-- /container -->
+    <!-- Javascripts -->
+    <?php echo $asset->script('bootstrap.min.js'); ?>
 
   </body>
 </html>

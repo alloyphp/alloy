@@ -1,6 +1,6 @@
 <?php $view->head()->title('Listing Items'); ?>
 
-<p><a href="<?php echo $kernel->url(array('module' => '{$generator.name_url}', 'action' => 'new'), 'module_action'); ?>" class="btn primary">New {$generator.name}</a></p>
+<p><a href="<?php echo $kernel->url(array('module' => '{$generator.name_url}', 'action' => 'new'), 'module_action'); ?>" class="btn btn-primary">New {$generator.name}</a></p>
 
 <?php
 // Use generic datagrid table
